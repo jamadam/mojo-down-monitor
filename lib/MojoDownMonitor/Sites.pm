@@ -10,43 +10,44 @@ use DBI;
 use base 'MojoDownMonitor::DB';
 use Data::Dumper;
     
-	sub init {
-		my ($self, $app) = @_;
+    sub init {
+        my ($self, $app) = @_;
         my $file = $app->home->rel_file('data/sites.sqlite');
-		my $dbh = DBI->connect("DBI:SQLite:dbname=$file",
-			undef, undef, {
-				AutoCommit => 1,
-				RaiseError => 1,
-				sqlite_unicode => 1,
-			}
-		) or die 'Connect to SQLite file '. $file. ' failed';
-		$self->dbh($dbh);
-		
-		$dbh->do(<<'EOF') or die $dbh->errstr;
+        my $dbh = DBI->connect("DBI:SQLite:dbname=$file",
+            undef, undef, {
+                AutoCommit => 1,
+                RaiseError => 1,
+                sqlite_unicode => 1,
+            }
+        ) or die 'Connect to SQLite file '. $file. ' failed';
+        
+        $self->dbh($dbh);
+        
+        $dbh->do(<<'EOF') or die $dbh->errstr;
 CREATE TABLE IF NOT EXISTS "sites" (
-	"id" INTEGER PRIMARY KEY  NOT NULL ,
-	"URI" VARCHAR NOT NULL ,
-	"Interval" INTEGER NOT NULL  DEFAULT (3600) ,
-	"Mail to" VARCHAR,
-	"Status must be" VARCHAR DEFAULT (200) ,
-	"MIME type must be" VARCHAR,
-	"Content must match" VARCHAR,
-	"HTTP header must match" VARCHAR,
-	"Site name" VARCHAR
+    "id" INTEGER PRIMARY KEY  NOT NULL ,
+    "URI" VARCHAR NOT NULL ,
+    "Interval" INTEGER NOT NULL  DEFAULT (3600) ,
+    "Mail to" VARCHAR,
+    "Status must be" VARCHAR DEFAULT (200) ,
+    "MIME type must be" VARCHAR,
+    "Content must match" VARCHAR,
+    "HTTP header must match" VARCHAR,
+    "Site name" VARCHAR
 );
 EOF
-		
-		$self->table('sites');
-		$self->set_test_data();
-	}
-	
-	sub set_test_data {
-		return <<'EOF';
+        
+        $self->table('sites');
+        $self->set_test_data();
+    }
+    
+    sub set_test_data {
+        return <<'EOF';
 INSERT INTO sites ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '10', 'http://example.com', '', 'text/html', '301', 'a@example.com,b@example.com', 'example.com');
 INSERT INTO sites ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '10', 'http://google.co.jp', '', '', '200', 'a@example.com,b@example.com', 'google');
 INSERT INTO sites ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '60', 'http://github.com', '', 'text/html; charset=utf-8', '200', 'a@example.com,b@example.com', 'github');
 EOF
-	}
+    }
 
 1;
 
