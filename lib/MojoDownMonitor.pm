@@ -83,7 +83,7 @@ our $VERSION = '0.01';
             'Site id'   => $site->{'id'},
             'OK'        => $err ? '0' : '1',
             'Error'     => $err,
-            'timestamp'    => $time,
+            'timestamp' => $time,
         };
     }
     
