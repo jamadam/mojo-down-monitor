@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <title>Welcome to the MojoX::Tusu Web Framework!</title>
+    <% include('/htmlhead.html') %>
+  </head>
+  <body>
+    <h1>
+      Skeleton Site
+    </h1>
+    <div id="main">
+      <h2>
+        Welcome to the MojoX::Tusu Web Framework!
+      </h2>
+      This is the document "public_html/index.html".
+      <br />Is the following line says 'Your function called?'
+      <br />That's a dynamically generated content with a tag \<% YC::your_function() %>.
+      <hr />
+      <% YC::your_function() %>
+      <hr />
+      <a href="./inquiry/">inquiry(skeleton)</a>
+    </div>
+    <div id="footer">
+      <% include('/copyright.html') %>
+    </div>
+  </body>
+</html>

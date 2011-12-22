@@ -1,0 +1,122 @@
+=head1 NAME
+
+Text::PSTemplate::Plugin::Developer - 
+
+=head1 DESCRIPTION
+
+This document describes how to develop Text::PSTemplate plugins.
+
+=head1 USAGE
+
+Plugins must be based on Text::PSTemplate::PluginBase, so the head of your
+plugins should be look like this.
+
+    package MyPlugin;
+    use strict;
+    use warnings;
+    use base qw(Text::PSTemplate::PluginBase);
+
+Plugins can contain functions which will be called from template files. 
+Template functions are internally called by template parser with arguments
+unshifted with plugin instance.
+
+The template functions look like this.
+
+    sub your_func : TplExport {
+        
+        my ($plugin, @your_args) = @_;
+        # ... do something
+        return $some_string;
+    }
+
+Template functions should returns string values. However returning undef is OK.
+Plugins automatically returns '' instead of undef.
+
+TplExport attribute also can take following options.
+
+=over
+
+=item chop
+
+This option specifies how parser treats line breaks after template tags.
+chop => 1 causes a line break reduced right after closing delimiter.
+
+    sub do_nothing : TplExport(chop => 1) {
+        return '';
+    }
+    
+    outside tag
+    <% do_nothing() %>
+    outside tag
+
+The result doesn't contain any empty lines.
+    
+    outside tag
+    outside tag
+
+chop option only affects when the function call is the main element of tag.
+
+    <% chop_func(&normal_func()) %> Chop occurs
+    <% nomal_func(&chop_func()) %> No chop occurs
+
+Also note that if any blocks specified, the target line break is the one
+following to block ending tag.
+
+    <% your_func()<<EOF %>
+        block content
+    <% EOF %> <--this is the target line break
+
+Reducing the line breaks inside the block is also possible. See also
+Text::PSTemplate::get_block() options.
+
+=back
+
+=head2 Getting Contextual something
+
+=head3 Getting mother template
+
+    sub your_func : TplExport {
+        
+        my $mother1 = Text::PSTemplate:get_current_parser;
+        my $mother2 = Text::PSTemplate:get_current_file_parser;
+    }
+
+With Text::PSTemplate::get_current_parser, you can get the parser instance witch
+is the one your_func is being parsed by.
+
+With Text::PSTemplate::get_current_file_parser, you can get the parser instance
+which is the one current file is being parsed by.
+
+=head3 Getting file name
+
+    sub your_func : TplExport {
+        
+        my $mother = Text::PSTemplate:get_current_filename;
+    }
+
+With Text::PSTemplate::get_current_filename, you can get current file name.
+
+=head3 Getting block data
+
+    sub your_func : TplExport {
+        
+        my $data1 = Text::PSTemplate:get_block(0);
+        my $data2 = Text::PSTemplate:get_block(1);
+        # ...
+    }
+
+With Text::PSTemplate:inline($index), you can get block data given in the
+template.
+
+=head1 AUTHOR
+
+Sugama Keita, E<lt>sugama@jamadam.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Sugama Keita.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

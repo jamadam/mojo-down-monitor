@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja"><!-- InstanceBegin template="/Templates/base.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+	<!-- InstanceBeginEditable name="doctitle" -->
+    <title>mojo-downlog</title>
+    <!-- InstanceEndEditable -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/yui-reset.css" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/yui-base.css" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/yui-fonts.css" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/common.css" />
+	<script type="text/javascript" src="/commons/js/jquery.1.7.1.js"></script>
+	<script type="text/javascript" src="/commons/js/jquery.currentTabManager.js"></script>
+	<script type="text/javascript" src="/commons/js/common.js"></script>
+	<!-- InstanceBeginEditable name="head" -->
+	<!-- InstanceEndEditable -->
+</head>
+<body>
+	<h1>
+		<a href="/">mojo-downlog</a>
+	</h1>
+	<div id="mainWrapper">
+        <div id="main">
+            <!-- InstanceBeginEditable name="main" -->
+			<div class="thirdMenu tabStyle">
+				<a href="/log.html?a=<%= param('a') %>">log</a>
+				<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
+			</div>
+			<div id="mainLevel2">
+				<h2>
+					Log
+				</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Site id</th>
+							<th>OK</th>
+							<th>Error</th>
+							<th>timestamp</th>
+						</tr>
+					</thead>
+					<% Log::loop(['Site id', 'OK', 'Error', 'timestamp'])<<EOF %>
+						<tbody>
+							<tr>
+								<td><a href="/site_edit.html?a=<%= $0 %>"><%= $0 %></a></td>
+								<td><%= $1 %></td>
+								<td><%= $2 %></td>
+								<td><%= $3 %></td>
+							</tr>
+						</tbody>
+					<% EOF %>
+				</table>
+			</div>
+			<!-- InstanceEndEditable -->
+        </div>
+    </div>
+	<div id="footer">
+		<div>
+			Copyright <a href="http://blog2.jamadam.com/">jamadam.com</a> alright reserved. | Powered by <a href="vid_options">MojoX::Tusu</a>
+		</div>
+	</div>
+    
+<div id="nowLoading" style="display:none">
+    	<div class="content">Now Loading..</div>
+        <div class="cancel">Cancel</div>
+    </div>
+</body>
+<!-- InstanceEnd --></html>

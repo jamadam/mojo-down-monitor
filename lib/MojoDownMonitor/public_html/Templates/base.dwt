@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+	<!-- TemplateBeginEditable name="doctitle" -->
+    <title>mojo-downlog</title>
+    <!-- TemplateEndEditable -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/yui-reset.css" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/yui-base.css" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/yui-fonts.css" />
+	<link type="text/css" rel="stylesheet" href="/commons/css/common.css" />
+	<script type="text/javascript" src="/commons/js/jquery.1.7.1.js"></script>
+	<script type="text/javascript" src="/commons/js/jquery.currentTabManager.js"></script>
+	<script type="text/javascript" src="/commons/js/common.js"></script>
+	<!-- TemplateBeginEditable name="head" -->
+	<!-- TemplateEndEditable -->
+</head>
+<body>
+	<h1>
+		<a href="/">mojo-downlog</a>
+	</h1>
+	<div id="mainWrapper">
+        <div id="main">
+            <!-- TemplateBeginEditable name="main" -->
+            <!-- TemplateEndEditable -->
+        </div>
+    </div>
+	<div id="footer">
+		<div>
+			Copyright <a href="http://blog2.jamadam.com/">jamadam.com</a> alright reserved. | Powered by <a href="vid_options">MojoX::Tusu</a>
+		</div>
+	</div>
+    
+<div id="nowLoading" style="display:none">
+    	<div class="content">Now Loading..</div>
+        <div class="cancel">Cancel</div>
+    </div>
+</body>
+</html>

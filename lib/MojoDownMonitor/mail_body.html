@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>mojo-downlog</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+		* {font-size:1em; font-weight:normal;}
+		h2 {border-left:5px solid #ccc; padding:3px 10px;}
+		th {text-align:right; padding:5px; background-color:#dde}
+		td {padding:5px;}
+	</style>
+</head>
+<body>
+<h2>
+	mojo-down-monitor detected an error!
+</h2>
+<table>
+	<tr>
+		<th>time</td>
+		<td><%= $log_timestamp %></td>
+	</tr>
+	<tr>
+		<th>URI</td>
+		<td><%= $site_URI %></td>
+	</tr>
+	<tr>
+		<th>Site name</th>
+		<td><%= $site_Site_name %></td>
+	</tr>
+	<tr>
+		<th>Error</th>
+		<td><%= $log_Error %></td>
+	</tr>
+</table>
+</body>
+</html>

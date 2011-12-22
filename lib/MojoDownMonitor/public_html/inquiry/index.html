@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <title>Welcome to the MojoX::Tusu Web Framework!</title>
+    <% include('/htmlhead.html') %>
+  </head>
+  <body>
+    <h1>
+      Demo
+    </h1>
+    <div id="main">
+      <h2>
+        Inquiry
+      </h2>
+      <div>
+        <form method="post" action="./">
+          <div>
+            <input type="text" name="name" value="" />
+            <input type="submit" value="send mail" />
+          </div>
+        </form>
+      </div>
+      <div>
+        <a href="../">Back to home</a>
+      </div>
+    </div>
+    <div id="footer">
+      <% include('/copyright.html') %>
+    </div>
+  </body>
+</html>
