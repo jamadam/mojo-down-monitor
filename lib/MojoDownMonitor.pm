@@ -51,7 +51,7 @@ our $VERSION = '0.01';
                         my @mailto = split(',', $site->{'Mail to'});
                         $self->sendmail(
                             \@mailto,
-                            '[ALERT] mojo-downlog detected an error',
+                            '[ALERT] mojo-down-monitor detected an error',
                             $self->mail_body($site, $new_log),
                         );
                     }
