@@ -7,7 +7,7 @@ use SQL::OOP::Dataset;
 use SQL::OOP::Insert;
 use SQL::OOP::Delete;
 use DBI;
-use base 'MojoDownMonitor::DB';
+use base 'MojoDownMonitor::SQLite';
 use Data::Dumper;
     
     sub init {
@@ -28,23 +28,30 @@ use Data::Dumper;
         
         $dbh->do(<<"EOF") or die $dbh->errstr;
 CREATE TABLE IF NOT EXISTS $table (
-    "host" VARCHAR PRIMARY KEY DEFAULT localhost,
+    "id" INTEGER PRIMARY KEY  NOT NULL ,
+    "host" VARCHAR DEFAULT localhost,
     "port" INTEGER NOT NULL DEFAULT 25,
     "ssl" BOOL NOT NULL DEFAULT 0,
-    "user" VARCHAR
+    "user" VARCHAR,
+    "password" VARCHAR
 );
 EOF
         
         $self->unemptify(<<"EOF");
-INSERT INTO $table (rowid) VALUES (NULL);
+INSERT INTO $table (id) VALUES (NULL);
 EOF
+    }
+    
+    sub server_info {
+        my $self = shift;
+        return $self->load_record(['host','port','ssl','user', 'password'], 1);
     }
 
 1;
 
 __END__
 
-=head1 NAME MojoDownMonitor::DB
+=head1 NAME MojoDownMonitor::SMTP
 
 =head1 SYNOPSIS
 

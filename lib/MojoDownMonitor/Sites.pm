@@ -7,7 +7,7 @@ use SQL::OOP::Dataset;
 use SQL::OOP::Insert;
 use SQL::OOP::Delete;
 use DBI;
-use base 'MojoDownMonitor::DB';
+use base 'MojoDownMonitor::SQLite';
 use Data::Dumper;
     
     sub init {
@@ -51,7 +51,7 @@ EOF
 
 __END__
 
-=head1 NAME MojoDownMonitor::DB
+=head1 NAME MojoDownMonitor::Sites
 
 =head1 SYNOPSIS
 

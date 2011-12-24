@@ -65,13 +65,8 @@ EOF
         return $out;
     }
     
-    ### ---
-    ### load record data into template
-    ### ---
-    sub load : TplExport {
-        
-        my ($self, $fields, $id, $assign_to) = @_;
-        
+    sub load_record {
+        my ($self, $fields, $id) = @_;
         my $select = SQL::OOP::Select->new();
         $select->set(
             $select->ARG_FIELDS => SQL::OOP::IDArray->new(@{$fields}),
@@ -81,11 +76,25 @@ EOF
         my $dbh = $self->dbh;
         my $sth = $dbh->prepare($select->to_string) or die $dbh->errstr;
         $sth->execute($select->bind) or die $sth->errstr;
-        my $data = $sth->fetchrow_hashref();
-        
+        return $sth->fetchrow_hashref();
+    }
+    
+    ### ---
+    ### load record data into template
+    ### ---
+    sub load : TplExport {
+        my ($self, $fields, $id, $assign_to) = @_;
         my $template = Text::PSTemplate::get_current_parser;
-        my $num = 0;
-        my @a = map {MojoDownMonitor::DB::Column->new($_, $data->{$_})} @{$fields};
+        my $data = $self->load_record($fields, $id);
+        my $table_structure = $self->get_table_structure;
+        my @a = map {
+            MojoDownMonitor::DB::Column->new(
+                $_,
+                $data->{$_},
+                $table_structure->{$_}->{type},
+                $table_structure->{$_}->{cid},
+            );
+        } @{$fields};
         $template->set_var($assign_to => \@a);
         return;
     }
@@ -95,8 +104,13 @@ use strict;
 use warnings;
 
     sub new {
-        my ($class, $key, $value) = @_;
-        return bless {key => $key, value => $value}, $class;
+        my ($class, $key, $value, $type, $cid) = @_;
+        return bless {
+            key     => $key,
+            value   => $value,
+            type    => $type,
+            cid     => $cid,
+        }, $class;
     }
     
     sub key {
@@ -105,6 +119,14 @@ use warnings;
     
     sub value {
         return $_[0]->{value} || '';
+    }
+    
+    sub type {
+        return $_[0]->{type} || '';
+    }
+    
+    sub cid {
+        return $_[0]->{cid} || '';
     }
 
 1;

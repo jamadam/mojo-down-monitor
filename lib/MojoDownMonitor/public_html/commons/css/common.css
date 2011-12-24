@@ -10,7 +10,8 @@ hr {
     height:1px;
     margin:10px 0;
 }
-input {
+input[type=text],
+input[type=password] {
     padding:2px 5px;
     min-width:300px;
 }
@@ -20,6 +21,11 @@ td {
 }
 th {
     background-color:#fee;
+}
+#mainMenu {
+	position:absolute;
+	right:10px;
+	top:10px;
 }
 #mainWrapper {
     position:relative;

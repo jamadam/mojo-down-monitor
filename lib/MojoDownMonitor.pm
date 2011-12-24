@@ -9,16 +9,8 @@ use Net::SMTP;
 use Net::SMTP::SSL;
 use MIME::Lite;
 use Authen::SASL;
-use Term::ReadPassword;
 use Time::Piece;
 our $VERSION = '0.01';
-
-    __PACKAGE__->attr('smtp_from', 'mojo-down-monitor@localhost');
-    __PACKAGE__->attr('smtp_host', 'localhost');
-    __PACKAGE__->attr('smtp_port', '25');
-    __PACKAGE__->attr('smtp_ssl', 0);
-    __PACKAGE__->attr('smtp_user', '');
-    __PACKAGE__->attr('smtp_pass', '');
 
     my $ua = Mojo::UserAgent->new;
     
@@ -44,16 +36,18 @@ our $VERSION = '0.01';
         {
             my $log = $tusu->get_component('MojoDownMonitor::Log');
             my $sth = $tusu->get_component('MojoDownMonitor::Sites')->dump();
+			my $smtp = $tusu->get_component('MojoDownMonitor::SMTP');
             while (my $site = $sth->fetchrow_hashref) {
                 my $loop_id;
                 my $cb = sub {
                     my $new_log = $self->check($site);
-                    if (0 and ! $new_log->{OK}) {
+                    if (! $new_log->{OK}) {
                         my @mailto = split(',', $site->{'Mail to'});
                         $self->sendmail(
                             \@mailto,
                             '[ALERT] mojo-down-monitor detected an error',
                             $self->mail_body($site, $new_log),
+							$smtp->server_info,
                         );
                     }
                     $log->store($new_log);
@@ -123,7 +117,7 @@ our $VERSION = '0.01';
     
     sub sendmail {
         
-        my ($self, $to, $subject, $body) = @_;
+        my ($self, $to, $subject, $body, $smtp_info) = @_;
         
         $subject = encode('MIME-Header', $subject);
         
@@ -146,29 +140,24 @@ our $VERSION = '0.01';
             Encoding => 'Quoted-printable',
         );
         
-        my $smtp_from = $self->smtp_from;
-        if ($smtp_from !~ /\@/) {
-            $smtp_from .= '@'. 'localhost';
-        }
+        my $from = 'mojo-down-monitor@'. $smtp_info->{host};
+		
         $to = (ref $to) ? $to : [$to];
         for my $addr (@$to) {
             my $smtp;
-            if ($self->smtp_ssl) {
-                $smtp = Net::SMTP::SSL->new($self->smtp_host, Port => $self->smtp_port);
+            if ($smtp_info->{ssl}) {
+                $smtp = Net::SMTP::SSL->new($smtp_info->{host}, Port => $smtp_info->{port});
             } else {
-                $smtp = Net::SMTP->new($self->smtp_host, Port => $self->smtp_port);
+                $smtp = Net::SMTP->new($smtp_info->{host}, Port => $smtp_info->{port});
             }
-            if ($self->smtp_user) {
-                if (! $self->smtp_pass) {
-                    $self->smtp_pass(read_password('SMTP password: '));
-                }
-                $smtp->auth($self->smtp_user, $self->smtp_pass);
+            if ($smtp_info->{user}) {
+                $smtp->auth($smtp_info->{user}, $smtp_info->{pass});
             }
             
-            $smtp->mail($smtp_from);
+            $smtp->mail($from);
             $smtp->to($addr);
             my $mime = MIME::Lite->new(
-                From    => encode('MIME-Header', $smtp_from),
+                From    => encode('MIME-Header', $from),
                 To      => encode('MIME-Header', $addr),
                 Subject => $subject,
                 Type     => 'multipart/mixed',
