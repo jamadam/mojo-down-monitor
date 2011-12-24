@@ -30,30 +30,30 @@
 	<div id="mainWrapper">
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
+			<% Sites::load([
+				'id',
+				'Site name',
+				'URI',
+				'Interval',
+				'Mail to',
+				'Status must be',
+				'MIME type must be',
+				'Content must match',
+				'HTTP header must match',
+			], &param('a'), 'site') %>
+			<h2>
+				<%= $site->value('Site name') %>
+			</h2>
 			<div class="tabStyleMenu">
 				<a href="/site_log.html?a=<%= param('a') %>">log</a>
 				<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
 			</div>
 			<div id="mainLevel2">
-				<h2>
-					Site List
-				</h2>
 				<table>
-					<% Sites::load([
-						'id',
-						'Site name',
-						'URI',
-						'Interval',
-						'Mail to',
-						'Status must be',
-						'MIME type must be',
-						'Content must match',
-						'HTTP header must match',
-					], &param('a'), 'site') %>
-					<% each($site, 'column')<<EOF %>
+					<% $site->each('colname' =>  'column')<<EOF %>
 						<tr>
 							<th>
-								<%= $column->key %>
+								<%= $colname %>
 							</th>
 							<td>
 								<% include('./form_parts/'. lc $column->type. '.html', {

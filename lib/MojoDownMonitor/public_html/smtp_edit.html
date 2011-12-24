@@ -31,25 +31,25 @@
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
 			<div id="mainLevel2">
+				<% SMTP::load([
+					'id',
+					'host',
+					'port',
+					'ssl',
+					'user',
+					'password',
+				], 1, 'smtp') %>
 				<h2>
 					Edit SMTP
 				</h2>
 				<table>
-					<% SMTP::load([
-						'id',
-						'host',
-						'port',
-						'ssl',
-						'user',
-						'password',
-					], 1, 'smtp') %>
-					<% each($smtp, 'column')<<EOF %>
+					<% $smtp->each('colname' => 'column')<<EOF %>
 						<tr>
 							<th>
-								<%= $column->key %>
+								<%= $colname %>
 							</th>
 							<td>
-								<% if_equals($column->key, 'password')<<THEN,ELSE %>
+								<% if_equals($colname, 'password')<<THEN,ELSE %>
 									<% include('./form_parts/password.html', {
 										val => $column->value,
 										cid => $column->cid,

@@ -37,11 +37,12 @@ EOF
     }
     
     sub dump {
-        my ($self) = @_;
+        my ($self, $where, $fields) = @_;
         my $select = SQL::OOP::Select->new;
         $select->set(
-            $select->ARG_FIELDS => '*',
+            $select->ARG_FIELDS => $fields ? SQL::OOP::IDArray->new($fields) : '*',
             $select->ARG_FROM   => $self->table,
+            $select->ARG_WHERE  => $where,
         );
         my $dbh = $self->dbh;
         my $sth = $dbh->prepare($select->to_string) or die $dbh->errstr;
@@ -50,9 +51,9 @@ EOF
     }
     
     sub loop : TplExport {
-        my ($self, $fields) = @_;
+        my ($self, $fields, $where) = @_;
         my $template = Text::PSTemplate::get_block(0);
-        my $sth = $self->dump;
+        my $sth = $self->dump($where, $fields);
         my $out = '';
         while (my $result = $sth->fetchrow_hashref) {
             my $tpl = Text::PSTemplate->new();
@@ -76,7 +77,9 @@ EOF
         my $dbh = $self->dbh;
         my $sth = $dbh->prepare($select->to_string) or die $dbh->errstr;
         $sth->execute($select->bind) or die $sth->errstr;
-        return $sth->fetchrow_hashref();
+        my $hash = $sth->fetchrow_hashref();
+        my $table_structure = $self->get_table_structure;
+        return MojoDownMonitor::DB::Record->new($hash, $table_structure);
     }
     
     ### ---
@@ -85,18 +88,41 @@ EOF
     sub load : TplExport {
         my ($self, $fields, $id, $assign_to) = @_;
         my $template = Text::PSTemplate::get_current_parser;
-        my $data = $self->load_record($fields, $id);
-        my $table_structure = $self->get_table_structure;
-        my @a = map {
-            MojoDownMonitor::DB::Column->new(
-                $_,
-                $data->{$_},
-                $table_structure->{$_}->{type},
-                $table_structure->{$_}->{cid},
-            );
-        } @{$fields};
-        $template->set_var($assign_to => \@a);
+        $template->set_var($assign_to => $self->load_record($fields, $id));
         return;
+    }
+
+package MojoDownMonitor::DB::Record;
+use strict;
+use warnings;
+
+    sub new {
+        my ($class, $hash, $table_structure) = @_;
+        my $self;
+        for my $key (keys %$hash) {
+            $self->{$key} = MojoDownMonitor::DB::Column->new(
+                $key,
+                $hash->{$key},
+                $table_structure->{$key}->{type},
+                $table_structure->{$key}->{cid},
+            );
+        }
+        return bless $self, $class;
+    }
+    
+    sub retrieve {
+        my ($self, $name) = @_;
+        return $self->{$name};
+    }
+    
+    sub value {
+        my ($self, $name) = @_;
+        return $self->{$name}->value;
+    }
+    
+    sub each {
+        my ($self, $assign1, $assign2) = @_;
+        Text::PSTemplate::Plugin::Control->each({%$self}, $assign1, $assign2);
     }
 
 package MojoDownMonitor::DB::Column;

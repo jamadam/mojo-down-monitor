@@ -63,6 +63,12 @@ EOF
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
         $sth->execute($sql->bind) or die $sth->errstr;
     }
+    
+    sub loop : TplExport {
+        my ($self, $fields, $id) = @_;
+        my $where = SQL::OOP::Where->cmp('=', 'Site id', $id);
+        $self->SUPER::loop($fields, $where);
+    }
 
 1;
 

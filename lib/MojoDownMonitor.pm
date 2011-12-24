@@ -140,18 +140,18 @@ our $VERSION = '0.01';
             Encoding => 'Quoted-printable',
         );
         
-        my $from = 'mojo-down-monitor@'. $smtp_info->{host};
+        my $from = 'mojo-down-monitor@'. $smtp_info->value('host');
 		
         $to = (ref $to) ? $to : [$to];
         for my $addr (@$to) {
             my $smtp;
-            if ($smtp_info->{ssl}) {
-                $smtp = Net::SMTP::SSL->new($smtp_info->{host}, Port => $smtp_info->{port});
+            if ($smtp_info->value('ssl')) {
+                $smtp = Net::SMTP::SSL->new($smtp_info->value('host'), Port => $smtp_info->value('port'));
             } else {
-                $smtp = Net::SMTP->new($smtp_info->{host}, Port => $smtp_info->{port});
+                $smtp = Net::SMTP->new($smtp_info->value('host'), Port => $smtp_info->value('port'));
             }
-            if ($smtp_info->{user}) {
-                $smtp->auth($smtp_info->{user}, $smtp_info->{pass});
+            if ($smtp_info->value('user')) {
+                $smtp->auth($smtp_info->value('user'), $smtp_info->value('pass'));
             }
             
             $smtp->mail($from);
