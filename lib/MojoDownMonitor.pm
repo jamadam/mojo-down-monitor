@@ -14,7 +14,7 @@ use Time::Piece;
 our $VERSION = '0.01';
 
     __PACKAGE__->attr('smtp_from', 'mojo-down-monitor@localhost');
-    __PACKAGE__->attr('smtp_server', 'localhost');
+    __PACKAGE__->attr('smtp_host', 'localhost');
     __PACKAGE__->attr('smtp_port', '25');
     __PACKAGE__->attr('smtp_ssl', 0);
     __PACKAGE__->attr('smtp_user', '');
@@ -29,8 +29,9 @@ our $VERSION = '0.01';
         $self->home->parse(File::Spec->catdir(dirname(__FILE__), 'MojoDownMonitor'));
         my $tusu = $self->plugin(tusu => {
             components => {
-                'MojoDownMonitor::Sites' => 'Sites',
-                'MojoDownMonitor::Log'   => 'Log',
+                'MojoDownMonitor::Sites'	=> 'Sites',
+                'MojoDownMonitor::Log'		=> 'Log',
+                'MojoDownMonitor::SMTP'		=> 'SMTP',
             },
             document_root => $self->home->rel_dir('public_html'),
         });
@@ -153,9 +154,9 @@ our $VERSION = '0.01';
         for my $addr (@$to) {
             my $smtp;
             if ($self->smtp_ssl) {
-                $smtp = Net::SMTP::SSL->new($self->smtp_server, Port => $self->smtp_port);
+                $smtp = Net::SMTP::SSL->new($self->smtp_host, Port => $self->smtp_port);
             } else {
-                $smtp = Net::SMTP->new($self->smtp_server, Port => $self->smtp_port);
+                $smtp = Net::SMTP->new($self->smtp_host, Port => $self->smtp_port);
             }
             if ($self->smtp_user) {
                 if (! $self->smtp_pass) {

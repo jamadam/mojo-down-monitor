@@ -13,6 +13,18 @@ use Data::Dumper;
     __PACKAGE__->attr('table');
     __PACKAGE__->attr('dbh');
     
+    sub unemptify {
+        my ($self, $sql) = @_;
+        my $table = $self->table;
+        my $count = $self->dbh->selectall_arrayref(<<"EOF")->[0]->[0];
+SELECT count(*) FROM $table;
+EOF
+        
+        if (! $count) {
+            $self->dbh->do($sql);
+        }
+    }
+    
     sub store {
         my ($self, $record) = @_;
         my $sql = SQL::OOP::Insert->new;

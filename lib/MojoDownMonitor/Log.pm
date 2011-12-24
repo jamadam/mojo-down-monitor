@@ -17,9 +17,10 @@ use Data::Dumper;
         my $file = $app->home->rel_file('data/sites.sqlite');
         my $dbh = DBI->connect("DBI:SQLite:dbname=$file",
             undef, undef, {
-                AutoCommit => 1,
-                RaiseError => 1,
-                sqlite_unicode => 1,
+                AutoCommit      => 1,
+                RaiseError      => 1,
+                sqlite_unicode  => 1,
+                sqlite_allow_multiple_statements => 1,
             }
         ) or die 'Connect to SQLite file '. $file. ' failed';
         
