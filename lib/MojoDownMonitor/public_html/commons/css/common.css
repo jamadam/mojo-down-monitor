@@ -69,12 +69,12 @@ th {
 		border-radius:5px;
 		font-size:10px;
 	}
-.thirdMenu.tabStyle {
+.tabStyleMenu {
   margin-bottom:1em;
   border-bottom:2px solid #555;
   font-size:13px;
 }
-  .thirdMenu.tabStyle a {
+  .tabStyleMenu a {
     float:left;
     padding:5px 10px;
     display: inline-block;
@@ -93,13 +93,13 @@ th {
     border-radius: 5px 5px 0 0;
     border-bottom:1px solid #fff;
   }
-    .thirdMenu.tabStyle a:hover {
+    .tabStyleMenu a:hover {
       text-decoration: none !important;
       background: #f47c20;
     }
-    .thirdMenu.tabStyle a.enabled {
+    .tabStyleMenu a.enabled {
       background-color:#444;
       border-bottom:1px solid #444;
     }
-  .thirdMenu.tabStyle:after {clear: both; content:'.'; display:block; visibility:hidden; height:0;}
-  .thirdMenu.tabStyle {display: inline-block; height: 1%; display: block;}
+  .tabStyleMenu:after {clear: both; content:'.'; display:block; visibility:hidden; height:0;}
+  .tabStyleMenu {display: inline-block; height: 1%; display: block;}
