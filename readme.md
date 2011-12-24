@@ -1,4 +1,4 @@
-MojoDownMonitor 0.34 beta
+MojoDownMonitor 0.01 ALPHA
 ---------------
 
 ## DESCRIPTION
