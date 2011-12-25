@@ -1,1 +1,5 @@
-<input type="checkbox" value="<% $val %>" id="<% $cid %>" />
+<% if($val)<<THEN,ELSE %>
+<input type="checkbox" id="<% $cid %>" selected="selected" />
+<% THEN %>
+<input type="checkbox" id="<% $cid %>" />
+<% ELSE %>
