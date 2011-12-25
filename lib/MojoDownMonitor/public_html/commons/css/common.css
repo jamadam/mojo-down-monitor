@@ -27,15 +27,30 @@ th {
 	right:10px;
 	top:10px;
 }
+	#mainMenu a {
+		padding:3px 5px;
+		background-color:#55a;
+		color:#fff;
+		border-radius:3px;
+		text-decoration:none;
+	}
 #mainWrapper {
     position:relative;
+	margin:0 30px;
 }
     #main {
+		width:100%;
         position:relative;
-        margin-left:40px;
         margin-bottom:20px;
-        padding:0 20px 20px;
+        padding:0 0 20px;
     }
+		#main h2 {
+			background-color:#48a;
+			color:#fff;
+			padding:5px 12px;
+			border-radius:8px;
+			box-shadow:0 0 5px rgba(0,0,0,0.3) inset;
+		}
         #main p,
         #main div {
             margin-bottom:1em;
@@ -43,9 +58,20 @@ th {
         #main .goDetail:hover {
             background-color:#fae;
         }
+		#mainLevel2 {
+			box-shadow:0 0 10px rgba(0,0,0,0.3) inset;
+			padding: 25px;
+			border-radius:20px;
+		}
 #footer {
     padding:20px;
+	text-align:center;
+	background-color:#333;
+	color:#fff;
 }
+	#footer a {
+		color:#fff;
+	}
 #nowLoading {
 	position:fixed;
 	top:130px;

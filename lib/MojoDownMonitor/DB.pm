@@ -29,7 +29,7 @@ EOF
         my ($self, $record) = @_;
         my $sql = SQL::OOP::Insert->new;
         $sql->set(
-            $sql->ARG_TABLE     => SQL::OOP::ID->new('log'),
+            $sql->ARG_TABLE     => $self->table,
             $sql->ARG_DATASET   => SQL::OOP::Dataset->new($record),
         );
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
