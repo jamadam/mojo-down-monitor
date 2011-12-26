@@ -11,7 +11,7 @@ use MIME::Lite;
 use Authen::SASL;
 use Time::Piece;
 our $VERSION = '0.01';
-
+	
     my $ua = Mojo::UserAgent->new;
     
     sub startup {
@@ -32,6 +32,12 @@ our $VERSION = '0.01';
         my $r = $self->routes;
         $r->route('/update')->via('get')->to(cb => sub {
         });
+		$r->route('/smtp_edit_api.html')->via('post')->to(cb => sub {
+			$tusu->bootstrap($_[0], 'MojoDownMonitor::SMTP', 'post');
+		});
+		$r->route('/site_edit_api.html')->via('post')->to(cb => sub {
+			$tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
+		});
         
         {
             my $log = $tusu->get_component('MojoDownMonitor::Log');

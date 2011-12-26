@@ -31,25 +31,45 @@
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
 			<div id="mainLevel2">
-				<% SMTP::load([
+				<% SMTP::load(1, 'smtp', [
 					'id',
 					'host',
 					'port',
 					'ssl',
 					'user',
 					'password',
-				], 1, 'smtp') %>
+				]) %>
 				<h2>
 					Edit SMTP
 				</h2>
+				
+				<% SMTP::put_user_err('formErrorContainer') %>
+				
+				<form enctype="multipart/form-data" method="post" action="./smtp_edit_api.html">
+				<div>
+					<input type="hidden" name="nextpage" value="/smtp_edit.html" />
+					<input type="hidden" name="errorpage" value="/smtp_edit.html" />
+					<input type="hidden" name="mode" value="update" />
+					<input type="hidden" name="where" value='{"id":"1"}' />
+					<input type="hidden" name="columns" value="host,port,ssl,user,password" />
+				</div>
 				<table>
-					<% $smtp->each('colname' => 'column')<<EOF %>
+					<tfoot>
+						<tr>
+							<td></td>
+							<td>
+								<input type="submit" value="edit" />
+							</td>
+						</tr>
+					</tfoot>
+					<tbody>
+					<% $smtp->each('column')<<EOF %>
 						<tr>
 							<th>
-								<%= $colname %>
+								<%= $column->key %>
 							</th>
 							<td>
-								<% if_equals($colname, 'password')<<THEN,ELSE %>
+								<% if_equals($column->key, 'password')<<THEN,ELSE %>
 									<% include('./form_parts/password.html', {
 										val => $column->value,
 										cid => $column->cid,
@@ -63,7 +83,9 @@
 							</td>
 						</tr>
 					<% EOF %>
+					</tbody>
 				</table>
+				</form>
 			</div>
 			<!-- InstanceEndEditable -->
         </div>

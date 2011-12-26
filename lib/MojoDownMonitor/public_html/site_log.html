@@ -30,7 +30,7 @@
 	<div id="mainWrapper">
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
-			<% Sites::load([
+			<% Sites::load(&param('a'), 'site', [
 				'id',
 				'Site name',
 				'URI',
@@ -40,7 +40,7 @@
 				'MIME type must be',
 				'Content must match',
 				'HTTP header must match',
-			], &param('a'), 'site') %>
+			]) %>
 			<h2>
 				<%= $site->value('Site name') %>
 			</h2>

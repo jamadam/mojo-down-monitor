@@ -22,6 +22,9 @@ td {
 th {
     background-color:#fee;
 }
+tfoot td {
+	border:0;
+}
 tbody th {
 	text-align:left;
 }
@@ -133,3 +136,9 @@ tbody th {
     }
   .tabStyleMenu:after {clear: both; content:'.'; display:block; visibility:hidden; height:0;}
   .tabStyleMenu {display: inline-block; height: 1%; display: block;}
+#formErrorContainer {
+	background-color:#fcc;
+	color:#f00;
+	margin:0;
+	padding:10px 20px;
+}

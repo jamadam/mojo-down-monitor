@@ -9,6 +9,7 @@ use SQL::OOP::Delete;
 use DBI;
 use base 'MojoDownMonitor::SQLite';
 use Data::Dumper;
+use feature q/:5.10/;
     
     sub init {
         my ($self, $app) = @_;
@@ -45,6 +46,92 @@ INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must m
 INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '10', 'http://google.co.jp', '', '', '200', 'a\@example.com,b\@example.com', 'google');
 INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '60', 'http://github.com', '', 'text/html; charset=utf-8', '200', 'a\@example.com,b\@example.com', 'github');
 EOF
+    }
+    
+    sub validate_form {
+        my ($self) = @_;
+        my $c = $self->controller;
+        #$self->user_err->stack('un error');
+    }
+    
+    sub post {
+        my ($self) = @_;
+        my $c = $self->controller;
+        
+        $self->validate_form;
+        
+        if ($self->user_err->count) {
+            my $template = $c->req->body_params->param('errorpage');
+            warn $template;
+            $c->render(handler => 'tusu', template => $template);
+        } else {
+            given ($c->req->body_params->param('mode')) {
+                when ('update') {$self->update}
+                when ('create') {$self->create}
+                when ('delete') {$self->delete}
+            }
+        }
+        return;
+    }
+	
+	### ---
+	### generate dataset for db insert or update with form data
+	### ---
+	sub generate_dataset {
+		my $self = shift;
+		my $data = SQL::OOP::Dataset->new();
+        my $tabe_structure = $self->get_table_structure;
+		my @columns = split /,/, $self->controller->param('columns');
+		if (! scalar @columns) {
+			return;
+		}
+		COLUMN : for my $cname (@columns) {
+			my $id = 'cid-'. $tabe_structure->{$cname}->{cid};
+			my $value = $self->controller->param($id);
+            given (lc $tabe_structure->{$cname}->{type}) {
+                when ('bool') {
+                    $value ||= 0;
+                }
+                when (['integer', 'real']) {
+                    if (defined $value && $value eq '') {
+                        next COLUMN;
+                    }
+                }
+            }
+			$data->append($cname => $value);
+		}
+		return $data;
+	}
+    
+    sub create {
+        my ($self) = @_;
+        my $c = $self->controller;
+        my $dataset = $self->generate_dataset;
+        my $res = $self->SUPER::create($dataset);
+        $c->redirect_to($c->req->body_params->param('nextpage'));
+        return;
+    }
+    
+    sub update {
+        my ($self) = @_;
+        my $c = $self->controller;
+        my $dataset = $self->generate_dataset;
+        my $where_seed = $self->controller->param('where');
+        my $json_parser = Mojo::JSON->new;
+        my $where = SQL::OOP::Where->and_hash($json_parser->decode($where_seed));
+        my $res = $self->SUPER::update($dataset, $where);
+        $c->redirect_to($c->req->body_params->param('nextpage'));
+        return;
+    }
+    
+    sub delete {
+        my ($self) = @_;
+        my $c = $self->controller;
+        my $where_seed = $self->controller->param('where');
+        my $where = SQL::OOP::Where->and_hash(Mojo::JSON->decode($where_seed));
+        my $res = $self->SUPER::delete($c, $where);
+        $c->redirect_to($c->req->body_params->param('nextpage'));
+        return;
     }
 
 1;
