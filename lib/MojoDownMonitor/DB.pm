@@ -93,54 +93,54 @@ EOF
         $template->set_var($assign_to => $self->load_record($id, $fields));
         return;
     }
-	
-	### ---
-	### create
-	### ---
-	sub create {
-		my ($self, $dataset) = @_;
-		my $table = $self->table;
-		my $sql = SQL::OOP::Insert->new();
-		$sql->set(
-			$sql->ARG_TABLE		=> SQL::OOP::ID->new($table),
-			$sql->ARG_DATASET	=> $dataset,
-		);
-		my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
-		$sth->execute($sql->bind) or die $sth->errstr;
-	}
-	
-	### ---
-	### update
-	### ---
-	sub update {
-		my ($self, $dataset, $where) = @_;
-		my $table = $self->table;
-		my $sql = SQL::OOP::Update->new();
-		$sql->set(
-			$sql->ARG_TABLE		=> SQL::OOP::ID->new($table),
-			$sql->ARG_WHERE		=> $where,
-			$sql->ARG_DATASET	=> $dataset,
-		);
-		my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
-		$sth->execute($sql->bind) or die $sth->errstr;
-	}
-	
-	### ---
-	### delete
-	### ---
-	sub delete {
-		my ($self, $where) = @_;
-		my $table = $self->table;
-		if ($where) {
-			my $sql = SQL::OOP::Delete->new();
-			$sql->set(
-				$sql->ARG_TABLE	=> SQL::OOP::ID->new($table),
-				$sql->ARG_WHERE	=> $where,
-			);
-			my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
-			$sth->execute($sql->bind) or die $sth->errstr;
-		}
-	}
+    
+    ### ---
+    ### create
+    ### ---
+    sub create {
+        my ($self, $dataset) = @_;
+        my $table = $self->table;
+        my $sql = SQL::OOP::Insert->new();
+        $sql->set(
+            $sql->ARG_TABLE     => SQL::OOP::ID->new($table),
+            $sql->ARG_DATASET   => $dataset,
+        );
+        my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
+        $sth->execute($sql->bind) or die $sth->errstr;
+    }
+    
+    ### ---
+    ### update
+    ### ---
+    sub update {
+        my ($self, $dataset, $where) = @_;
+        my $table = $self->table;
+        my $sql = SQL::OOP::Update->new();
+        $sql->set(
+            $sql->ARG_TABLE     => SQL::OOP::ID->new($table),
+            $sql->ARG_WHERE     => $where,
+            $sql->ARG_DATASET   => $dataset,
+        );
+        my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
+        $sth->execute($sql->bind) or die $sth->errstr;
+    }
+    
+    ### ---
+    ### delete
+    ### ---
+    sub delete {
+        my ($self, $where) = @_;
+        my $table = $self->table;
+        if ($where) {
+            my $sql = SQL::OOP::Delete->new();
+            $sql->set(
+                $sql->ARG_TABLE    => SQL::OOP::ID->new($table),
+                $sql->ARG_WHERE    => $where,
+            );
+            my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
+            $sth->execute($sql->bind) or die $sth->errstr;
+        }
+    }
     
     sub put_user_err : TplExport {
         my ($self, $id) = @_;

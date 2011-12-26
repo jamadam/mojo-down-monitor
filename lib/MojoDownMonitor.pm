@@ -11,7 +11,7 @@ use MIME::Lite;
 use Authen::SASL;
 use Time::Piece;
 our $VERSION = '0.01';
-	
+    
     my $ua = Mojo::UserAgent->new;
     
     sub startup {
@@ -21,45 +21,53 @@ our $VERSION = '0.01';
         $self->home->parse(File::Spec->catdir(dirname(__FILE__), 'MojoDownMonitor'));
         my $tusu = $self->plugin(tusu => {
             components => {
-                'MojoDownMonitor::Sites'	=> 'Sites',
-                'MojoDownMonitor::Log'		=> 'Log',
-                'MojoDownMonitor::SMTP'		=> 'SMTP',
+                'MojoDownMonitor::Sites'    => 'Sites',
+                'MojoDownMonitor::Log'      => 'Log',
+                'MojoDownMonitor::SMTP'     => 'SMTP',
             },
             document_root => $self->home->rel_dir('public_html'),
         });
         
         # special route
         my $r = $self->routes;
-        $r->route('/update')->via('get')->to(cb => sub {
+        $r->route('/smtp_edit_api.html')->via('post')->to(cb => sub {
+            $tusu->bootstrap($_[0], 'MojoDownMonitor::SMTP', 'post');
         });
-		$r->route('/smtp_edit_api.html')->via('post')->to(cb => sub {
-			$tusu->bootstrap($_[0], 'MojoDownMonitor::SMTP', 'post');
-		});
-		$r->route('/site_edit_api.html')->via('post')->to(cb => sub {
-			$tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
-		});
+        $r->route('/site_edit_api.html')->via('post')->to(cb => sub {
+            $tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
+            $self->set_cron($tusu);
+        });
         
-        {
-            my $log = $tusu->get_component('MojoDownMonitor::Log');
-            my $sth = $tusu->get_component('MojoDownMonitor::Sites')->dump();
-			my $smtp = $tusu->get_component('MojoDownMonitor::SMTP');
-            while (my $site = $sth->fetchrow_hashref) {
-                my $loop_id;
-                my $cb = sub {
-                    my $new_log = $self->check($site);
-                    if (! $new_log->{OK}) {
-                        my @mailto = split(',', $site->{'Mail to'});
-                        $self->sendmail(
-                            \@mailto,
-                            '[ALERT] mojo-down-monitor detected an error',
-                            $self->mail_body($site, $new_log),
-							$smtp->server_info,
-                        );
-                    }
-                    $log->store($new_log);
-                };
-                $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => $cb);
-            }
+        $self->set_cron($tusu);
+    }
+    
+    my @loop_ids;
+    
+    sub set_cron {
+        my ($self, $tusu) = @_;
+        
+        while (my $id = shift @loop_ids) {
+            Mojo::IOLoop->drop($id);
+        }
+        
+        my $log = $tusu->get_component('MojoDownMonitor::Log');
+        my $sth = $tusu->get_component('MojoDownMonitor::Sites')->dump();
+        my $smtp = $tusu->get_component('MojoDownMonitor::SMTP');
+        while (my $site = $sth->fetchrow_hashref) {
+            my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
+                my $new_log = $self->check($site);
+                if (! $new_log->{OK}) {
+                    my @mailto = split(',', $site->{'Mail to'});
+                    $self->sendmail(
+                        \@mailto,
+                        '[ALERT] mojo-down-monitor detected an error',
+                        $self->mail_body($site, $new_log),
+                        $smtp->server_info,
+                    );
+                }
+                $log->store($new_log);
+            });
+            push(@loop_ids, $loop_id);
         }
     }
     
@@ -147,7 +155,7 @@ our $VERSION = '0.01';
         );
         
         my $from = 'mojo-down-monitor@'. $smtp_info->value('host');
-		
+        
         $to = (ref $to) ? $to : [$to];
         for my $addr (@$to) {
             my $smtp;

@@ -4,73 +4,73 @@ use warnings;
 use utf8;
 use base 'MojoDownMonitor::DB';
 
-	### ---
-	### get table information
-	### ---
-	sub get_table_structure {
-	
-		my ($self) = @_;
+    ### ---
+    ### get table information
+    ### ---
+    sub get_table_structure {
+    
+        my ($self) = @_;
         my $table = $self->table;
-		my $sql = qq{PRAGMA table_info ("$table")};
-		my $sth = $self->dbh->prepare($sql) or die $DBI::errstr;
-		my %ret = ();
+        my $sql = qq{PRAGMA table_info ("$table")};
+        my $sth = $self->dbh->prepare($sql) or die $DBI::errstr;
+        my %ret = ();
         
-		$sth->execute();
+        $sth->execute();
         
-		while (my $res = $sth->fetchrow_hashref) {
-			$ret{$res->{name}} = {
-				cid     => $res->{cid},
-				type    => $res->{type},
-			};
-		}
-		return \%ret;
-	}
-	
-	### ---
-	### timestamp of sqlite file
-	### ---
-	sub get_timestamp {
-		my $self = shift;
-		my $file = File::Spec->catfile($self->db_name);
-		if (-e $file) {
-			return (stat($file))[9];
-		}
-	}
-	
-	### ---
-	### get last inserted rowid
-	### ---
-	sub last_insert_rowid {
-		my $self = shift;
-		my $sth = $self->dbh->prepare('SELECT last_insert_rowid() as curval')
-			or die $DBI::errstr;
-		my $count_view = $sth->execute();
-		return $sth->fetchrow_hashref->{curval};
-	}
-	
-	### ---
-	### check if table exists
-	### ---
-	sub table_exists {
-		my ($self, $dbh, $table) = @_;
-		return $dbh->selectrow_array(<<EOF);
+        while (my $res = $sth->fetchrow_hashref) {
+            $ret{$res->{name}} = {
+                cid     => $res->{cid},
+                type    => $res->{type},
+            };
+        }
+        return \%ret;
+    }
+    
+    ### ---
+    ### timestamp of sqlite file
+    ### ---
+    sub get_timestamp {
+        my $self = shift;
+        my $file = File::Spec->catfile($self->db_name);
+        if (-e $file) {
+            return (stat($file))[9];
+        }
+    }
+    
+    ### ---
+    ### get last inserted rowid
+    ### ---
+    sub last_insert_rowid {
+        my $self = shift;
+        my $sth = $self->dbh->prepare('SELECT last_insert_rowid() as curval')
+            or die $DBI::errstr;
+        my $count_view = $sth->execute();
+        return $sth->fetchrow_hashref->{curval};
+    }
+    
+    ### ---
+    ### check if table exists
+    ### ---
+    sub table_exists {
+        my ($self, $dbh, $table) = @_;
+        return $dbh->selectrow_array(<<EOF);
 SELECT
-	tbl_name
+    tbl_name
 FROM
-	main.sqlite_master
+    main.sqlite_master
 WHERE
-	type = 'table'
-	AND
-	tbl_name = '$table';
+    type = 'table'
+    AND
+    tbl_name = '$table';
 EOF
-	}
-	
-	### ---
-	### true value for sql statement
-	### ---
-	sub true_for_sql_statement {
-		return '1';
-	}
+    }
+    
+    ### ---
+    ### true value for sql statement
+    ### ---
+    sub true_for_sql_statement {
+        return '1';
+    }
 
 1;
 
