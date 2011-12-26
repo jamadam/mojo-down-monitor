@@ -27,17 +27,6 @@ EOF
         }
     }
     
-    sub store {
-        my ($self, $record) = @_;
-        my $sql = SQL::OOP::Insert->new;
-        $sql->set(
-            $sql->ARG_TABLE     => $self->table,
-            $sql->ARG_DATASET   => SQL::OOP::Dataset->new($record),
-        );
-        my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
-        $sth->execute($sql->bind) or die $sth->errstr;
-    }
-    
     sub dump {
         my ($self, $where, $fields) = @_;
         my $select = SQL::OOP::Select->new;
@@ -92,6 +81,17 @@ EOF
         my $template = Text::PSTemplate::get_current_parser;
         $template->set_var($assign_to => $self->load_record($id, $fields));
         return;
+    }
+    
+    sub store {
+        my ($self, $record) = @_;
+        my $sql = SQL::OOP::Insert->new;
+        $sql->set(
+            $sql->ARG_TABLE     => $self->table,
+            $sql->ARG_DATASET   => SQL::OOP::Dataset->new($record),
+        );
+        my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
+        $sth->execute($sql->bind) or die $sth->errstr;
     }
     
     ### ---

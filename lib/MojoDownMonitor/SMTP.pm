@@ -71,6 +71,7 @@ EOF
                 when ('create') {$self->create}
                 when ('delete') {$self->delete}
             }
+            $c->redirect_to($c->req->body_params->param('nextpage'));
         }
         return;
     }
@@ -106,33 +107,23 @@ EOF
     
     sub create {
         my ($self) = @_;
-        my $c = $self->controller;
-        my $dataset = $self->generate_dataset;
-        my $res = $self->SUPER::create($dataset);
-        $c->redirect_to($c->req->body_params->param('nextpage'));
-        return;
+        $self->SUPER::create($self->generate_dataset);
     }
     
     sub update {
         my ($self) = @_;
         my $c = $self->controller;
-        my $dataset = $self->generate_dataset;
-        my $where_seed = $self->controller->param('where');
         my $json_parser = Mojo::JSON->new;
+        my $where_seed = $self->controller->param('where');
         my $where = SQL::OOP::Where->and_hash($json_parser->decode($where_seed));
-        my $res = $self->SUPER::update($dataset, $where);
-        $c->redirect_to($c->req->body_params->param('nextpage'));
-        return;
+        $self->SUPER::update($self->generate_dataset, $where);
     }
     
     sub delete {
         my ($self) = @_;
-        my $c = $self->controller;
         my $where_seed = $self->controller->param('where');
         my $where = SQL::OOP::Where->and_hash(Mojo::JSON->decode($where_seed));
-        my $res = $self->SUPER::delete($c, $where);
-        $c->redirect_to($c->req->body_params->param('nextpage'));
-        return;
+        $self->SUPER::delete($where);
     }
 
 1;

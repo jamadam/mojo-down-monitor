@@ -42,13 +42,11 @@ tbody th {
 	}
 #mainWrapper {
     position:relative;
-	margin:0 30px;
+	margin:0 30px 60px;
 }
     #main {
 		width:100%;
         position:relative;
-        margin-bottom:20px;
-        padding:0 0 20px;
     }
 		#main h2 {
 			background-color:#48a;
@@ -71,10 +69,15 @@ tbody th {
 			border-radius:20px;
 		}
 #footer {
-    padding:20px;
+	position:fixed;
+	bottom:0;
+	width:100%;
 	text-align:center;
 	background-color:#333;
 	color:#fff;
+	font-size:11px;
+	height:30px;
+	line-height:30px;
 }
 	#footer a {
 		color:#fff;

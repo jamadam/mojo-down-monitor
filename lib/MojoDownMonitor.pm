@@ -10,6 +10,7 @@ use Net::SMTP::SSL;
 use MIME::Lite;
 use Authen::SASL;
 use Time::Piece;
+use SQL::OOP::Dataset;
 our $VERSION = '0.01';
     
     my $ua = Mojo::UserAgent->new;
@@ -65,7 +66,7 @@ our $VERSION = '0.01';
                         $smtp->server_info,
                     );
                 }
-                $log->store($new_log);
+                $log->create(SQL::OOP::Dataset->new($new_log));
             });
             push(@loop_ids, $loop_id);
         }

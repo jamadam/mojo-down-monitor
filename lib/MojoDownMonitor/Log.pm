@@ -38,9 +38,9 @@ EOF
         $self->table('log');
     }
     
-    sub store {
+    sub create {
         my $self = shift;
-        $self->SUPER::store(@_);
+        $self->SUPER::create(@_);
         $self->vacuum();
     }
     
