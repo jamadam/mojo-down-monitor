@@ -46,7 +46,7 @@ EOF
     
     sub server_info {
         my $self = shift;
-        return $self->load_record(1, ['host','port','ssl','user', 'password']);
+        return $self->load(1, ['host','port','ssl','user', 'password']);
     }
     
     sub validate_form {

@@ -31,14 +31,14 @@
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
 			<div id="mainLevel2">
-				<% SMTP::load(1, 'smtp', [
+				<% assign(smtp => &SMTP::load(1, [
 					'id',
 					'host',
 					'port',
 					'ssl',
 					'user',
 					'password',
-				]) %>
+				])) %>
 				<h2>
 					Edit SMTP
 				</h2>

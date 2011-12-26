@@ -65,7 +65,7 @@ EOF
         return $out;
     }
     
-    sub load_record {
+    sub load : TplExport {
         my ($self, $id, $fields) = @_;
         my $select = SQL::OOP::Select->new();
         $select->set(
@@ -79,16 +79,6 @@ EOF
         my $hash = $sth->fetchrow_hashref();
         my $table_structure = $self->get_table_structure;
         return MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $fields);
-    }
-    
-    ### ---
-    ### load record data into template
-    ### ---
-    sub load : TplExport {
-        my ($self, $id, $assign_to, $fields) = @_;
-        my $template = Text::PSTemplate::get_current_parser;
-        $template->set_var($assign_to => $self->load_record($id, $fields));
-        return;
     }
     
     ### ---
