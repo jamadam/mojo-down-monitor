@@ -43,16 +43,16 @@
 							<th>Interval(sec)</th>
 						</tr>
 					</thead>
-					<% Sites::loop(['id', 'Site name', 'URI', 'Interval'])<<EOF %>
-						<tbody>
-							<tr class="goDetail">
-								<td><a href="/site_edit.html?a=<%= $0 %>"><%= $0 %></a></td>
-								<td><%= $1 %></td>
-								<td><%= $2 %></td>
-								<td><%= $3 %></td>
-							</tr>
-						</tbody>
+					<tbody>
+					<% Sites::loop(fields => ['id', 'Site name', 'URI', 'Interval'])<<EOF %>
+						<tr class="goDetail">
+							<td><a href="/site_edit.html?a=<%= $0 %>"><%= $0 %></a></td>
+							<td><%= $1 %></td>
+							<td><%= $2 %></td>
+							<td><%= $3 %></td>
+						</tr>
 					<% EOF %>
+					</tbody>
 				</table>
 			</div>
 			<!-- InstanceEndEditable -->

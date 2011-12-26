@@ -7,7 +7,7 @@ use SQL::OOP::Dataset;
 use SQL::OOP::Insert;
 use SQL::OOP::Delete;
 use DBI;
-use base 'MojoDownMonitor::SQLite';
+use base 'MojoX::Tusu::Component::SQLite';
 use Data::Dumper;
 
     __PACKAGE__->attr('max_log', 50);
@@ -62,12 +62,6 @@ EOF
         );
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
         $sth->execute($sql->bind) or die $sth->errstr;
-    }
-    
-    sub loop : TplExport {
-        my ($self, $fields, $id) = @_;
-        my $where = SQL::OOP::Where->cmp('=', 'Site id', $id);
-        $self->SUPER::loop($fields, $where);
     }
 
 1;

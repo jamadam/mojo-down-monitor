@@ -7,7 +7,7 @@ use SQL::OOP::Dataset;
 use SQL::OOP::Insert;
 use SQL::OOP::Delete;
 use DBI;
-use base 'MojoDownMonitor::SQLite';
+use base 'MojoX::Tusu::Component::SQLite';
 use Data::Dumper;
 use feature q/:5.10/;
     
@@ -111,11 +111,10 @@ EOF
     
     sub update {
         my ($self) = @_;
-        my $dataset = $self->generate_dataset;
-        my $where_seed = $self->controller->param('where');
         my $json_parser = Mojo::JSON->new;
+        my $where_seed = $self->controller->param('where');
         my $where = SQL::OOP::Where->and_hash($json_parser->decode($where_seed));
-        $self->SUPER::update($dataset, $where);
+        $self->SUPER::update($self->generate_dataset, $where);
     }
     
     sub delete {

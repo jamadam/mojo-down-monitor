@@ -1,4 +1,4 @@
-package MojoDownMonitor::DB;
+package MojoX::Tusu::Component::DB;
 use strict;
 use warnings;
 use Text::PSTemplate;
@@ -28,12 +28,13 @@ EOF
     }
     
     sub dump {
-        my ($self, $where, $fields) = @_;
+        my ($self, $where, $fields, $limit) = @_;
         my $select = SQL::OOP::Select->new;
         $select->set(
             $select->ARG_FIELDS => $fields ? SQL::OOP::IDArray->new($fields) : '*',
             $select->ARG_FROM   => $self->table,
-            $select->ARG_WHERE  => $where,
+            $select->ARG_WHERE  => SQL::OOP::Where->and_hash($where),
+            $select->ARG_LIMIT 	=> $limit,
         );
         my $dbh = $self->dbh;
         my $sth = $dbh->prepare($select->to_string) or die $dbh->errstr;
@@ -42,14 +43,20 @@ EOF
     }
     
     sub loop : TplExport {
-        my ($self, $fields, $where) = @_;
+        my $self = shift;
+		my %args = (
+			fields => undef,
+			where  => undef,
+			limit  => undef,
+			@_);
+		
         my $template = Text::PSTemplate::get_block(0);
-        my $sth = $self->dump($where, $fields);
+        my $sth = $self->dump($args{where}, $args{fields}, $args{limit});
         my $out = '';
         while (my $result = $sth->fetchrow_hashref) {
             my $tpl = Text::PSTemplate->new();
             my $num = 0;
-            for my $key (@$fields) {
+            for my $key (@{$args{fields}}) {
                 $tpl->set_var($num++ => $result->{$key} || '');
             }
             $out .= $tpl->parse_str($template);
@@ -81,17 +88,6 @@ EOF
         my $template = Text::PSTemplate::get_current_parser;
         $template->set_var($assign_to => $self->load_record($id, $fields));
         return;
-    }
-    
-    sub store {
-        my ($self, $record) = @_;
-        my $sql = SQL::OOP::Insert->new;
-        $sql->set(
-            $sql->ARG_TABLE     => $self->table,
-            $sql->ARG_DATASET   => SQL::OOP::Dataset->new($record),
-        );
-        my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
-        $sth->execute($sql->bind) or die $sth->errstr;
     }
     
     ### ---

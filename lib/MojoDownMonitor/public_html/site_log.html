@@ -58,7 +58,10 @@
 							<th>timestamp</th>
 						</tr>
 					</thead>
-					<% Log::loop(['Site id', 'OK', 'Error', 'timestamp'], &param('a') )<<EOF %>
+					<% Log::loop(
+						fields => ['Site id', 'OK', 'Error', 'timestamp'],
+						where => {'Site id' => &param('a')},
+					)<<EOF %>
 						<tbody>
 							<tr>
 								<td><a href="/site_edit.html?a=<%= $0 %>"><%= $0 %></a></td>

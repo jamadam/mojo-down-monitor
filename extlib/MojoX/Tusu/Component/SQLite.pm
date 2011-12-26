@@ -1,8 +1,8 @@
-package MojoDownMonitor::SQLite;
+package MojoX::Tusu::Component::SQLite;
 use strict;
 use warnings;
 use utf8;
-use base 'MojoDownMonitor::DB';
+use base 'MojoX::Tusu::Component::DB';
 
     ### ---
     ### get table information
