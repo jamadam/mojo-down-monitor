@@ -13,7 +13,7 @@ use Data::Dumper;
 
     __PACKAGE__->attr('table');
     __PACKAGE__->attr('dbh');
-    __PACKAGE__->attr('user_err', sub {MojoDownMonitor::DB::User_error->new});
+    __PACKAGE__->attr('user_err', sub {MojoX::Tusu::Component::DB::User_error->new});
     
     sub unemptify {
         my ($self, $sql) = @_;
@@ -57,7 +57,8 @@ EOF
             my $tpl = Text::PSTemplate->new();
             my $num = 0;
             for my $key (@{$args{fields}}) {
-                $tpl->set_var($num++ => $result->{$key} || '');
+				my $obj = MojoX::Tusu::Component::DB::Column->new($key, $result->{$key});
+                $tpl->set_var($num++ => $obj);
             }
             $out .= $tpl->parse_str($template);
         }
@@ -77,7 +78,7 @@ EOF
         $sth->execute($select->bind) or die $sth->errstr;
         my $hash = $sth->fetchrow_hashref();
         my $table_structure = $self->get_table_structure;
-        return MojoDownMonitor::DB::Record->new($hash, $table_structure, $fields);
+        return MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $fields);
     }
     
     ### ---
@@ -156,75 +157,83 @@ EOF
         die 'get_table_structure must be implemented.';
     }
 
-package MojoDownMonitor::DB::Record;
+package MojoX::Tusu::Component::DB::Record;
 use strict;
 use warnings;
 
+	my $MEM_DATA	= 1;
+	my $MEM_FIELDS	= 2;
+	
     sub new {
         my ($class, $hash, $table_structure, $fields) = @_;
         my $data = {};
         for my $key (keys %$hash) {
-            $data->{$key} = MojoDownMonitor::DB::Column->new(
+            $data->{$key} = MojoX::Tusu::Component::DB::Column->new(
                 $key,
                 $hash->{$key},
                 $table_structure->{$key}->{type},
                 $table_structure->{$key}->{cid},
             );
         }
-        return bless {data => $data, fields => $fields}, $class;
+        return bless {$MEM_DATA => $data, $MEM_FIELDS => $fields}, $class;
     }
     
     sub retrieve {
         my ($self, $name) = @_;
-        return $self->{data}->{$name};
+        return $self->{$MEM_DATA}->{$name};
     }
     
     sub value {
         my ($self, $name) = @_;
-        return $self->{data}->{$name}->value;
+        return $self->{$MEM_DATA}->{$name}->value;
     }
     
     sub each {
         my ($self) = shift;
-        my @fields = $self->{fields} ? @{$self->{fields}} : keys %{$self->{data}};
-        my @data = map {$self->{data}->{$_}} @fields;
+        my @fields = $self->{$MEM_FIELDS} ? @{$self->{$MEM_FIELDS}} : keys %{$self->{$MEM_DATA}};
+        my @data = map {$self->{$MEM_DATA}->{$_}} @fields;
         Text::PSTemplate::Plugin::Control->each(\@data, @_);
     }
 
-package MojoDownMonitor::DB::Column;
+package MojoX::Tusu::Component::DB::Column;
 use strict;
 use warnings;
+	
+	my $MEM_KEY		= 1;
+	my $MEM_VALUE	= 2;
+	my $MEM_TYPE 	= 3;
+	my $MEM_CID		= 4;
 
     sub new {
         my ($class, $key, $value, $type, $cid) = @_;
         return bless {
-            key     => $key,
-            value   => $value,
-            type    => $type,
-            cid     => $cid,
+            $MEM_KEY 	=> $key,
+            $MEM_VALUE	=> $value,
+            $MEM_TYPE	=> $type,
+            $MEM_CID	=> $cid,
         }, $class;
     }
     
     sub key {
-        return $_[0]->{key} // '';
+        return $_[0]->{$MEM_KEY} // '';
     }
     
     sub value {
-        return $_[0]->{value} // '';
+        return $_[0]->{$MEM_VALUE} // '';
     }
     
     sub type {
-        return $_[0]->{type} // '';
+        return $_[0]->{$MEM_TYPE} // '';
     }
     
     sub cid {
-        return $_[0]->{cid} // '';
+        return $_[0]->{$MEM_CID} // '';
     }
 
 ### ---
 ### Stackable user err class
 ### ---
-package MojoDownMonitor::DB::User_error;
+package MojoX::Tusu::Component::DB::User_error;
 use strict;
 use warnings;
 
@@ -252,7 +261,7 @@ use warnings;
 
 __END__
 
-=head1 NAME MojoDownMonitor::DB
+=head1 NAME MojoX::Tusu::Component::DB
 
 =head1 SYNOPSIS
 
