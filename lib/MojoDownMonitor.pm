@@ -4,13 +4,9 @@ use Text::PSTemplate;
 use File::Basename 'dirname';
 use Mojo::UserAgent;
 use Data::Dumper;
-use Encode;
-use Net::SMTP;
-use Net::SMTP::SSL;
-use MIME::Lite;
-use Authen::SASL;
 use Time::Piece;
 use SQL::OOP::Dataset;
+use MojoDownMonitor::Util::Sendmail;
 our $VERSION = '0.01';
     
     my $ua = Mojo::UserAgent->new;
@@ -58,12 +54,19 @@ our $VERSION = '0.01';
             my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
                 my $new_log = $self->check($site);
                 if (! $new_log->{OK}) {
+                    my $smtp_info = $smtp->server_info;
+                    my $sendmail = MojoDownMonitor::Util::Sendmail->new(
+                        $smtp_info->value('host'),
+                        $smtp_info->value('port'),
+                        $smtp_info->value('ssl'),
+                        $smtp_info->value('user'),
+                        $smtp_info->value('password'),
+                    );
                     my @mailto = split(',', $site->{'Mail to'});
-                    $self->sendmail(
+                    $sendmail->sendmail(
                         \@mailto,
                         '[ALERT] mojo-down-monitor detected an error',
                         $self->mail_body($site, $new_log),
-                        $smtp->server_info,
                     );
                 }
                 $log->create(SQL::OOP::Dataset->new($new_log));
@@ -118,71 +121,6 @@ our $VERSION = '0.01';
             $parser->set_var('log_'. $key2 => $log->{$key});
         }
         return $parser->parse_file($self->home->rel_file('mail_body.html'));
-    }
-    
-    sub html_to_plaintext {
-        my $html = shift;
-        if ($html =~ qr{<body.*?>(.+?)</body>}s) {
-            $html = $1;
-        }
-        $html =~ s{<.+?>}{}g;
-        $html =~ s{\t}{  }g;
-        return $html;
-    }
-    
-    sub sendmail {
-        
-        my ($self, $to, $subject, $body, $smtp_info) = @_;
-        
-        $subject = encode('MIME-Header', $subject);
-        
-        my $plain = html_to_plaintext($body);
-        
-        utf8::encode($body);
-        utf8::encode($plain);
-        
-        my $mime_sub = MIME::Lite->new(
-            Type     => 'multipart/alternative',
-        );
-        $mime_sub->attach(
-            Data     => $plain,
-            Type     => 'text/plain; charset=utf-8',
-            Encoding => 'Base64',
-        );
-        $mime_sub->attach(
-            Data     => $body,
-            Type     => 'text/html; charset=utf-8',
-            Encoding => 'Quoted-printable',
-        );
-        
-        my $from = 'mojo-down-monitor@'. $smtp_info->value('host');
-        
-        $to = (ref $to) ? $to : [$to];
-        for my $addr (@$to) {
-            my $smtp;
-            if ($smtp_info->value('ssl')) {
-                $smtp = Net::SMTP::SSL->new($smtp_info->value('host'), Port => $smtp_info->value('port'));
-            } else {
-                $smtp = Net::SMTP->new($smtp_info->value('host'), Port => $smtp_info->value('port'));
-            }
-            if ($smtp_info->value('user')) {
-                $smtp->auth($smtp_info->value('user'), $smtp_info->value('pass'));
-            }
-            
-            $smtp->mail($from);
-            $smtp->to($addr);
-            my $mime = MIME::Lite->new(
-                From    => encode('MIME-Header', $from),
-                To      => encode('MIME-Header', $addr),
-                Subject => $subject,
-                Type     => 'multipart/mixed',
-            );
-            $mime->attach($mime_sub);
-            $smtp->data();
-            $smtp->datasend($mime->as_string);
-            $smtp->datasend();
-            $smtp->quit();
-        }
     }
 
 1;
