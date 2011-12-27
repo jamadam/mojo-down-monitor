@@ -48,22 +48,32 @@ INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must m
 EOF
     }
     
-    sub form_cid {
-        my ($self, $name) = @_;
-        return 'cid-'. $self->get_table_structure->{$name}->{cid};
+    sub cid_table {
+        my ($self) = @_;
+        my $t_def = $self->get_table_structure;
+        my $out = {};
+        my $p = $self->controller->req->body_params;
+        for my $name (keys %$t_def) {
+            my $cid = 'cid-'. $t_def->{$name}->{cid};
+            $out->{$name} = $p->param($cid)
+        }
+        return $out;
     }
     
     sub validate_form {
         my ($self) = @_;
         my $params = $self->controller->req->body_params;
-        
+        my $cid_data = $self->cid_table;
         given ($params->param('mode')) {
             when ($_ ~~ ['update','create']) {
-                if (! $params->param($self->form_cid('Site name'))) {
+                if (! $cid_data->{'Site name'}) {
                     $self->user_err->stack('Site name is required');
                 }
-                if ($params->param($self->form_cid('Interval')) =~ /\D/) {
+                if (! $cid_data->{'Interval'} || $cid_data->{'Interval'} =~ /\D+/) {
                     $self->user_err->stack('Interval must be a digit');
+                }
+                if (! $cid_data->{'URI'}) {
+                    $self->user_err->stack('URI must be a digit');
                 }
             }
             when ('delete') {
@@ -82,7 +92,7 @@ EOF
         
         if ($self->user_err->count) {
             my $template = $c->req->body_params->param('errorpage');
-            $c->render(handler => 'tusu', template => $template);
+            #$c->render(handler => 'tusu', template => $template);
         } else {
             given ($c->req->body_params->param('mode')) {
                 when ('update') {$self->update}
