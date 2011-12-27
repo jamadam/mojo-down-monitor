@@ -66,6 +66,21 @@ EOF
         return $out;
     }
     
+    sub skeleton : TplExport {
+        my $self = shift;
+		my %args = (
+			fields 	=> undef,
+			assign	=> 'rec',
+			@_);
+		
+        my $template = Text::PSTemplate::get_block(0);
+		my $table_structure = $self->get_table_structure;
+		my $tpl = Text::PSTemplate->new();
+		my $rec = MojoX::Tusu::Component::DB::Record->new(undef, $table_structure, $args{fields});
+		$tpl->set_var($args{assign} => $rec);
+		return $tpl->parse_str($template);
+    }
+    
     sub load {
         my $self = shift;
 		my %args = (
@@ -158,17 +173,17 @@ use warnings;
     sub new {
         my ($class, $hash, $table_structure, $fields) = @_;
         my $data = {};
-        for my $key (keys %$hash) {
+        for my $key ($hash ? keys %$hash : @$fields) {
             $data->{$key} = MojoX::Tusu::Component::DB::Column->new(
                 $key,
-                $hash->{$key},
+                $hash ? $hash->{$key} : undef,
                 $table_structure->{$key}->{type},
                 $table_structure->{$key}->{cid},
             );
         }
         return bless {$MEM_DATA => $data, $MEM_FIELDS => $fields}, $class;
     }
-    
+	
     sub retrieve {
         my ($self, $name) = @_;
         return $self->{$MEM_DATA}->{$name};

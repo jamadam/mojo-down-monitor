@@ -30,34 +30,65 @@
 	<div id="mainWrapper">
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
-			<div id="mainLevel2">
+			<% Sites::skeleton(
+				assign 	=> 'site',
+				fields 	=> [
+					'id',
+					'Site name',
+					'URI',
+					'Interval',
+					'Mail to',
+					'Status must be',
+					'MIME type must be',
+					'Content must match',
+					'HTTP header must match',
+				]
+			)<<EOF %>
 				<h2>
-					Site List
+					<%= $site->value('Site name') %>
 				</h2>
-				<div>
-					<a href="/site_new.html">Add Site</a>
+				
+				<% Sites::put_user_err('formErrorContainer') %>
+				
+				<div class="tabStyleMenu">
+					<a href="/site_log.html">log</a>
+					<a href="/site_edit.html">Site Edit</a>
 				</div>
-				<table>
-					<thead>
-						<tr>
-							<th>id</th>
-							<th>Site name</th>
-							<th>URI</th>
-							<th>Interval(sec)</th>
-						</tr>
-					</thead>
-					<tbody>
-					<% Sites::loop(assign => 'site', fields => ['id', 'Site name', 'URI', 'Interval'])<<EOF %>
-						<tr class="goDetail">
-							<td><a href="/site_edit.html?a=<%= $site->value('id') %>"><%= $site->value('id') %></a></td>
-							<td><%= $site->value('Site name') %></td>
-							<td><%= $site->value('URI') %></td>
-							<td><%= $site->value('Interval') %></td>
-						</tr>
-					<% EOF %>
-					</tbody>
-				</table>
-			</div>
+				<div id="mainLevel2">
+					<form enctype="multipart/form-data" method="post" action="./site_edit_api.html">
+					<div>
+						<input type="hidden" name="nextpage" value="/" />
+						<input type="hidden" name="errorpage" value="/site_new.html" />
+						<input type="hidden" name="mode" value="create" />
+						<input type="hidden" name="columns" value="Site name,URI,Interval,Mail to,Status must be,MIME type must be,Content must match,HTTP header must match," />
+					</div>
+					<table>
+						<tfoot>
+							<tr>
+								<td></td>
+								<td>
+									<input type="submit" value="edit" />
+								</td>
+							</tr>
+						</tfoot>
+						<% $site->each('column')<<EOF2 %>
+							<tr>
+								<th>
+									<%= $column->key %>
+								</th>
+								<td>
+									<% switch($column->key, ['id'])<<CASE1,DEFAULT %>
+										<% include('./form_parts/readonly_varchar.html', {column => $column}) %>
+									<% CASE1 %>
+										<% include('./form_parts/'. lc $column->type. '.html', {column => $column}) %>
+									<% DEFAULT %>
+								</td>
+							</tr>
+						<% EOF2 %>
+					</table>
+					</form>
+				</div>
+			<% EOF %>
 			<!-- InstanceEndEditable -->
         </div>
     </div>
