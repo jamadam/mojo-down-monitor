@@ -31,61 +31,59 @@
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
 			<div id="mainLevel2">
-				<% assign(smtp => &SMTP::load(1, [
-					'id',
-					'host',
-					'port',
-					'ssl',
-					'user',
-					'password',
-				])) %>
-				<h2>
-					Edit SMTP
-				</h2>
-				
-				<% SMTP::put_user_err('formErrorContainer') %>
-				
-				<form enctype="multipart/form-data" method="post" action="./smtp_edit_api.html">
-				<div>
-					<input type="hidden" name="nextpage" value="/smtp_edit.html" />
-					<input type="hidden" name="errorpage" value="/smtp_edit.html" />
-					<input type="hidden" name="mode" value="update" />
-					<input type="hidden" name="where" value='{"id":"1"}' />
-					<input type="hidden" name="columns" value="host,port,ssl,user,password" />
-				</div>
-				<table>
-					<tfoot>
-						<tr>
-							<td></td>
-							<td>
-								<input type="submit" value="edit" />
-							</td>
-						</tr>
-					</tfoot>
-					<tbody>
-					<% $smtp->each('column')<<EOF %>
-						<tr>
-							<th>
-								<%= $column->key %>
-							</th>
-							<td>
-								<% if_equals($column->key, 'password')<<THEN,ELSE %>
-									<% include('./form_parts/password.html', {
-										val => $column->value,
-										cid => $column->cid,
-									}) %>
-								<% THEN %>
-									<% include('./form_parts/'. lc $column->type. '.html', {
-										val => $column->value,
-										cid => $column->cid,
-									}) %>
-								<% ELSE %>
-							</td>
-						</tr>
-					<% EOF %>
-					</tbody>
-				</table>
-				</form>
+				<% SMTP::loop(
+					assign 	=> 'smtp',
+					where 	=> {id => 1},
+					fields 	=> [
+						'host',
+						'port',
+						'ssl',
+						'user',
+						'password',
+					]
+				)<<EOF %>
+					<h2>
+						Edit SMTP
+					</h2>
+					
+					<% SMTP::put_user_err('formErrorContainer') %>
+					
+					<form enctype="multipart/form-data" method="post" action="./smtp_edit_api.html">
+					<div>
+						<input type="hidden" name="nextpage" value="/smtp_edit.html" />
+						<input type="hidden" name="errorpage" value="/smtp_edit.html" />
+						<input type="hidden" name="mode" value="update" />
+						<input type="hidden" name="where" value='{"id":"1"}' />
+						<input type="hidden" name="columns" value="host,port,ssl,user,password" />
+					</div>
+					<table>
+						<tfoot>
+							<tr>
+								<td></td>
+								<td>
+									<input type="submit" value="edit" />
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						<% $smtp->each('column')<<EOF2 %>
+							<tr>
+								<th>
+									<%= $column->key %>
+								</th>
+								<td>
+									<% switch($column->key, ['password'])<<CASE1,DEFAULT %>
+										<% include('./form_parts/password.html', {column => $column}) %>
+									<% CASE1 %>
+										<% include('./form_parts/'. lc $column->type. '.html', {column => $column}) %>
+									<% DEFAULT %>
+								</td>
+							</tr>
+						<% EOF2 %>
+						</tbody>
+					</table>
+					</form>
+				<% EOF %>
 			</div>
 			<!-- InstanceEndEditable -->
         </div>

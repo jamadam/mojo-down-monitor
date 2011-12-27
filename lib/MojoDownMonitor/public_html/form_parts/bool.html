@@ -1,5 +1,5 @@
-<% if($val)<<THEN,ELSE %>
-<input type="checkbox" name="cid-<% $cid %>" id="cid-<% $cid %>" selected="selected" />
+<% if($column->value)<<THEN,ELSE %>
+<input type="checkbox" name="cid-<% $column->cid %>" id="cid-<% $column->cid %>" selected="selected" />
 <% THEN %>
-<input type="checkbox" name="cid-<% $cid %>" id="cid-<% $cid %>" />
+<input type="checkbox" name="cid-<% $column->cid %>" id="cid-<% $column->cid %>" />
 <% ELSE %>

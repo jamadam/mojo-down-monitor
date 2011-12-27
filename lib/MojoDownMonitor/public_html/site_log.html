@@ -30,49 +30,55 @@
 	<div id="mainWrapper">
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
-			<% assign(site => &Sites::load(&param('a'), [
-				'id',
-				'Site name',
-				'URI',
-				'Interval',
-				'Mail to',
-				'Status must be',
-				'MIME type must be',
-				'Content must match',
-				'HTTP header must match',
-			])) %>
-			<h2>
-				<%= $site->value('Site name') %>
-			</h2>
-			<div class="tabStyleMenu">
-				<a href="/site_log.html?a=<%= param('a') %>">log</a>
-				<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
-			</div>
-			<div id="mainLevel2">
-				<table>
-					<thead>
-						<tr>
-							<th>Site id</th>
-							<th>OK</th>
-							<th>Error</th>
-							<th>timestamp</th>
-						</tr>
-					</thead>
-					<% Log::loop(
-						fields => ['Site id', 'OK', 'Error', 'timestamp'],
-						where => {'Site id' => &param('a')},
-					)<<EOF %>
-						<tbody>
+			<% Sites::loop(
+				assign 	=> 'site',
+				where 	=> {id => &param('a')},
+				fields 	=> [
+					'id',
+					'Site name',
+					'URI',
+					'Interval',
+					'Mail to',
+					'Status must be',
+					'MIME type must be',
+					'Content must match',
+					'HTTP header must match',
+				]
+			)<<EOF %>
+				<h2>
+					<%= $site->value('Site name') %>
+				</h2>
+				<div class="tabStyleMenu">
+					<a href="/site_log.html?a=<%= param('a') %>">log</a>
+					<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
+				</div>
+				<div id="mainLevel2">
+					<table>
+						<thead>
 							<tr>
-								<td><a href="/site_edit.html?a=<%= $0->value %>"><%= $0->value %></a></td>
-								<td><%= $1->value %></td>
-								<td><%= $2->value %></td>
-								<td><%= $3->value %></td>
+								<th>Site id</th>
+								<th>OK</th>
+								<th>Error</th>
+								<th>timestamp</th>
 							</tr>
-						</tbody>
-					<% EOF %>
-				</table>
-			</div>
+						</thead>
+						<% Log::loop(
+							assign => 'log',
+							fields => ['Site id', 'OK', 'Error', 'timestamp'],
+							where => {'Site id' => &param('a')},
+						)<<EOF2 %>
+							<tbody>
+								<tr>
+									<td><a href="/site_edit.html?a=<%= $log->value('Site id') %>"><%= $log->value('Site id') %></a></td>
+									<td><%= $log->value('OK') %></td>
+									<td><%= $log->value('Error') %></td>
+									<td><%= $log->value('timestamp') %></td>
+								</tr>
+							</tbody>
+						<% EOF2 %>
+					</table>
+				</div>
+			<% EOF %>
 			<!-- InstanceEndEditable -->
         </div>
     </div>

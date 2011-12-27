@@ -28,13 +28,14 @@ EOF
     }
     
     sub dump {
-        my ($self, $where, $fields, $limit) = @_;
+        my ($self, $where, $fields, $limit, $orderby) = @_;
         my $select = SQL::OOP::Select->new;
         $select->set(
-            $select->ARG_FIELDS => $fields ? SQL::OOP::IDArray->new($fields) : '*',
-            $select->ARG_FROM   => $self->table,
-            $select->ARG_WHERE  => SQL::OOP::Where->and_hash($where),
-            $select->ARG_LIMIT 	=> $limit,
+            $select->ARG_FIELDS 	=> $fields ? SQL::OOP::IDArray->new($fields) : '*',
+            $select->ARG_FROM   	=> $self->table,
+            $select->ARG_WHERE  	=> SQL::OOP::Where->and_hash($where),
+            $select->ARG_ORDERBY  	=> SQL::OOP::Order->abstract($orderby),
+            $select->ARG_LIMIT 		=> $limit,
         );
         my $dbh = $self->dbh;
         my $sth = $dbh->prepare($select->to_string) or die $dbh->errstr;
@@ -45,40 +46,40 @@ EOF
     sub loop : TplExport {
         my $self = shift;
 		my %args = (
-			fields => undef,
-			where  => undef,
-			limit  => undef,
+			fields 	=> undef,
+			where  	=> undef,
+			limit  	=> undef,
+			orderby	=> undef,
+			assign	=> 'rec',
 			@_);
 		
         my $template = Text::PSTemplate::get_block(0);
-        my $sth = $self->dump($args{where}, $args{fields}, $args{limit});
+        my $sth = $self->dump($args{where}, $args{fields}, $args{limit}, $args{orderby});
         my $out = '';
-        while (my $result = $sth->fetchrow_hashref) {
+		my $table_structure = $self->get_table_structure;
+        while (my $hash = $sth->fetchrow_hashref) {
             my $tpl = Text::PSTemplate->new();
-            my $num = 0;
-            for my $key (@{$args{fields}}) {
-				my $obj = MojoX::Tusu::Component::DB::Column->new($key, $result->{$key});
-                $tpl->set_var($num++ => $obj);
-            }
+			my $rec = MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
+			$tpl->set_var($args{assign} => $rec);
             $out .= $tpl->parse_str($template);
         }
         return $out;
     }
     
-    sub load : TplExport {
-        my ($self, $id, $fields) = @_;
-        my $select = SQL::OOP::Select->new();
-        $select->set(
-            $select->ARG_FIELDS => $fields ? SQL::OOP::IDArray->new($fields) : '*',
-            $select->ARG_FROM   => SQL::OOP::ID->new($self->table),
-            $select->ARG_WHERE  => SQL::OOP::Where->cmp('=', 'id', $id),
-        );
-        my $dbh = $self->dbh;
-        my $sth = $dbh->prepare($select->to_string) or die $dbh->errstr;
-        $sth->execute($select->bind) or die $sth->errstr;
-        my $hash = $sth->fetchrow_hashref();
-        my $table_structure = $self->get_table_structure;
-        return MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $fields);
+    sub load {
+        my $self = shift;
+		my %args = (
+			fields 	=> undef,
+			where  	=> undef,
+			limit  	=> undef,
+			orderby	=> undef,
+			@_);
+		
+        my $sth = $self->dump($args{where}, $args{fields}, $args{limit}, $args{orderby});
+		my $table_structure = $self->get_table_structure;
+        if (my $hash = $sth->fetchrow_hashref) {
+			return MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
+        }
     }
     
     ### ---
@@ -189,18 +190,18 @@ package MojoX::Tusu::Component::DB::Column;
 use strict;
 use warnings;
 	
-	my $MEM_KEY		= 1;
-	my $MEM_VALUE	= 2;
-	my $MEM_TYPE 	= 3;
-	my $MEM_CID		= 4;
+	my $MEM_KEY			= 1;
+	my $MEM_VALUE		= 2;
+	my $MEM_TYPE 		= 3;
+	my $MEM_CID			= 4;
 
     sub new {
-        my ($class, $key, $value, $type, $cid) = @_;
+        my ($class, $key, $value, $type, $cid, $annotation) = @_;
         return bless {
-            $MEM_KEY 	=> $key,
-            $MEM_VALUE	=> $value,
-            $MEM_TYPE	=> $type,
-            $MEM_CID	=> $cid,
+            $MEM_KEY 		=> $key,
+            $MEM_VALUE		=> $value,
+            $MEM_TYPE		=> $type,
+            $MEM_CID		=> $cid,
         }, $class;
     }
     

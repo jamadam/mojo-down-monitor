@@ -44,12 +44,12 @@
 						</tr>
 					</thead>
 					<tbody>
-					<% Sites::loop(fields => ['id', 'Site name', 'URI', 'Interval'])<<EOF %>
+					<% Sites::loop(assign => 'site', fields => ['id', 'Site name', 'URI', 'Interval'])<<EOF %>
 						<tr class="goDetail">
-							<td><a href="/site_edit.html?a=<%= $0->value %>"><%= $0->value %></a></td>
-							<td><%= $1->value %></td>
-							<td><%= $2->value %></td>
-							<td><%= $3->value %></td>
+							<td><a href="/site_edit.html?a=<%= $site->value('id') %>"><%= $site->value('id') %></a></td>
+							<td><%= $site->value('Site name') %></td>
+							<td><%= $site->value('URI') %></td>
+							<td><%= $site->value('Interval') %></td>
 						</tr>
 					<% EOF %>
 					</tbody>
