@@ -62,6 +62,8 @@ EOF
         my ($self) = @_;
         my $c = $self->controller;
         
+        $self->user_err->empty;
+        
         $self->validate_form;
         
         if ($self->user_err->count) {

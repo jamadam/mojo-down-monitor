@@ -27,11 +27,23 @@ our $VERSION = '0.01';
         
         # special route
         my $r = $self->routes;
-        $r->route('/smtp_edit_api.html')->via('post')->to(cb => sub {
+        $r->route('/api/smtp_edit.html')->via('post')->to(cb => sub {
             $tusu->bootstrap($_[0], 'MojoDownMonitor::SMTP', 'post');
         });
-        $r->route('/site_edit_api.html')->via('post')->to(cb => sub {
+        $r->route('/api/site_edit.html')->via('post')->to(cb => sub {
             $tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
+            $self->set_cron($tusu);
+        });
+        $r->route('/site_new.html')->via('post')->to(cb => sub {
+            $tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
+            $self->set_cron($tusu);
+        });
+        $r->route('/site_edit.html')->via('post')->to(cb => sub {
+            $tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
+            $self->set_cron($tusu);
+        });
+        $r->route('/smtp_edit.html')->via('post')->to(cb => sub {
+            $tusu->bootstrap($_[0], 'MojoDownMonitor::SMTP', 'post');
             $self->set_cron($tusu);
         });
         

@@ -13,6 +13,8 @@ use Data::Dumper;
 
     __PACKAGE__->attr('table');
     __PACKAGE__->attr('dbh');
+	
+	# TODO must protected from outside session
     __PACKAGE__->attr('user_err', sub {MojoX::Tusu::Component::DB::User_error->new});
     
     sub unemptify {
@@ -262,6 +264,11 @@ use warnings;
         my ($self) = @_;
         return @$self;
     }
+	
+	sub empty {
+        my ($self) = @_;
+		@$self = ();
+	}
 
 1;
 

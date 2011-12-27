@@ -48,21 +48,40 @@ INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must m
 EOF
     }
     
+    sub form_cid {
+        my ($self, $name) = @_;
+        return 'cid-'. $self->get_table_structure->{$name}->{cid};
+    }
+    
     sub validate_form {
         my ($self) = @_;
-        my $c = $self->controller;
-        #$self->user_err->stack('un error');
+        my $params = $self->controller->req->body_params;
+        
+        given ($params->param('mode')) {
+            when ($_ ~~ ['update','create']) {
+                if (! $params->param($self->form_cid('Site name'))) {
+                    $self->user_err->stack('Site name is required');
+                }
+                if ($params->param($self->form_cid('Interval')) =~ /\D/) {
+                    $self->user_err->stack('Interval must be a digit');
+                }
+            }
+            when ('delete') {
+                
+            }
+        }
     }
     
     sub post {
         my ($self) = @_;
         my $c = $self->controller;
         
+        $self->user_err->empty;
+        
         $self->validate_form;
         
         if ($self->user_err->count) {
             my $template = $c->req->body_params->param('errorpage');
-            warn $template;
             $c->render(handler => 'tusu', template => $template);
         } else {
             given ($c->req->body_params->param('mode')) {
@@ -72,6 +91,7 @@ EOF
             }
             $c->redirect_to($c->req->body_params->param('nextpage'));
         }
+        $self->user_err->empty;
         return;
     }
 	
