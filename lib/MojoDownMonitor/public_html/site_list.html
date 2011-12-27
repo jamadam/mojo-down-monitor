@@ -44,6 +44,7 @@
 							<th>Site name</th>
 							<th>URI</th>
 							<th>Interval(sec)</th>
+							<th>Delete</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -53,6 +54,17 @@
 							<td><%= $site->value('Site name') %></td>
 							<td><%= $site->value('URI') %></td>
 							<td><%= $site->value('Interval') %></td>
+							<td>
+								<form enctype="multipart/form-data" method="post" action="./site_edit_api.html">
+									<div>
+										<input type="hidden" name="nextpage" value="/site_list.html" />
+										<input type="hidden" name="errorpage" value="/site_list.html" />
+										<input type="hidden" name="mode" value="delete" />
+										<input type="hidden" name="where" value='{"id":<%= $site->value('id') %>}' />
+									</div>
+									<input type="submit" value="Delete" />
+								</form>
+							</td>
 						</tr>
 					<% EOF %>
 					</tbody>
