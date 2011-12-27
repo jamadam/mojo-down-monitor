@@ -45,15 +45,11 @@
 				]
 			)<<EOF %>
 				<h2>
-					<%= $site->value('Site name') %>
+					Add New Site
 				</h2>
 				
 				<% Sites::put_user_err('formErrorContainer') %>
 				
-				<div class="tabStyleMenu">
-					<a href="/site_log.html">log</a>
-					<a href="/site_edit.html">Site Edit</a>
-				</div>
 				<div id="mainLevel2">
 					<form enctype="multipart/form-data" method="post" action="./site_edit_api.html">
 					<div>
