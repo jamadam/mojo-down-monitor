@@ -1,1 +1,1 @@
-<input type="text" name="cid-<% $column->cid %>" value="<% $column->value %>" id="cid-<% $column->cid %>" />
+<input type="text" name="cid-<% $column->cid %>" value="<% default(&param('cid-'. $column->cid), $column->value) %>" id="cid-<% $column->cid %>" />
