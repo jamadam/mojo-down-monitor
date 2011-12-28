@@ -99,21 +99,21 @@ EOF
         }
         return;
     }
-	
-	### ---
-	### generate dataset for db insert or update with form data
-	### ---
-	sub generate_dataset {
-		my $self = shift;
-		my $data = SQL::OOP::Dataset->new();
+    
+    ### ---
+    ### generate dataset for db insert or update with form data
+    ### ---
+    sub generate_dataset {
+        my $self = shift;
+        my $data = SQL::OOP::Dataset->new();
         my $tabe_structure = $self->get_table_structure;
-		my @columns = split /,/, $self->controller->param('columns');
-		if (! scalar @columns) {
-			return;
-		}
-		COLUMN : for my $cname (@columns) {
-			my $id = 'cid-'. $tabe_structure->{$cname}->{cid};
-			my $value = $self->controller->param($id);
+        my @columns = split /,/, $self->controller->param('columns');
+        if (! scalar @columns) {
+            return;
+        }
+        COLUMN : for my $cname (@columns) {
+            my $id = 'cid-'. $tabe_structure->{$cname}->{cid};
+            my $value = $self->controller->param($id);
             given (lc $tabe_structure->{$cname}->{type}) {
                 when ('bool') {
                     $value ||= 0;
@@ -124,10 +124,10 @@ EOF
                     }
                 }
             }
-			$data->append($cname => $value);
-		}
-		return $data;
-	}
+            $data->append($cname => $value);
+        }
+        return $data;
+    }
     
     sub create {
         my ($self) = @_;
