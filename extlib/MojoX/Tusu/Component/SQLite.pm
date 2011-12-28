@@ -71,6 +71,13 @@ EOF
     sub true_for_sql_statement {
         return '1';
     }
+    
+    ### ---
+    ### true value for sql statement
+    ### ---
+    sub false_for_sql_statement {
+        return '0';
+    }
 
 1;
 

@@ -52,10 +52,32 @@ EOF
         );
     }
     
+    sub cid_table {
+        my ($self) = @_;
+        my $t_def = $self->get_table_structure;
+        my $out = {};
+        my $p = $self->controller->req->body_params;
+        for my $name (keys %$t_def) {
+            my $cid = 'cid-'. $t_def->{$name}->{cid};
+            $out->{$name} = $p->param($cid)
+        }
+        return $out;
+    }
+    
     sub validate_form {
         my ($self) = @_;
-        my $c = $self->controller;
-        #$self->user_err->stack('un error');
+        my $params = $self->controller->req->body_params;
+        my $cid_data = $self->cid_table;
+        given ($params->param('mode')) {
+            when ($_ ~~ ['update','create']) {
+                if (! $cid_data->{'host'}) {
+                    $self->user_err->stack('Host name is required');
+                }
+            }
+            when ('delete') {
+                
+            }
+        }
     }
     
     sub post {
@@ -93,7 +115,11 @@ EOF
             my $value = $self->controller->param($id);
             given (lc $tabe_structure->{$cname}->{type}) {
                 when ('bool') {
-                    $value ||= 0;
+                    if ($value) {
+                        $value = $self->true_for_sql_statement;
+                    } else {
+                        $value = $self->false_for_sql_statement;
+                    }
                 }
                 when (['integer', 'real']) {
                     if (defined $value && $value eq '') {
