@@ -34,8 +34,8 @@
 				<h2>
 					Site List
 				</h2>
-				<div>
-					<a href="/site_new.html">Add Site</a>
+				<div class="buttonContainer">
+					<a class="button" href="/site_new.html">Add Site</a>
 				</div>
 				<table>
 					<thead>
@@ -63,8 +63,8 @@
 										<input type="hidden" name="nextpage" value="/site_list.html" />
 										<input type="hidden" name="mode" value="delete" />
 										<input type="hidden" name="where" value='{"id":<%= $site->value('id') %>}' />
+										<input type="submit" value="Delete" class="button" />
 									</div>
-									<input type="submit" value="Delete" />
 								</form>
 							</td>
 						</tr>

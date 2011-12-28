@@ -48,9 +48,10 @@
 					Add New Site
 				</h2>
 				
-				<% Sites::put_user_err('formErrorContainer') %>
-				
 				<div id="mainLevel2">
+					
+					<% Sites::put_user_err('formErrorContainer') %>
+					
 					<form enctype="multipart/form-data" method="post" action="./site_new.html">
 					<div>
 						<input type="hidden" name="nextpage" value="/" />
@@ -62,7 +63,7 @@
 							<tr>
 								<td></td>
 								<td>
-									<input type="submit" value="edit" />
+									<input type="submit" value="edit" class="button" />
 								</td>
 							</tr>
 						</tfoot>

@@ -28,6 +28,64 @@ tfoot td {
 tbody th {
 	text-align:left;
 }
+.button {
+	display: inline-block;
+	zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
+	  *display: inline;
+	vertical-align: baseline;
+	margin: 0 2px;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	font: normal bold 11px/100% Arial, Helvetica, sans-serif;
+	padding: 0.4em 0.4em 0.45em;
+	text-shadow: -1px -1px 0 rgba(0,0,0,.1);
+	-webkit-border-radius: .4em;
+	-moz-border-radius: .4em;
+	border-radius: .4em;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	color: #fef4e9;
+	border: solid 1px #da7c0c;
+	border-top: solid 1px #da8;
+	background: #f78d1d;
+	background: -webkit-gradient(linear, left top, left bottom, from(#faa51a), to(#f47a20));
+	background: -moz-linear-gradient(top,  #faa51a,  #f47a20);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#faa51a', endColorstr='#f47a20');
+}
+	.button:hover {
+		text-decoration: none !important;
+		background: #f47c20;
+		background: -webkit-gradient(linear, left top, left bottom, from(#f88e11), to(#f06015));
+		background: -moz-linear-gradient(top,  #f88e11,  #f06015);
+		filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f88e11', endColorstr='#f06015');
+	}
+	.button:active {
+		position: relative;
+		top: 1px;
+		color: #fcd3a5 !important;
+		background: -webkit-gradient(linear, left top, left bottom, from(#f47a20), to(#faa51a));
+		background: -moz-linear-gradient(top,  #f47a20,  #faa51a);
+		filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#faa51a');
+	}
+	.button.disabled {
+		color:#666;
+		top:0;
+		text-shadow: -1px -1px 0 rgba(255,255,255,0.1);
+		background: #f47a20;
+		background: -webkit-gradient(linear, left top, left bottom, from(#f47a20), to(#faa51a));
+		background: -moz-linear-gradient(top,  #f47a20,  #faa51a);
+		filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#faa51a');
+		opacity:0.6;
+	}
+		.button.disabled:hover {
+			color:#666 !important;
+		}
+		.button.disabled:active {
+			color:#666 !important;
+		}
 #mainMenu {
 	position:absolute;
 	right:10px;
@@ -55,10 +113,9 @@ tbody th {
 			border-radius:8px;
 			box-shadow:0 0 5px rgba(0,0,0,0.3) inset;
 		}
-        #main p,
-        #main div {
-            margin-bottom:1em;
-        }
+		#main .buttonContainer {
+			margin-bottom:1em;
+		}
         #main .goDetail:hover {
             background-color:#fae;
 			cursor:pointer;
