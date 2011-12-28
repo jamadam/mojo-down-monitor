@@ -3,7 +3,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja"><!-- InstanceBegin template="/Templates/base.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 	<!-- InstanceBeginEditable name="doctitle" -->
-    <title>mojo-down-monitor</title>
+	<% assign(site => &Sites::load(
+		assign 	=> 'site',
+		where 	=> {id => &param('a')},
+		fields 	=> [
+			'id',
+			'Site name',
+			'URI',
+			'Interval',
+			'Mail to',
+			'Status must be',
+			'MIME type must be',
+			'Content must match',
+			'HTTP header must match',
+		]
+	)) %>
+    <title>Log for <% $site->value('Site name') %> | mojo-down-monitor</title>
     <!-- InstanceEndEditable -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
@@ -29,55 +44,39 @@
 	<div id="mainWrapper">
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
-			<% Sites::loop(
-				assign 	=> 'site',
-				where 	=> {id => &param('a')},
-				fields 	=> [
-					'id',
-					'Site name',
-					'URI',
-					'Interval',
-					'Mail to',
-					'Status must be',
-					'MIME type must be',
-					'Content must match',
-					'HTTP header must match',
-				]
-			)<<EOF %>
-				<h2>
-					<%= $site->value('Site name') %>
-				</h2>
-				<div class="tabStyleMenu">
-					<a href="/site_log.html?a=<%= param('a') %>">log</a>
-					<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
-				</div>
-				<div id="mainLevel2">
-					<table>
-						<thead>
+			<h2>
+				<%= $site->value('Site name') %>
+			</h2>
+			<div class="tabStyleMenu">
+				<a href="/site_log.html?a=<%= param('a') %>">log</a>
+				<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
+			</div>
+			<div id="mainLevel2">
+				<table>
+					<thead>
+						<tr>
+							<th>Site id</th>
+							<th>OK</th>
+							<th>Error</th>
+							<th>timestamp</th>
+						</tr>
+					</thead>
+					<% Log::loop(
+						assign => 'log',
+						fields => ['Site id', 'OK', 'Error', 'timestamp'],
+						where => {'Site id' => &param('a')},
+					)<<EOF2 %>
+						<tbody>
 							<tr>
-								<th>Site id</th>
-								<th>OK</th>
-								<th>Error</th>
-								<th>timestamp</th>
+								<td><a href="/site_edit.html?a=<%= $log->value('Site id') %>"><%= $log->value('Site id') %></a></td>
+								<td><%= $log->value('OK') %></td>
+								<td><%= $log->value('Error') %></td>
+								<td><%= $log->value('timestamp') %></td>
 							</tr>
-						</thead>
-						<% Log::loop(
-							assign => 'log',
-							fields => ['Site id', 'OK', 'Error', 'timestamp'],
-							where => {'Site id' => &param('a')},
-						)<<EOF2 %>
-							<tbody>
-								<tr>
-									<td><a href="/site_edit.html?a=<%= $log->value('Site id') %>"><%= $log->value('Site id') %></a></td>
-									<td><%= $log->value('OK') %></td>
-									<td><%= $log->value('Error') %></td>
-									<td><%= $log->value('timestamp') %></td>
-								</tr>
-							</tbody>
-						<% EOF2 %>
-					</table>
-				</div>
-			<% EOF %>
+						</tbody>
+					<% EOF2 %>
+				</table>
+			</div>
 			<!-- InstanceEndEditable -->
         </div>
     </div>

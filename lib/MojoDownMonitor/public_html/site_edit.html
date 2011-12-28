@@ -3,7 +3,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja"><!-- InstanceBegin template="/Templates/base.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 	<!-- InstanceBeginEditable name="doctitle" -->
-    <title>mojo-down-monitor</title>
+	<% assign(site => &Sites::load(
+		assign 	=> 'site',
+		where 	=> {id => &param('a')},
+		fields 	=> [
+			'id',
+			'Site name',
+			'URI',
+			'Interval',
+			'Mail to',
+			'Status must be',
+			'MIME type must be',
+			'Content must match',
+			'HTTP header must match',
+		]
+	)) %>
+    <title>Edit <% $site->value('Site name') %> | mojo-down-monitor</title>
     <!-- InstanceEndEditable -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
@@ -29,67 +44,51 @@
 	<div id="mainWrapper">
       <div id="main">
             <!-- InstanceBeginEditable name="main" -->
-			<% Sites::loop(
-				assign 	=> 'site',
-				where 	=> {id => &param('a')},
-				fields 	=> [
-					'id',
-					'Site name',
-					'URI',
-					'Interval',
-					'Mail to',
-					'Status must be',
-					'MIME type must be',
-					'Content must match',
-					'HTTP header must match',
-				]
-			)<<EOF %>
-				<h2>
-					<%= $site->value('Site name') %>
-				</h2>
+			<h2>
+				<%= $site->value('Site name') %>
+			</h2>
+			
+			<div class="tabStyleMenu">
+				<a href="/site_log.html?a=<%= param('a') %>">log</a>
+				<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
+			</div>
+			<div id="mainLevel2">
 				
-				<div class="tabStyleMenu">
-					<a href="/site_log.html?a=<%= param('a') %>">log</a>
-					<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
+				<% Sites::put_user_err('formErrorContainer') %>
+				
+				<form enctype="multipart/form-data" method="post" action="./site_edit.html?a=<%= param('a') %>">
+				<div>
+					<input type="hidden" name="nextpage" value="/site_edit.html?a=<%= param('a') %>" />
+					<input type="hidden" name="mode" value="update" />
+					<input type="hidden" name="where" value='{"id":<%= param('a') %>}' />
+					<input type="hidden" name="columns" value="Site name,URI,Interval,Mail to,Status must be,MIME type must be,Content must match,HTTP header must match," />
 				</div>
-				<div id="mainLevel2">
-					
-					<% Sites::put_user_err('formErrorContainer') %>
-					
-					<form enctype="multipart/form-data" method="post" action="./site_edit.html?a=<%= param('a') %>">
-					<div>
-						<input type="hidden" name="nextpage" value="/site_edit.html?a=<%= param('a') %>" />
-						<input type="hidden" name="mode" value="update" />
-						<input type="hidden" name="where" value='{"id":<%= param('a') %>}' />
-						<input type="hidden" name="columns" value="Site name,URI,Interval,Mail to,Status must be,MIME type must be,Content must match,HTTP header must match," />
-					</div>
-					<table>
-						<tfoot>
-							<tr>
-								<td></td>
-								<td>
-									<input type="submit" value="edit" class="button" />
-								</td>
-							</tr>
-						</tfoot>
-						<% $site->each('column')<<EOF2 %>
-							<tr>
-								<th>
-									<%= $column->key %>
-								</th>
-								<td>
-									<% switch($column->key, ['id'])<<CASE1,DEFAULT %>
-										<% include('./form_parts/readonly_varchar.html', {column => $column}) %>
-									<% CASE1 %>
-										<% include('./form_parts/'. lc $column->type. '.html', {column => $column}) %>
-									<% DEFAULT %>
-								</td>
-							</tr>
-						<% EOF2 %>
-					</table>
-					</form>
-				</div>
-			<% EOF %>
+				<table>
+					<tfoot>
+						<tr>
+							<td></td>
+							<td>
+								<input type="submit" value="edit" class="button" />
+							</td>
+						</tr>
+					</tfoot>
+					<% $site->each('column')<<EOF2 %>
+						<tr>
+							<th>
+								<%= $column->key %>
+							</th>
+							<td>
+								<% switch($column->key, ['id'])<<CASE1,DEFAULT %>
+									<% include('./form_parts/readonly_varchar.html', {column => $column}) %>
+								<% CASE1 %>
+									<% include('./form_parts/'. lc $column->type. '.html', {column => $column}) %>
+								<% DEFAULT %>
+							</td>
+						</tr>
+					<% EOF2 %>
+				</table>
+				</form>
+			</div>
 			<!-- InstanceEndEditable -->
         </div>
     </div>

@@ -89,7 +89,7 @@ EOF
 		return $tpl->parse_str($template);
     }
     
-    sub load {
+    sub load : TplExport {
         my $self = shift;
 		my %args = (
 			fields 	=> undef,
@@ -103,6 +103,7 @@ EOF
         if (my $hash = $sth->fetchrow_hashref) {
 			return MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
         }
+		return;
     }
     
     ### ---
