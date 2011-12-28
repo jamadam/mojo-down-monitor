@@ -86,13 +86,11 @@ EOF
         my ($self) = @_;
         my $c = $self->controller;
         
-        $self->user_err->empty;
-        
         $self->validate_form;
         
         if ($self->user_err->count) {
             my $template = $c->req->body_params->param('errorpage');
-            #$c->render(handler => 'tusu', template => $template);
+            $c->render(handler => 'tusu', template => $template);
         } else {
             given ($c->req->body_params->param('mode')) {
                 when ('update') {$self->update}
@@ -101,7 +99,6 @@ EOF
             }
             $c->redirect_to($c->req->body_params->param('nextpage'));
         }
-        $self->user_err->empty;
         return;
     }
 	

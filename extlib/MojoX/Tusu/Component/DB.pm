@@ -13,9 +13,15 @@ use Data::Dumper;
 
     __PACKAGE__->attr('table');
     __PACKAGE__->attr('dbh');
-	
-	# TODO must protected from outside session
-    __PACKAGE__->attr('user_err', sub {MojoX::Tusu::Component::DB::User_error->new});
+    
+    sub user_err {
+        my ($self) = @_;
+        my $c = $self->controller;
+        if (! $c->stash('user_err')) {
+            $c->stash('user_err', MojoX::Tusu::Component::DB::User_error->new)
+        }
+        return $c->stash('user_err');
+    }
     
     sub unemptify {
         my ($self, $sql) = @_;
@@ -264,11 +270,6 @@ use warnings;
         my ($self) = @_;
         return @$self;
     }
-	
-	sub empty {
-        my ($self) = @_;
-		@$self = ();
-	}
 
 1;
 
