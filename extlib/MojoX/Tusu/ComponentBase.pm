@@ -24,8 +24,17 @@ use Mojo::Base;
     }
     
     sub controller {
-        
         return $Mojolicious::Plugin::Tusu::CONTROLLER;
+    }
+    
+    sub render {
+        my ($self) = shift;
+        my $c = $Mojolicious::Plugin::Tusu::CONTROLLER;
+        $c->render(
+            handler => 'tusu',
+            template => $c->req->url->path->to_string,
+            @_
+        );
     }
 
 1;

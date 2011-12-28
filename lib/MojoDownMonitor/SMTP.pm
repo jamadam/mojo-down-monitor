@@ -65,9 +65,7 @@ EOF
         $self->validate_form;
         
         if ($self->user_err->count) {
-            my $template = $c->req->body_params->param('errorpage');
-            warn $template;
-            $c->render(handler => 'tusu', template => $template);
+            $self->render;
         } else {
             given ($c->req->body_params->param('mode')) {
                 when ('update') {$self->update}

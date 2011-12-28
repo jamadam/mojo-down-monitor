@@ -59,7 +59,6 @@
 					<form enctype="multipart/form-data" method="post" action="./site_edit.html?a=<%= param('a') %>">
 					<div>
 						<input type="hidden" name="nextpage" value="/site_edit.html?a=<%= param('a') %>" />
-						<input type="hidden" name="errorpage" value="/site_edit.html" />
 						<input type="hidden" name="mode" value="update" />
 						<input type="hidden" name="where" value='{"id":<%= param('a') %>}' />
 						<input type="hidden" name="columns" value="Site name,URI,Interval,Mail to,Status must be,MIME type must be,Content must match,HTTP header must match," />
