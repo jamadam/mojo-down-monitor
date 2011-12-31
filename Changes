@@ -1,4 +1,10 @@
 Revision history for mojo-checkbot
 
-0.01 2011/12/28
+0.02 2012/01/01
+  - Changed max_log to be act as per site limitation.
+  - Made log descent order.
+  - Renamed script.
+  - Improved document a little.
+
+0.01 2011/12/31
   - initial release
