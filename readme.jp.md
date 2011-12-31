@@ -3,7 +3,10 @@ MojoDownMonitor 0.01 ALPHA
 
 ## DESCRIPTION
 
-This is a tool for detecting and notifying web site down.
+This is a web monitoring tool to detect your sites down.
+
+MojoDownMonitor gets multiple URIs in regular basis and checks if the response
+fulfills given conditions. 
 
 Copyright (c) 2011 [jamadam]
 [jamadam]: http://blog2.jamadam.com/
