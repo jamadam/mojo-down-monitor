@@ -82,7 +82,7 @@ our $VERSION = '0.01';
                     
                     my @change_msg_tbl = ();
                     $change_msg_tbl[0][1] = 'detected an error';
-                    $change_msg_tbl[1][0] = 'detected resolved';
+                    $change_msg_tbl[1][0] = 'detected an error resolved';
                     $change_msg_tbl[1][1] = 'detected an error continuously';
                     my $title = $change_msg_tbl[$new_log->{OK}][$last_log->{OK}];
                     
