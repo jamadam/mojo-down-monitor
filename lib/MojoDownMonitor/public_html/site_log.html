@@ -62,9 +62,10 @@
 						</tr>
 					</thead>
 					<% Log::loop(
-						assign => 'log',
-						fields => ['Site id', 'OK', 'Error', 'timestamp'],
-						where => {'Site id' => &param('a')},
+						assign 	=> 'log',
+						fields	=> ['Site id', 'OK', 'Error', 'timestamp'],
+						where 	=> {'Site id' => &param('a')},
+						orderby	=> [['id', 1]]
 					)<<EOF2 %>
 						<tbody>
 							<tr>
