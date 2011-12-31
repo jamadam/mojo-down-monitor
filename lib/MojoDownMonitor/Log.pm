@@ -10,7 +10,7 @@ use DBI;
 use base 'MojoX::Tusu::Component::SQLite';
 use Data::Dumper;
 
-    __PACKAGE__->attr('max_log', 500);
+    __PACKAGE__->attr('max_log', 50);
     
     sub init {
         my ($self, $app) = @_;
@@ -46,19 +46,25 @@ EOF
     
     ### ---
     ### limit logs number into max_log
+    ### DELETE FROM log WHERE id IN (select id  FROM log WHERE "Site id" = 4 ORDER BY id LIMIT -1 OFFSET 400);
     ### ---
     sub vacuum {
-        my ($self) = @_;
+        my ($self, $site_id) = @_;
         my $sql = SQL::OOP::Delete->new();
         $sql->set(
             $sql->ARG_TABLE => SQL::OOP::ID->new($self->table),
-            $sql->ARG_WHERE => SQL::OOP::Where->cmp('<=', 'id', sub {
+            $sql->ARG_WHERE => sub {
                 my $sub = SQL::OOP::Select->new;
-                return $sub->set(
-                    $sub->ARG_FIELDS    => 'max(id) - '. $self->max_log,
-                    $sub->ARG_FROM      => SQL::OOP::ID->new($self->table),
+                $sub->set(
+                    $sub->ARG_FIELDS    => 'id',
+                    $sub->ARG_FROM      => 'log',
+                    $sub->ARG_WHERE     => SQL::OOP::Where->cmp('=', 'Site id', $site_id),
+                    $sub->ARG_ORDERBY   => SQL::OOP::Order->new_desc('id'),
+                    $sub->ARG_LIMIT     => -1,
+                    $sub->ARG_OFFSET    => $self->max_log,
                 );
-            }),
+                return SQL::OOP::Where->in('id', $sub);
+            }
         );
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
         $sth->execute($sql->bind) or die $sth->errstr;
