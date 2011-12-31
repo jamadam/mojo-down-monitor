@@ -10,7 +10,7 @@ use DBI;
 use base 'MojoX::Tusu::Component::SQLite';
 use Data::Dumper;
 
-    __PACKAGE__->attr('max_log', 50);
+    __PACKAGE__->attr('max_log', 500);
     
     sub init {
         my ($self, $app) = @_;

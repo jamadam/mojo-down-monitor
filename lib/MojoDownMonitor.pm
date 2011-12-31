@@ -62,7 +62,14 @@ our $VERSION = '0.01';
         while (my $site = $sth->fetchrow_hashref) {
             my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
                 my $new_log = $self->check($site);
-                if (! $new_log->{OK}) {
+                my $last_log =
+                    $log
+                    ->dump({'Site id' => $site->{'Site id'}}, ['OK'], 1, [['id', 1]])
+                    ->fetchrow_hashref;
+                
+                $log->create(SQL::OOP::Dataset->new($new_log));
+                
+                if (! $new_log->{OK} || ! $last_log->{OK}) {
                     my $smtp_info = $smtp->server_info;
                     my $sendmail = MojoDownMonitor::Util::Sendmail->new(
                         $smtp_info->value('host'),
@@ -78,7 +85,6 @@ our $VERSION = '0.01';
                         $self->mail_body($site, $new_log),
                     );
                 }
-                $log->create(SQL::OOP::Dataset->new($new_log));
             });
             push(@loop_ids, $loop_id);
         }
