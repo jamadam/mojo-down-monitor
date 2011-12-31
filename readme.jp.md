@@ -8,6 +8,15 @@ This is a web monitoring tool to detect your sites down.
 MojoDownMonitor gets multiple URIs in regular basis and checks if the response
 fulfills given conditions. 
 
+## INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
 Copyright (c) 2011 [jamadam]
 [jamadam]: http://blog2.jamadam.com/
 
