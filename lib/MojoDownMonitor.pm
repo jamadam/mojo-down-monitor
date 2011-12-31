@@ -7,7 +7,7 @@ use Data::Dumper;
 use Time::Piece;
 use SQL::OOP::Dataset;
 use MojoDownMonitor::Util::Sendmail;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
     
     my $ua = Mojo::UserAgent->new;
     
