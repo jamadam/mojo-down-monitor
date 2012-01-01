@@ -68,6 +68,7 @@ our $VERSION = '0.03';
                     ->fetchrow_hashref;
                 
                 $log->create(SQL::OOP::Dataset->new($new_log));
+                warn $site->{'Site name'};
                 
                 if (! $new_log->{OK} || ! $last_log->{OK}) {
                     
