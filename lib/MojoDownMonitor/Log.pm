@@ -32,7 +32,7 @@ EOF
     sub create {
         my $self = shift;
         $self->SUPER::create(@_);
-        $self->vacuum($self->last_insert_rowid);
+        $self->vacuum($_[0]->retrieve('Site id'));
     }
     
     ### ---

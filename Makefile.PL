@@ -14,7 +14,7 @@ WriteMakefile(
         'Class::Data::Inheritable'  => '0.08',
         'DBD::SQLite'               => '1.35',
         'Try::Tiny'                 => '0.11',
-        'SQL::OOP'                  => '0.15',
+        'SQL::OOP'                  => '0.20',
         'Mojolicious'               => '2.32',
         'Authen::SASL'              => '2,15',
         'Net::SMTP::SSL'            => '1.01',
