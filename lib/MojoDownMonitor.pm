@@ -96,7 +96,7 @@ our $VERSION = '0.04';
                     $change_msg_tbl[1][0] = 'detected an error';
                     $change_msg_tbl[0][1] = 'detected an error resolved';
                     $change_msg_tbl[0][0] = 'detected an error continuously';
-                    my $title = $change_msg_tbl[$new_log->{OK}][$last_log->{OK}];
+                    my $title = $change_msg_tbl[$last_log->{OK}][$new_log->{OK}];
                     
                     my @mailto = split(',', $site->{'Mail to'});
                     $sendmail->sendmail(
