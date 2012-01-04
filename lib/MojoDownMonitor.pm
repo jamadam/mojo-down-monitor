@@ -9,7 +9,12 @@ use SQL::OOP::Dataset;
 use MojoDownMonitor::Util::Sendmail;
 our $VERSION = '0.04';
     
+    __PACKAGE__->attr('mdm_sites');
+    __PACKAGE__->attr('mdm_log');
+    __PACKAGE__->attr('mdm_smtp');
+    
     my $ua = Mojo::UserAgent->new;
+    my $json_parser = Mojo::JSON->new;
     
     sub startup {
         my $self = shift;
@@ -25,54 +30,60 @@ our $VERSION = '0.04';
             document_root => $self->home->rel_dir('public_html'),
         });
         
+        $self->mdm_log($tusu->get_component('MojoDownMonitor::Log'));
+        $self->mdm_sites($tusu->get_component('MojoDownMonitor::Sites'));
+        $self->mdm_smtp($tusu->get_component('MojoDownMonitor::SMTP'));
+        
         # special route
         my $r = $self->routes;
         $r->route('/site_list.html')->via('post')->to(cb => sub {
-            $tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
-            $self->set_cron($tusu);
+            my $c = $_[0];
+            $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
+            $self->set_cron($json_parser->decode($c->param('where'))->{id});
         });
         $r->route('/site_new.html')->via('post')->to(cb => sub {
-            $tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
-            $self->set_cron($tusu);
+            my $c = $_[0];
+            $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
+            $self->set_cron($self->mdm_sites->last_insert_rowid);
         });
         $r->route('/site_edit.html')->via('post')->to(cb => sub {
-            $tusu->bootstrap($_[0], 'MojoDownMonitor::Sites', 'post');
-            $self->set_cron($tusu);
+            my $c = $_[0];
+            $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
+            $self->set_cron($json_parser->decode($c->param('where'))->{id});
         });
         $r->route('/smtp_edit.html')->via('post')->to(cb => sub {
-            $tusu->bootstrap($_[0], 'MojoDownMonitor::SMTP', 'post');
-            $self->set_cron($tusu);
+            my $c = $_[0];
+            $tusu->bootstrap($c, 'MojoDownMonitor::SMTP', 'post');
+            $self->set_cron();
         });
         
-        $self->set_cron($tusu);
+        $self->set_cron();
     }
     
-    my @loop_ids;
+    my %loop_ids;
     
     sub set_cron {
-        my ($self, $tusu) = @_;
+        my ($self, $site_id) = @_;
+        my $sth = $self->mdm_sites->dump({id => $site_id});
         
-        while (my $id = shift @loop_ids) {
-            Mojo::IOLoop->drop($id);
-        }
-        
-        my $log = $tusu->get_component('MojoDownMonitor::Log');
-        my $sth = $tusu->get_component('MojoDownMonitor::Sites')->dump();
-        my $smtp = $tusu->get_component('MojoDownMonitor::SMTP');
         while (my $site = $sth->fetchrow_hashref) {
+            if ($loop_ids{$site->{'id'}}) {
+                Mojo::IOLoop->drop($loop_ids{$site->{'id'}});
+                delete $loop_ids{$site->{'id'}};
+            }
             my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
                 my $new_log = $self->check($site);
                 my $last_log =
-                    $log
+                    $self->mdm_log
                     ->dump({'Site id' => $site->{'id'}}, ['OK'], 1, [['id', 1]])
                     ->fetchrow_hashref;
                 
-                $log->create(SQL::OOP::Dataset->new($new_log));
-                $log->vacuum($site->{'Max log'}, $site->{'id'});
+                $self->mdm_log->create(SQL::OOP::Dataset->new($new_log));
+                $self->mdm_log->vacuum($site->{'Max log'}, $site->{'id'});
                 
-                if (! $new_log->{OK} || ! $last_log->{OK}) {
+                if ($last_log && ! $new_log->{OK} || ! $last_log->{OK}) {
                     
-                    my $smtp_info = $smtp->server_info;
+                    my $smtp_info = $self->mdm_smtp->server_info;
                     my $sendmail = MojoDownMonitor::Util::Sendmail->new(
                         $smtp_info->value('host'),
                         $smtp_info->value('port'),
@@ -95,7 +106,7 @@ our $VERSION = '0.04';
                     );
                 }
             });
-            push(@loop_ids, $loop_id);
+            $loop_ids{$site->{'id'}} = $loop_id;
         }
     }
     

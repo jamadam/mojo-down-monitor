@@ -31,10 +31,10 @@ use feature q/:5.10/;
     }
     
     sub cid_table {
-        my ($self) = @_;
+        my ($self, $c) = @_;
         my $t_def = $self->get_table_structure;
         my $out = {};
-        my $p = $self->controller->req->body_params;
+        my $p = ($c || $self->controller)->req->body_params;
         for my $name (keys %$t_def) {
             my $cid = 'cid-'. $t_def->{$name}->{cid};
             $out->{$name} = $p->param($cid)

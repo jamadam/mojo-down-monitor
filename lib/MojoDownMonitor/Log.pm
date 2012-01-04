@@ -57,7 +57,6 @@ EOF
                 return SQL::OOP::Where->in('id', $sub);
             }
         );
-        warn $sql->to_string_embedded;
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
         $sth->execute($sql->bind) or die $sth->errstr;
     }
