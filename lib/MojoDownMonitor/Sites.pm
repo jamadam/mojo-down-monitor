@@ -28,14 +28,15 @@ CREATE TABLE IF NOT EXISTS $table (
     "MIME type must be" VARCHAR,
     "Content must match" VARCHAR,
     "HTTP header must match" VARCHAR,
-    "Site name" VARCHAR
+    "Site name" VARCHAR,
+    "Max log" INTEGER NOT NULL DEFAULT (50)
 );
 EOF
         
         $self->unemptify(<<"EOF");
-INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '10', 'http://example.com', '', 'text/html', '301', 'a\@example.com,b\@example.com', 'example.com');
-INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '10', 'http://google.co.jp', '', '', '200', 'a\@example.com,b\@example.com', 'google');
-INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name") VALUES ('', '60', 'http://github.com', '', 'text/html; charset=utf-8', '200', 'a\@example.com,b\@example.com', 'github');
+INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name", "Site name") VALUES ('', '10', 'http://example.com', '', 'text/html', '301', 'a\@example.com,b\@example.com', 'example.com', 50);
+INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name", "Site name") VALUES ('', '10', 'http://google.co.jp', '', '', '200', 'a\@example.com,b\@example.com', 'google', 50);
+INSERT INTO $table ("Content must match", "Interval", "URI", "HTTP header must match", "MIME type must be", "Status must be", "Mail to", "Site name", "Site name") VALUES ('', '60', 'http://github.com', '', 'text/html; charset=utf-8', '200', 'a\@example.com,b\@example.com', 'github', 50);
 EOF
     }
     

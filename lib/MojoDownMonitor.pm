@@ -64,10 +64,11 @@ our $VERSION = '0.03';
                 my $new_log = $self->check($site);
                 my $last_log =
                     $log
-                    ->dump({'Site id' => $site->{'Site id'}}, ['OK'], 1, [['id', 1]])
+                    ->dump({'Site id' => $site->{'id'}}, ['OK'], 1, [['id', 1]])
                     ->fetchrow_hashref;
                 
                 $log->create(SQL::OOP::Dataset->new($new_log));
+                $log->vacuum($site->{'Max log'}, $site->{'id'});
                 
                 if (! $new_log->{OK} || ! $last_log->{OK}) {
                     

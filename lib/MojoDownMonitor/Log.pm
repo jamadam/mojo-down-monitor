@@ -10,7 +10,7 @@ use DBI;
 use base 'MojoDownMonitor::SitesBase';
 use Data::Dumper;
 
-    __PACKAGE__->attr('max_log', 50);
+    __PACKAGE__->attr('max_log', 1000);
     
     sub init {
         my ($self, $app) = @_;
@@ -32,7 +32,7 @@ EOF
     sub create {
         my $self = shift;
         $self->SUPER::create(@_);
-        $self->vacuum($_[0]->retrieve('Site id'));
+        $self->vacuum($self->max_log);
     }
     
     ### ---
@@ -40,7 +40,7 @@ EOF
     ### DELETE FROM log WHERE id IN (select id  FROM log WHERE "Site id" = 4 ORDER BY id LIMIT -1 OFFSET 400);
     ### ---
     sub vacuum {
-        my ($self, $site_id) = @_;
+        my ($self, $max, $site_id) = @_;
         my $sql = SQL::OOP::Delete->new();
         $sql->set(
             $sql->ARG_TABLE => SQL::OOP::ID->new($self->table),
@@ -52,11 +52,12 @@ EOF
                     $sub->ARG_WHERE     => SQL::OOP::Where->cmp('=', 'Site id', $site_id),
                     $sub->ARG_ORDERBY   => SQL::OOP::Order->new_desc('id'),
                     $sub->ARG_LIMIT     => -1,
-                    $sub->ARG_OFFSET    => $self->max_log,
+                    $sub->ARG_OFFSET    => $max || $self->max_log,
                 );
                 return SQL::OOP::Where->in('id', $sub);
             }
         );
+        warn $sql->to_string_embedded;
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
         $sth->execute($sql->bind) or die $sth->errstr;
     }

@@ -16,6 +16,7 @@
 			'MIME type must be',
 			'Content must match',
 			'HTTP header must match',
+			'Max log',
 		]
 	)) %>
 	<title>Edit <% $site->value('Site name') %> | mojo-down-monitor</title>
@@ -61,7 +62,7 @@
 					<input type="hidden" name="nextpage" value="/site_edit.html?a=<%= param('a') %>" />
 					<input type="hidden" name="mode" value="update" />
 					<input type="hidden" name="where" value='{"id":<%= param('a') %>}' />
-					<input type="hidden" name="columns" value="Site name,URI,Interval,Mail to,Status must be,MIME type must be,Content must match,HTTP header must match," />
+					<input type="hidden" name="columns" value="Site name,URI,Interval,Mail to,Status must be,MIME type must be,Content must match,HTTP header must match,Max log" />
 				</div>
 				<table>
 					<tfoot>
