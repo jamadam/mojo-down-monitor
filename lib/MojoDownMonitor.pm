@@ -7,7 +7,7 @@ use Data::Dumper;
 use Time::Piece;
 use SQL::OOP::Dataset;
 use MojoDownMonitor::Util::Sendmail;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
     
     my $ua = Mojo::UserAgent->new;
     
@@ -62,7 +62,16 @@ our $VERSION = '0.01';
         while (my $site = $sth->fetchrow_hashref) {
             my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
                 my $new_log = $self->check($site);
-                if (! $new_log->{OK}) {
+                my $last_log =
+                    $log
+                    ->dump({'Site id' => $site->{'Site id'}}, ['OK'], 1, [['id', 1]])
+                    ->fetchrow_hashref;
+                
+                $log->create(SQL::OOP::Dataset->new($new_log));
+                warn $site->{'Site name'};
+                
+                if (! $new_log->{OK} || ! $last_log->{OK}) {
+                    
                     my $smtp_info = $smtp->server_info;
                     my $sendmail = MojoDownMonitor::Util::Sendmail->new(
                         $smtp_info->value('host'),
@@ -71,14 +80,20 @@ our $VERSION = '0.01';
                         $smtp_info->value('user'),
                         $smtp_info->value('password'),
                     );
+                    
+                    my @change_msg_tbl = ();
+                    $change_msg_tbl[1][0] = 'detected an error';
+                    $change_msg_tbl[0][1] = 'detected an error resolved';
+                    $change_msg_tbl[0][0] = 'detected an error continuously';
+                    my $title = $change_msg_tbl[$new_log->{OK}][$last_log->{OK}];
+                    
                     my @mailto = split(',', $site->{'Mail to'});
                     $sendmail->sendmail(
                         \@mailto,
-                        '[ALERT] mojo-down-monitor detected an error',
-                        $self->mail_body($site, $new_log),
+                        "[ALERT] mojo-down-monitor $title",
+                        $self->mail_body($site, $new_log, $title),
                     );
                 }
-                $log->create(SQL::OOP::Dataset->new($new_log));
             });
             push(@loop_ids, $loop_id);
         }
@@ -117,8 +132,9 @@ our $VERSION = '0.01';
     }
     
     sub mail_body {
-        my ($self, $site, $log) = @_;
+        my ($self, $site, $log, $title) = @_;
         my $parser = Text::PSTemplate->new;
+        $parser->set_var('title' => $title);
         for my $key (keys %$site) {
             my $key2 = $key;
             $key2 =~ s{ }{_};

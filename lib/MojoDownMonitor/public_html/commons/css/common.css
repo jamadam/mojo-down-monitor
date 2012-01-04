@@ -231,3 +231,26 @@ tbody th {
 	margin-bottom:1em;
 	padding:10px 20px;
 }
+    #notifierContainer {
+        position:fixed;
+        top:10px;
+        right:10px;
+    }
+        #notifierContainer .notifier {
+            width:250px;
+            height:auto;
+            background-color:#000;
+            opacity:0.8;
+            border-radius:10px;
+            color:#fff;
+            padding:8px 12px;
+            min-height:50px;
+            margin-bottom:5px;
+            box-shadow:1px 1px 3px #888;
+        }
+        #notifierContainer .notifier:hover {
+            opacity:1;
+        }
+            #notifierContainer .notifier .error {
+                width:100%;
+            }
