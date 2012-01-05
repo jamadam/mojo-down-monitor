@@ -1,6 +1,8 @@
 Revision history for mojo-checkbot
 
-0.04 2012/01/01
+0.05 2012/01/05
+
+0.04 2012/01/05
   - Added Max log option on site edit
   - Added hypnotoad.conf
 

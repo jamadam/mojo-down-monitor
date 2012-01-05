@@ -7,7 +7,7 @@ use Data::Dumper;
 use Time::Piece;
 use SQL::OOP::Dataset;
 use MojoDownMonitor::Util::Sendmail;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
     
     __PACKAGE__->attr('mdm_sites');
     __PACKAGE__->attr('mdm_log');
