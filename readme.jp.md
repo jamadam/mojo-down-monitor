@@ -12,10 +12,17 @@ fulfills given conditions.
 
 To install this module, run the following commands:
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    $ make install
+
+## GETTING STARTED
+
+    $ hypnotoad ./script/mojo_down_monitor
+    Server available at http://127.0.0.1:8010.
+
+    $ hypnotoad ./script/mojo_down_monitor --stop
 
 Copyright (c) 2011 [jamadam]
 [jamadam]: http://blog2.jamadam.com/
