@@ -53,7 +53,6 @@ our $VERSION = '0.05';
         $r->route('/smtp_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::SMTP', 'post');
-            $self->set_cron();
         });
         
         $self->set_cron();
