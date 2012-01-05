@@ -18,7 +18,6 @@ our $VERSION = '0.04';
     
     sub startup {
         my $self = shift;
-        #my $home2 = Mojo::Home->new($self->home);
         $self->app->secret(time());
         $self->home->parse(File::Spec->catdir(dirname(__FILE__), 'MojoDownMonitor'));
         my $tusu = $self->plugin(tusu => {
