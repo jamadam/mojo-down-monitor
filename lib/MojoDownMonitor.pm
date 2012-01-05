@@ -91,15 +91,15 @@ our $VERSION = '0.05';
                     );
                     
                     my @change_msg_tbl = ();
-                    $change_msg_tbl[1][0] = 'detected an error';
-                    $change_msg_tbl[0][1] = 'detected an error resolved';
-                    $change_msg_tbl[0][0] = 'detected an error continuously';
+                    $change_msg_tbl[1][0] = 'An error detected';
+                    $change_msg_tbl[0][1] = 'An error resolved';
+                    $change_msg_tbl[0][0] = 'An error continuously detected';
                     my $title = $change_msg_tbl[$last_log->{OK}][$new_log->{OK}];
                     
                     my @mailto = split(',', $site->{'Mail to'});
                     $sendmail->sendmail(
                         \@mailto,
-                        "[ALERT] mojo-down-monitor $title",
+                        "[ALERT] $title",
                         $self->mail_body($site, $new_log, $title),
                     );
                 }
