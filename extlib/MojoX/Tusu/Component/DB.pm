@@ -11,6 +11,7 @@ use DBI;
 use base 'MojoX::Tusu::ComponentBase';
 use Data::Dumper;
 
+    __PACKAGE__->attr('table_structure');
     __PACKAGE__->attr('table');
     __PACKAGE__->attr('dbh');
     

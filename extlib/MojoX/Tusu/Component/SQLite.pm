@@ -8,22 +8,24 @@ use base 'MojoX::Tusu::Component::DB';
     ### get table information
     ### ---
     sub get_table_structure {
-    
         my ($self) = @_;
-        my $table = $self->table;
-        my $sql = qq{PRAGMA table_info ("$table")};
-        my $sth = $self->dbh->prepare($sql) or die $DBI::errstr;
-        my %ret = ();
-        
-        $sth->execute();
-        
-        while (my $res = $sth->fetchrow_hashref) {
-            $ret{$res->{name}} = {
-                cid     => $res->{cid},
-                type    => $res->{type},
-            };
+        if ($self->table_structure) {
+            my $table = $self->table;
+            my $sql = qq{PRAGMA table_info ("$table")};
+            my $sth = $self->dbh->prepare($sql) or die $DBI::errstr;
+            my %ret = ();
+            
+            $sth->execute();
+            
+            while (my $res = $sth->fetchrow_hashref) {
+                $ret{$res->{name}} = {
+                    cid     => $res->{cid},
+                    type    => $res->{type},
+                };
+            }
+            $self->table_structure(\%ret);
         }
-        return \%ret;
+        return $self->table_structure;
     }
     
     ### ---
