@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS $table (
     "Content must match" VARCHAR,
     "HTTP header must match" VARCHAR,
     "Site name" VARCHAR,
-    "Max log" INTEGER NOT NULL DEFAULT (50)
+    "Max log" INTEGER NOT NULL DEFAULT (50),
+    "Connect timeout" INTEGER DEFAULT (10),
+    "Body size must be" INTEGER,
+    "User Agent" VARCHAR
 );
 EOF
         

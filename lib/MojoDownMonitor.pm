@@ -7,13 +7,13 @@ use Data::Dumper;
 use Time::Piece;
 use SQL::OOP::Dataset;
 use MojoDownMonitor::Util::Sendmail;
+use Time::HiRes qw ( time );
 our $VERSION = '0.05';
     
     __PACKAGE__->attr('mdm_sites');
     __PACKAGE__->attr('mdm_log');
     __PACKAGE__->attr('mdm_smtp');
     
-    my $ua = Mojo::UserAgent->new;
     my $json_parser = Mojo::JSON->new;
     
     sub startup {
@@ -22,6 +22,7 @@ our $VERSION = '0.05';
         $self->home->parse(File::Spec->catdir(dirname(__FILE__), 'MojoDownMonitor'));
         my $tusu = $self->plugin(tusu => {
             components => {
+                'MojoDownMonitor::SitesBase'=> 'SitesBase',
                 'MojoDownMonitor::Sites'    => 'Sites',
                 'MojoDownMonitor::Log'      => 'Log',
                 'MojoDownMonitor::SMTP'     => 'SMTP',
@@ -44,6 +45,17 @@ our $VERSION = '0.05';
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
             $self->set_cron($self->mdm_sites->last_insert_rowid);
+        });
+        $r->route('/site_test.html')->via('post')->to(cb => sub {
+            my $c = $_[0];
+            my %data = $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'generate_dataset_hash_seed');
+            eval {
+                my $res = $self->check(\%data);
+                $c->render_json({result => $res});
+            };
+            if ($@) {
+                $c->render_json({error => $@});
+            }
         });
         $r->route('/site_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
@@ -110,19 +122,31 @@ our $VERSION = '0.05';
     
     sub check {
         my ($self, $site) = @_;
+        my $ua = Mojo::UserAgent->new->name($site->{'User Agent'} || "mojo-down-monitor/$VERSION (+https://github.com/jamadam/mojo-down-monitor)");
+        $ua->connect_timeout($site->{'Connect timeout'} || 10);
+        
+        my $time_s = time;
         my $tx = $ua->get($site->{URI});
+        my $time_e = time;
+        
+        my $res_time = (int($time_e * 1000000) - int($time_s * 1000000)) / 1000;
+        
         my $res = $tx->res;
         my $code = $res->code;
         my $type = $res->headers->content_type || '';
         my $body = $res->body || '';
+        my $body_size = $res->body_size;
         my $err;
         if ($code) {
             $err ||= is($code, $site->{'Status must be'}, qq{Got wrong status '$code'});
             $err ||= is($type, $site->{'MIME type must be'}, qq{Got wrong MIME type '$type'});
             $err ||= is($body, $site->{'Content must match'}, qq{Content doesn't match expectation});
+            $err ||= is($body_size, $site->{'Body size must be'}, qq{Got wrong body size $body_size bytes});
         } else {
             $err ||= $tx->error || 'Unknown error';
+            utf8::decode($err);
         }
+        
         my $time = Time::Piece::localtime()->datetime;
         $time =~ s{T}{ };
         return {
@@ -130,6 +154,7 @@ our $VERSION = '0.05';
             'OK'        => $err ? '0' : '1',
             'Error'     => $err,
             'timestamp' => $time,
+            'Response time' => $res_time,
         };
     }
     

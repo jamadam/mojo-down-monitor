@@ -1,6 +1,12 @@
 Revision history for mojo-checkbot
 
-0.05 2012/01/05
+0.05 2012/01/06
+  - Added connection test button on site form.
+  - Added user agent option on site form.
+  - Added connection timeout option on site form.
+  - Added response time on log.
+  - Fixed charactor corruption on log message.
+  - Improved pjax response architecture.
 
 0.04 2012/01/05
   - Added Max log option on site edit

@@ -9,7 +9,7 @@ use base 'MojoX::Tusu::Component::DB';
     ### ---
     sub get_table_structure {
         my ($self) = @_;
-        if ($self->table_structure) {
+        if (! $self->table_structure) {
             my $table = $self->table;
             my $sql = qq{PRAGMA table_info ("$table")};
             my $sth = $self->dbh->prepare($sql) or die $DBI::errstr;

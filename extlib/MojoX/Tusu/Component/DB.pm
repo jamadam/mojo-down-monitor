@@ -70,6 +70,7 @@ EOF
             my $tpl = Text::PSTemplate->new();
 			my $rec = MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
 			$tpl->set_var($args{assign} => $rec);
+			$tpl->set_var(component => $self);
             $out .= $tpl->parse_str($template);
         }
         return $out;
@@ -87,8 +88,49 @@ EOF
 		my $tpl = Text::PSTemplate->new();
 		my $rec = MojoX::Tusu::Component::DB::Record->new(undef, $table_structure, $args{fields});
 		$tpl->set_var($args{assign} => $rec);
+		$tpl->set_var(component => $self);
 		return $tpl->parse_str($template);
     }
+	
+	### ---
+	### top
+	### ---
+	sub top : TplExport {
+		my $self = shift;
+		my %args = (
+			assign 	=> 'rec',
+			field 	=> '',
+			limit 	=> 10,
+			@_);
+		
+        my $template = Text::PSTemplate::get_block(0);
+		
+		my $sql = SQL::OOP::Select->new();
+		$sql->set(
+			$sql->ARG_FIELDS 	=>
+				SQL::OOP::IDArray->new(
+					SQL::OOP::ID->new($args{field})->as($args{field}),
+					SQL::OOP->new("count(*) AS count"),
+				),
+			$sql->ARG_FROM		=> SQL::OOP::ID->new($self->table),
+			$sql->ARG_GROUPBY	=> SQL::OOP::ID->new($args{field}),
+			$sql->ARG_ORDERBY	=> SQL::OOP::Order->new_desc('count'),
+			$sql->ARG_LIMIT		=> $args{limit},
+		);
+		my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
+		
+		$sth->execute($sql->bind) or return;
+		
+        my $out = '';
+		my $table_structure = $self->get_table_structure;
+        while (my $hash = $sth->fetchrow_hashref) {
+            my $tpl = Text::PSTemplate->new();
+			my $rec = MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, [$args{field}]);
+			$tpl->set_var($args{assign} => $rec);
+            $out .= $tpl->parse_str($template);
+        }
+        return $out;
+	}
     
     sub load : TplExport {
         my $self = shift;

@@ -1,98 +1,59 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja"><!-- InstanceBegin template="/Templates/base.dwt" codeOutsideHTMLIsLocked="false" -->
-<head>
-	<!-- InstanceBeginEditable name="doctitle" -->
-	<% assign(site => &Sites::load(
-		assign 	=> 'site',
-		where 	=> {id => &param('a')},
-		fields 	=> [
-			'id',
-			'Site name',
-			'URI',
-			'Interval',
-			'Mail to',
-			'Status must be',
-			'MIME type must be',
-			'Content must match',
-			'HTTP header must match',
-		]
-	)) %>
+<% assign(site => &Sites::load(
+	assign 	=> 'site',
+	where 	=> {id => &param('a')},
+	fields 	=> [
+		'id',
+		'Site name',
+		'URI',
+		'Interval',
+		'Mail to',
+		'Status must be',
+		'MIME type must be',
+		'Content must match',
+		'HTTP header must match',
+	]
+)) %>
+<% extends(&SitesBase::is_pjax() ? '/base_pjax.html' : '/base.html')<<EXTENDS %>
+	<% block('doctitle')<<BLOCK %>
 	<title>Log for <% $site->value('Site name') %> | mojo-down-monitor</title>
-	<!-- InstanceEndEditable -->
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<meta http-equiv="Content-Style-Type" content="text/css" />
-	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-	<link type="text/css" rel="stylesheet" href="/commons/css/yui-reset.css" />
-	<link type="text/css" rel="stylesheet" href="/commons/css/yui-fonts.css" />
-	<link type="text/css" rel="stylesheet" href="/commons/css/common.css" />
-	<script type="text/javascript" src="/commons/js/jquery.1.7.1.js"></script>
-	<script type="text/javascript" src="/commons/js/jquery.currentTabManager.js"></script>
-	<script type="text/javascript" src="/commons/js/common.js"></script>
-	<!-- InstanceBeginEditable name="head" -->
-	<!-- InstanceEndEditable -->
-</head>
-<body>
-	<h1>
-		<a href="/">mojo-down-monitor</a>
-	</h1>
-	<div id="mainMenu">
-		<a href="/">Site List</a>
-		<a href="/smtp_edit.html">Edit SMTP</a>
+	<% BLOCK %>
+	<% block('main')<<BLOCK %>
+	<h2>
+		<%= $site->value('Site name') %>
+	</h2>
+	<div class="tabStyleMenu">
+		<a href="/site_log.html?a=<%= param('a') %>">log</a>
+		<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
 	</div>
-	<div id="mainWrapper">
-	  <div id="main">
-			<!-- InstanceBeginEditable name="main" -->
-			<h2>
-				<%= $site->value('Site name') %>
-			</h2>
-			<div class="tabStyleMenu">
-				<a href="/site_log.html?a=<%= param('a') %>">log</a>
-				<a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
-			</div>
-			<div id="mainLevel2">
-				<table>
-					<thead>
-						<tr>
-							<th>Site id</th>
-							<th>OK</th>
-							<th>Error</th>
-							<th>timestamp</th>
-						</tr>
-					</thead>
-					<% Log::loop(
-						assign 	=> 'log',
-						fields	=> ['Site id', 'OK', 'Error', 'timestamp'],
-						where 	=> {'Site id' => &param('a')},
-						orderby	=> [['id', 1]]
-					)<<EOF2 %>
-						<tbody>
-							<tr>
-								<td><a href="/site_edit.html?a=<%= $log->value('Site id') %>"><%= $log->value('Site id') %></a></td>
-								<td><%= $log->value('OK') %></td>
-								<td><%= $log->value('Error') %></td>
-								<td><%= $log->value('timestamp') %></td>
-							</tr>
-						</tbody>
-					<% EOF2 %>
-				</table>
-			</div>
-			<!-- InstanceEndEditable -->
-		</div>
+	<div id="mainLevel2">
+		<table>
+			<thead>
+				<tr>
+					<th>Site id</th>
+					<th>OK</th>
+					<th>Error</th>
+					<th>timestamp</th>
+					<th>Response time(ms)</th>
+				</tr>
+			</thead>
+			<% Log::loop(
+				assign 	=> 'log',
+				fields	=> ['Site id', 'OK', 'Error', 'timestamp', 'Response time'],
+				where 	=> {'Site id' => &param('a')},
+				orderby	=> [['id', 1]]
+			)<<EOF2 %>
+				<tbody>
+					<tr>
+						<td><a href="/site_edit.html?a=<%= $log->value('Site id') %>"><%= $log->value('Site id') %></a></td>
+						<td><%= $log->value('OK') %></td>
+						<td><%= $log->value('Error') %></td>
+						<td><%= $log->value('timestamp') %></td>
+						<td><%= $log->value('Response time') %></td>
+					</tr>
+				</tbody>
+			<% EOF2 %>
+		</table>
 	</div>
-	<div id="footer">
-		<div>
-			&copy; <a rel="external" href="http://blog2.jamadam.com/">jamadam.com</a> |
-			Powered by <a rel="external" href="https://github.com/jamadam/MojoX-Tusu">MojoX::Tusu</a>
-		</div>
-	</div>
-	
-	<div id="nowLoading" style="display:none">
-		<div class="content">Now Loading..</div>
-		<div class="cancel">Cancel</div>
-	</div>
-	<div id="notifierContainer">
-	</div>
-</body>
-<!-- InstanceEnd --></html>
+	<% BLOCK %>
+<% EXTENDS %>
+

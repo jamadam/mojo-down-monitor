@@ -30,6 +30,11 @@ use feature q/:5.10/;
         $self->dbh($dbh);
     }
     
+    sub is_pjax : TplExport {
+        my ($self) = @_;
+        return defined $self->controller->req->headers->header('X-PJAX');
+    }
+    
     sub cid_table {
         my ($self, $c) = @_;
         my $t_def = $self->get_table_structure;
@@ -42,12 +47,9 @@ use feature q/:5.10/;
         return $out;
     }
     
-    ### ---
-    ### generate dataset for db insert or update with form data
-    ### ---
-    sub generate_dataset {
+    sub generate_dataset_hash_seed {
         my $self = shift;
-        my $data = SQL::OOP::Dataset->new();
+        my @data;
         my $tabe_structure = $self->get_table_structure;
         my @columns = split /,/, $self->controller->param('columns');
         if (! scalar @columns) {
@@ -70,7 +72,20 @@ use feature q/:5.10/;
                     }
                 }
             }
-            $data->append($cname => $value);
+            push(@data, $cname, $value);
+        }
+        return @data;
+    }
+    
+    ### ---
+    ### generate dataset for db insert or update with form data
+    ### ---
+    sub generate_dataset {
+        my $self = shift;
+        my $data = SQL::OOP::Dataset->new();
+        my @array = $self->generate_dataset_hash_seed;
+        while (my ($key, $value) = splice @array, 0, 2) {
+            $data->append($key => $value);
         }
         return $data;
     }

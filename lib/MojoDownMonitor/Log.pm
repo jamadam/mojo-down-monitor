@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS "log" (
     "Site id" VARCHAR,
     "OK" BOOL NOT NULL ,
     "Error" TEXT,
-    "timestamp" DATETIME DEFAULT (datetime('now','localtime'))
+    "timestamp" DATETIME DEFAULT (datetime('now','localtime')),
+    "Response time" REAL
 )
 EOF
         $self->table('log');
