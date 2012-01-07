@@ -8,11 +8,11 @@ This is a web monitoring tool to detect your sites down.
 MojoDownMonitor gets multiple URIs in regular basis and checks if the response
 fulfills given conditions. 
 
-![Site list](/jamadam/mojo-down-monitor/raw/master/screenshot/01.jpg "Site list")
+![Site list](/jamadam/mojo-down-monitor/raw/master/screenshot/01.png "Site list")
 
-![Site edit](/jamadam/mojo-down-monitor/raw/master/screenshot/02.jpg "Site edit")
+![Site edit](/jamadam/mojo-down-monitor/raw/master/screenshot/02.png "Site edit")
 
-![Site log](/jamadam/mojo-down-monitor/raw/master/screenshot/03.jpg "Site log")
+![Site log](/jamadam/mojo-down-monitor/raw/master/screenshot/03.png "Site log")
 
 ## INSTALLATION
 
