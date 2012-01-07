@@ -39,18 +39,18 @@ our $VERSION = '0.05';
         $r->route('/site_list.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $self->set_cron($json_parser->decode($c->param('where'))->{id});
+            $c->app->set_cron($json_parser->decode($c->param('where'))->{id});
         });
         $r->route('/site_new.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $self->set_cron($self->mdm_sites->last_insert_rowid);
+            $c->app->set_cron($c->app->mdm_sites->last_insert_rowid);
         });
         $r->route('/site_test.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             my %data = $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'generate_dataset_hash_seed');
             eval {
-                my $res = $self->check(\%data);
+                my $res = $c->app->check(\%data);
                 $c->render_json({result => $res});
             };
             if ($@) {
@@ -60,7 +60,7 @@ our $VERSION = '0.05';
         $r->route('/site_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $self->set_cron($json_parser->decode($c->param('where'))->{id});
+            $c->app->set_cron($json_parser->decode($c->param('where'))->{id});
         });
         $r->route('/smtp_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
