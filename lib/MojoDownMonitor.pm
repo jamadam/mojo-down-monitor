@@ -10,7 +10,7 @@ use Time::Piece;
 use SQL::OOP::Dataset;
 use MojoDownMonitor::Util::Sendmail;
 use Time::HiRes qw ( time );
-our $VERSION = '0.05';
+our $VERSION = '0.07';
     
     __PACKAGE__->attr('mdm_sites');
     __PACKAGE__->attr('mdm_log');
