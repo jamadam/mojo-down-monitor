@@ -30,6 +30,10 @@ our $VERSION = '0.05';
                 'MojoDownMonitor::SMTP'     => 'SMTP',
             },
             document_root => $self->home->rel_dir('public_html'),
+            error_document => {
+                404 => '/error_document/404.html',
+                500 => '/error_document/500.html',
+            },
         });
         
         $self->mdm_log($tusu->get_component('MojoDownMonitor::Log'));
