@@ -152,7 +152,7 @@ our $VERSION = '0.05';
         return {
             'Site id'   => $site->{'id'},
             'OK'        => $err ? '0' : '1',
-            'Error'     => $err,
+            'Error'     => $err || undef,
             'timestamp' => $time,
             'Response time' => $res_time,
         };
@@ -172,12 +172,12 @@ our $VERSION = '0.05';
         for my $key (keys %$site) {
             my $key2 = $key;
             $key2 =~ s{ }{_};
-            $parser->set_var('site_'. $key2 => $site->{$key});
+            $parser->set_var('site_'. $key2 => $site->{$key} || '');
         }
         for my $key (keys %$log) {
             my $key2 = $key;
             $key2 =~ s{ }{_};
-            $parser->set_var('log_'. $key2 => $log->{$key});
+            $parser->set_var('log_'. $key2 => $log->{$key} || '');
         }
         return $parser->parse_file($self->home->rel_file('mail_body.html'));
     }
