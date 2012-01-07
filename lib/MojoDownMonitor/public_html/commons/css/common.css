@@ -170,8 +170,9 @@ tbody th {
 	}
 #nowLoading {
 	position:fixed;
-	top:130px;
-	right:30px;
+	width:100%;
+	top:50%;
+	left:0;
 	text-align:center;
 	cursor:pointer;
 	padding:10px;
@@ -184,7 +185,7 @@ tbody th {
 		background-image:url(/commons/image/loading.gif);
 		text-indent:-9999px;
 		margin-bottom:5px;
-		opacity:0.6;
+		opacity:0.4;
 	}
 	#nowLoading .cancel {
 		color:#555;
