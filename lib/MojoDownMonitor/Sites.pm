@@ -56,7 +56,7 @@ EOF
                     $self->user_err->stack('Interval must be a digit');
                 }
                 if (! $cid_data->{'URI'}) {
-                    $self->user_err->stack('URI must be a digit');
+                    $self->user_err->stack('URI is required');
                 }
             }
             when ('delete') {
