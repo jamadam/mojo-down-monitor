@@ -29,7 +29,6 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Site id</th>
 					<th>OK</th>
 					<th>Error</th>
 					<th>timestamp</th>
@@ -38,13 +37,12 @@
 			</thead>
 			<% Log::loop(
 				assign 	=> 'log',
-				fields	=> ['Site id', 'OK', 'Error', 'timestamp', 'Response time'],
+				fields	=> ['OK', 'Error', 'timestamp', 'Response time'],
 				where 	=> {'Site id' => &param('a')},
 				orderby	=> [['id', 1]]
 			)<<EOF2 %>
 				<tbody>
 					<tr>
-						<td><a href="/site_edit.html?a=<%= $log->value('Site id') %>"><%= $log->value('Site id') %></a></td>
 						<td><%= $log->value('OK') %></td>
 						<td><%= $log->value('Error') %></td>
 						<td><%= $log->value('timestamp') %></td>
