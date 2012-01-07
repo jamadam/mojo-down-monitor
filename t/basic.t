@@ -3,6 +3,11 @@
 use strict;
 use warnings;
 
+use File::Basename 'dirname';
+use File::Spec;
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'extlib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+
 use Test::More tests => 5;
 use Test::Mojo;
 

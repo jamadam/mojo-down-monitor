@@ -103,9 +103,11 @@ __END__
 
 =head1 METHODS
 
-=head2 C<startup>
+=head2 Class->new
 
-Not written yet.
+=head2 Class->sendmail
+
+=head2 Class->html_to_plaintext
 
 =head1 SEE ALSO
 

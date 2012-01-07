@@ -1,4 +1,6 @@
 package MojoDownMonitor;
+use strict;
+use warnings;
 use Mojo::Base 'Mojolicious';
 use Text::PSTemplate;
 use File::Basename 'dirname';
@@ -39,12 +41,12 @@ our $VERSION = '0.05';
         $r->route('/site_list.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $c->app->set_cron($json_parser->decode($c->param('where'))->{id});
+            $c->app->_set_cron($json_parser->decode($c->param('where'))->{id});
         });
         $r->route('/site_new.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $c->app->set_cron($c->app->mdm_sites->last_insert_rowid);
+            $c->app->_set_cron($c->app->mdm_sites->last_insert_rowid);
         });
         $r->route('/site_test.html')->via('post')->to(cb => sub {
             my $c = $_[0];
@@ -60,19 +62,19 @@ our $VERSION = '0.05';
         $r->route('/site_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $c->app->set_cron($json_parser->decode($c->param('where'))->{id});
+            $c->app->_set_cron($json_parser->decode($c->param('where'))->{id});
         });
         $r->route('/smtp_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::SMTP', 'post');
         });
         
-        $self->set_cron();
+        $self->_set_cron();
     }
     
     my %loop_ids;
     
-    sub set_cron {
+    sub _set_cron {
         my ($self, $site_id) = @_;
         my $sth = $self->mdm_sites->dump({id => $site_id});
         
@@ -112,7 +114,7 @@ our $VERSION = '0.05';
                     $sendmail->sendmail(
                         \@mailto,
                         "[ALERT] $title",
-                        $self->mail_body($site, $new_log, $title),
+                        $self->_mail_body($site, $new_log, $title),
                     );
                 }
             });
@@ -138,10 +140,10 @@ our $VERSION = '0.05';
         my $body_size = $res->body_size;
         my $err;
         if ($code) {
-            $err ||= is($code, $site->{'Status must be'}, qq{Got wrong status '$code'});
-            $err ||= is($type, $site->{'MIME type must be'}, qq{Got wrong MIME type '$type'});
-            $err ||= is($body, $site->{'Content must match'}, qq{Content doesn't match expectation});
-            $err ||= is($body_size, $site->{'Body size must be'}, qq{Got wrong body size $body_size bytes});
+            $err ||= _is($code, $site->{'Status must be'}, qq{Got wrong status '$code'});
+            $err ||= _is($type, $site->{'MIME type must be'}, qq{Got wrong MIME type '$type'});
+            $err ||= _is($body, $site->{'Content must match'}, qq{Content doesn't match expectation});
+            $err ||= _is($body_size, $site->{'Body size must be'}, qq{Got wrong body size $body_size bytes});
         } else {
             $err ||= $tx->error || 'Unknown error';
             utf8::decode($err);
@@ -158,14 +160,14 @@ our $VERSION = '0.05';
         };
     }
     
-    sub is {
+    sub _is {
         my ($got, $expected, $err) = @_;
         if ($expected && $got && $got ne $expected) {
             return $err;
         }
     }
     
-    sub mail_body {
+    sub _mail_body {
         my ($self, $site, $log, $title) = @_;
         my $parser = Text::PSTemplate->new;
         $parser->set_var('title' => $title);
@@ -193,6 +195,10 @@ __END__
 =head1 DESCRIPTION
 
 =head1 METHODS
+
+=head2 $instance->startup
+
+=head2 $instance->check
 
 =head2 C<startup>
 
