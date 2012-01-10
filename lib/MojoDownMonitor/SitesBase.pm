@@ -6,6 +6,7 @@ use SQL::OOP::Select;
 use SQL::OOP::Dataset;
 use SQL::OOP::Insert;
 use SQL::OOP::Delete;
+use Mojo::JSON;
 use DBI;
 use base 'MojoX::Tusu::Component::SQLite';
 use Data::Dumper;
@@ -15,6 +16,8 @@ use feature q/:5.10/;
         my $self= shift;
         $self->get_engine->get_plugin(__PACKAGE__)->dbh;
     }
+	
+	my $json_parser = Mojo::JSON->new;
     
     sub init {
         my ($self, $app) = @_;
@@ -115,17 +118,18 @@ use feature q/:5.10/;
     }
     
     sub update {
-        my ($self, $data) = @_;
-        my $json_parser = Mojo::JSON->new;
-        my $where_seed = $self->controller->param('where');
-        my $where = SQL::OOP::Where->and_hash($json_parser->decode($where_seed));
+        my ($self, $data, $where_seed) = @_;
+		my $where_hash =
+			$json_parser->decode($where_seed || $self->controller->param('where'));
+		my $where = SQL::OOP::Where->and_hash($where_hash);
         $self->SUPER::update($data || $self->generate_dataset, $where);
     }
     
     sub delete {
-        my ($self) = @_;
-        my $where_seed = $self->controller->param('where');
-        my $where = SQL::OOP::Where->and_hash(Mojo::JSON->decode($where_seed));
+        my ($self, $where_seed) = @_;
+		my $where_hash =
+			$json_parser->decode($where_seed || $self->controller->param('where'));
+		my $where = SQL::OOP::Where->and_hash($where_hash);
         $self->SUPER::delete($where);
     }
 

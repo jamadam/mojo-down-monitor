@@ -42,7 +42,7 @@ our $VERSION = '0.07';
         
         # special route
         my $r = $self->routes;
-        $r->route('/site_list.html')->via('post')->to(cb => sub {
+        $r->route('/index.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
             $c->app->_set_cron($json_parser->decode($c->param('where'))->{id});

@@ -31,9 +31,9 @@
 					<td><%= $site->value('URI') %></td>
 					<td><%= $site->value('Interval') %></td>
 					<td>
-						<form enctype="multipart/form-data" method="post" action="./site_list.html">
+						<form enctype="multipart/form-data" method="post" action="/index.html">
 							<div>
-								<input type="hidden" name="nextpage" value="/site_list.html" />
+								<input type="hidden" name="nextpage" value="/index.html" />
 								<input type="hidden" name="mode" value="delete" />
 								<input type="hidden" name="where" value='{"id":<%= $site->value('id') %>}' />
 								<input type="submit" value="Delete" class="button" />
