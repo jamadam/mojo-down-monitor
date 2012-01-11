@@ -36,6 +36,25 @@ use Mojo::Base;
             @_
         );
     }
+	
+	sub redirect_to {
+		my ($self, $url) = @_;
+		my $c = $self->controller;
+		
+		my $base;
+		if ($ENV{REQUEST_URI}) {
+			$base = $c->req->url->base->clone->path($ENV{REQUEST_URI})->to_abs;
+		} else {
+			$base = $c->req->url->clone->to_abs;
+		}
+		$base->userinfo(undef);
+		
+		my $res     = $c->res;
+		my $headers = $res->headers;
+		$headers->location(Mojo::URL->new($url)->base($base)->to_abs);
+		$c->rendered($res->is_status_class(300) ? undef : 302);
+		return $c;
+	}
 
 1;
 
@@ -93,6 +112,16 @@ called from constructor.
 =head2 $instance->attr
 
 =head2 $class->new
+
+=head2 $instance->redirect_to
+
+This is a wrapper method for $c->redirect_to to avoid using PATH_INFO on CGI
+environment.
+
+    $self->redirect_to('./foo.html');
+    $self->redirect_to('/foo/bar.html');
+    $self->redirect_to('http://example.com/foo/bar.html');
+    $self->redirect_to('/');
 
 =head1 SEE ALSO
 

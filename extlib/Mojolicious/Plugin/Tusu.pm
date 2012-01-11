@@ -110,9 +110,9 @@ use Carp;
     ### ---
     sub bootstrap {
         
-        my ($self, $c, $component, $action) = @_;
+        my ($self, $c, $component, $action, @args) = @_;
         local $CONTROLLER = $c;
-        return $self->engine->get_plugin($component)->$action($c);
+        return $self->engine->get_plugin($component)->$action(@args);
     }
     
     ### ---

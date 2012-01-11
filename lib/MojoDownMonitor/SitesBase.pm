@@ -107,7 +107,7 @@ use feature q/:5.10/;
                 when ('create') {$self->create}
                 when ('delete') {$self->delete}
             }
-            $c->redirect_to($c->req->body_params->param('nextpage'));
+            $self->redirect_to($c->req->body_params->param('nextpage'));
         }
         return;
     }
