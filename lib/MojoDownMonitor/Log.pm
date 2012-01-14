@@ -14,7 +14,15 @@ use Data::Dumper;
     
     sub init {
         my ($self, $app) = @_;
-        my $dbh = $self->common_dbh;
+        my $file = $app->home->rel_file('data/sites.sqlite');
+        my $dbh = DBI->connect_cached("DBI:SQLite:dbname=$file",
+            undef, undef, {
+                AutoCommit      => 1,
+                RaiseError      => 1,
+                sqlite_unicode  => 1,
+                sqlite_allow_multiple_statements => 1,
+            }
+        ) or die 'Connect to SQLite file '. $file. ' failed';
         $self->dbh($dbh);
         
         $dbh->do(<<'EOF') or die $dbh->errstr;
@@ -32,8 +40,10 @@ EOF
     
     sub create {
         my $self = shift;
+        $self->dbh->begin_work;
         $self->SUPER::create(@_);
         $self->vacuum($self->max_log);
+        $self->dbh->commit;
     }
     
     ### ---

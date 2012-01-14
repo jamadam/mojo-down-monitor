@@ -89,10 +89,11 @@ our $VERSION = '0.07';
             }
             my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
                 my $new_log = $self->check($site);
-                my $last_log =
+                my $sth =
                     $self->mdm_log
-                    ->dump({'Site id' => $site->{'id'}}, ['OK'], 1, [['id', 1]])
-                    ->fetchrow_hashref;
+                         ->dump({'Site id' => $site->{'id'}}, ['OK'], 1, [['id', 1]]);
+                my $last_log = $sth->fetchrow_hashref;
+                $sth->finish;
                 
                 $self->mdm_log->create(SQL::OOP::Dataset->new($new_log));
                 $self->mdm_log->vacuum($site->{'Max log'}, $site->{'id'});
@@ -124,6 +125,7 @@ our $VERSION = '0.07';
             });
             $loop_ids{$site->{'id'}} = $loop_id;
         }
+        $sth->finish;
     }
     
     sub check {

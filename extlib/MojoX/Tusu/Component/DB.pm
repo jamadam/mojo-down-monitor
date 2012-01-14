@@ -86,6 +86,7 @@ EOF
 			$tpl->set_var(component => $self);
             $out .= $tpl->parse_str($template);
         }
+		$sth->finish;
         return $out;
     }
     
@@ -145,6 +146,7 @@ EOF
 			$tpl->set_var($args{assign} => $rec);
             $out .= $tpl->parse_str($template);
         }
+		$sth->finish;
         return $out;
 	}
     
@@ -165,6 +167,7 @@ EOF
         if (my $hash = $sth->fetchrow_hashref) {
 			return MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
         }
+		$sth->finish;
 		return;
     }
 	
@@ -187,6 +190,7 @@ EOF
 			my $rec = MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
 			push(@array, $rec);
         }
+		$sth->finish;
 		return MojoX::Tusu::Component::DB::Records->new(\@array);
 	}
     
@@ -203,6 +207,7 @@ EOF
         );
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
         $sth->execute($sql->bind) or die $sth->errstr;
+		$sth->finish;
     }
     
     ### ---
@@ -219,6 +224,7 @@ EOF
         );
         my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
         $sth->execute($sql->bind) or die $sth->errstr;
+		$sth->finish;
     }
     
     ### ---
@@ -235,6 +241,7 @@ EOF
             );
             my $sth = $self->dbh->prepare($sql->to_string) or die $self->dbh->errstr;
             $sth->execute($sql->bind) or die $sth->errstr;
+			$sth->finish;
         }
     }
     
