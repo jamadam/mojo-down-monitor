@@ -11,8 +11,8 @@ use DBI;
 use base 'MojoX::Tusu::Component::SQLite';
 use Data::Dumper;
 use feature q/:5.10/;
-	
-	my $json_parser = Mojo::JSON->new;
+    
+    my $json_parser = Mojo::JSON->new;
     
     sub is_pjax : TplExport {
         my ($self) = @_;
@@ -100,17 +100,17 @@ use feature q/:5.10/;
     
     sub update {
         my ($self, $data, $where_seed) = @_;
-		my $where_hash =
-			$json_parser->decode($where_seed || $self->controller->param('where'));
-		my $where = SQL::OOP::Where->and_hash($where_hash);
+        my $where_hash =
+            $json_parser->decode($where_seed || $self->controller->param('where'));
+        my $where = SQL::OOP::Where->and_hash($where_hash);
         $self->SUPER::update($data || $self->generate_dataset, $where);
     }
     
     sub delete {
         my ($self, $where_seed) = @_;
-		my $where_hash =
-			$json_parser->decode($where_seed || $self->controller->param('where'));
-		my $where = SQL::OOP::Where->and_hash($where_hash);
+        my $where_hash =
+            $json_parser->decode($where_seed || $self->controller->param('where'));
+        my $where = SQL::OOP::Where->and_hash($where_hash);
         $self->SUPER::delete($where);
     }
 
