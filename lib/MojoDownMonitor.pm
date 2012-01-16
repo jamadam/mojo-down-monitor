@@ -17,6 +17,7 @@ our $VERSION = '0.07';
     __PACKAGE__->attr('mdm_smtp');
     
     my $json_parser = Mojo::JSON->new;
+    my %loop_ids;
     
     sub startup {
         my $self = shift;
@@ -73,10 +74,28 @@ our $VERSION = '0.07';
             $tusu->bootstrap($c, 'MojoDownMonitor::SMTP', 'post');
         });
         
+        # routes for debuging below
+        
+        $r->route('/debug/benchmark.html')->via('get')->to(cb => sub {
+            my $c = $_[0];
+            my $s = time;
+            $self->mdm_sites({id => 1});
+            my $e = time;
+            my $res_time = (int($e * 1000000) - int($s * 1000000)) / 1000;
+            $c->render_text($res_time);
+        });
+        $r->route('/debug/dump.html')->via('get')->to(cb => sub {
+            my $c = $_[0];
+            my $dump = Dumper(Mojo::IOLoop->singleton);
+            $c->render_text($dump);
+        });
+        $r->route('/debug/loops.html')->via('get')->to(cb => sub {
+            my $c = $_[0];
+            $c->render_json(\%loop_ids);
+        });
+        
         $self->_set_cron();
     }
-    
-    my %loop_ids;
     
     sub _set_cron {
         my ($self, $site_id) = @_;
@@ -131,7 +150,7 @@ our $VERSION = '0.07';
     sub check {
         my ($self, $site) = @_;
         my $ua = Mojo::UserAgent->new->name($site->{'User Agent'} || "mojo-down-monitor/$VERSION (+https://github.com/jamadam/mojo-down-monitor)");
-        $ua->connect_timeout($site->{'Connect timeout'} || 10);
+        $ua->inactivity_timeout($site->{'Connect timeout'} || 10);
         
         my $time_s = time;
         my $tx = $ua->get($site->{URI});
