@@ -46,12 +46,16 @@ our $VERSION = '0.07';
         $r->route('/index.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $c->app->_set_cron($json_parser->decode($c->param('where'))->{id});
+            my $id = $json_parser->decode($c->param('where'))->{id};
+            $c->app->_delete_cron($id);
+            $c->app->_set_cron($id);
         });
         $r->route('/site_new.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $c->app->_set_cron($c->app->mdm_sites->last_insert_rowid);
+            my $id = $c->app->mdm_sites->last_insert_rowid;
+            $c->app->_delete_cron($id);
+            $c->app->_set_cron($id);
         });
         $r->route('/site_test.html')->via('post')->to(cb => sub {
             my $c = $_[0];
@@ -67,7 +71,9 @@ our $VERSION = '0.07';
         $r->route('/site_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
-            $c->app->_set_cron($json_parser->decode($c->param('where'))->{id});
+            my $id = $json_parser->decode($c->param('where'))->{id};
+            $c->app->_delete_cron($id);
+            $c->app->_set_cron($id);
         });
         $r->route('/smtp_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
@@ -97,15 +103,19 @@ our $VERSION = '0.07';
         $self->_set_cron();
     }
     
+    sub _delete_cron {
+        my ($self, $site_id) = @_;
+        if ($loop_ids{$site_id}) {
+            Mojo::IOLoop->drop($loop_ids{$site_id});
+            delete $loop_ids{$site_id};
+        }
+    }
+    
     sub _set_cron {
         my ($self, $site_id) = @_;
         my $sth = $self->mdm_sites->dump({id => $site_id});
         
         while (my $site = $sth->fetchrow_hashref) {
-            if ($loop_ids{$site->{'id'}}) {
-                Mojo::IOLoop->drop($loop_ids{$site->{'id'}});
-                delete $loop_ids{$site->{'id'}};
-            }
             my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
                 my $new_log = $self->check($site);
                 my $sth =
