@@ -5,7 +5,15 @@
 	<% block('main')<<BLOCK %>
 	<div id="mainLevel2">
 		
-		<% SMTP::put_user_err('formErrorContainer') %>
+		<% if(&Sites::user_err()->count)<<USERERR %>
+			<ul id="formErrorContainer">
+				<% Sites::user_err()->each('value')<<LI %>
+					<li>
+						<% $value %>
+					</li>
+				<% LI %>
+			</ul>
+		<% USERERR %>
 		
 		<% SMTP::loop(
 			assign 	=> 'smtp',

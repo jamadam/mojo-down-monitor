@@ -1,9 +1,10 @@
 package MojoX::Tusu::ComponentBase;
 use strict;
 use warnings;
-use base qw(Text::PSTemplate::PluginBase);
 use Mojo::Base;
-    
+use MojoX::Tusu::UserError;
+use base qw(Text::PSTemplate::PluginBase);
+
     sub attr {
         Mojo::Base::attr(@_);
     }
@@ -18,6 +19,10 @@ use Mojo::Base;
     sub init {
         ### Must be implemented on sub classes.
     }
+	
+	sub component : TplExport {
+		return $_[0];
+	}
     
     sub _dummy : TplExport {
         
@@ -55,6 +60,18 @@ use Mojo::Base;
 		$c->rendered($res->is_status_class(300) ? undef : 302);
 		return $c;
 	}
+    
+	### ---
+	### user_error
+	### ---
+    sub user_err : TplExport {
+        my ($self) = @_;
+        my $c = $self->controller;
+        if (! $c->stash('user_err')) {
+            $c->stash('user_err', MojoX::Tusu::UserError->new)
+        }
+        return $c->stash('user_err');
+    }
 
 1;
 
@@ -122,6 +139,14 @@ environment.
     $self->redirect_to('/foo/bar.html');
     $self->redirect_to('http://example.com/foo/bar.html');
     $self->redirect_to('/');
+
+=head2 $instance->component
+
+Returns component instance.
+
+=head2 $instance->user_error
+
+=head2 $instance->put_user_error
 
 =head1 SEE ALSO
 

@@ -16,18 +16,6 @@ use Data::Dumper;
     __PACKAGE__->attr('dbh');
     
 	### ---
-	### user_error
-	### ---
-    sub user_err {
-        my ($self) = @_;
-        my $c = $self->controller;
-        if (! $c->stash('user_err')) {
-            $c->stash('user_err', MojoX::Tusu::Component::DB::User_error->new)
-        }
-        return $c->stash('user_err');
-    }
-    
-	### ---
 	### unemptify
 	### ---
     sub unemptify {
@@ -245,20 +233,6 @@ EOF
         }
     }
     
-	### ---
-	### put_user_err
-	### ---
-    sub put_user_err : TplExport {
-        my ($self, $id) = @_;
-        my $c = $self->controller;
-        if ($self->user_err->count) {
-            $id ||= 'error';
-            my @errs = map {'<li>'. $_. '</li>'} $self->user_err->array;
-            return '<ul id="'. $id. '">'. join('', @errs). '</ul>';
-        }
-        return;
-    }
-    
     ### ---
     ### get_table_structure
     ### ---
@@ -356,33 +330,6 @@ use warnings;
     
     sub cid {
         return $_[0]->{$MEM_CID} // '';
-    }
-
-### ---
-### Stackable user err class
-### ---
-package MojoX::Tusu::Component::DB::User_error;
-use strict;
-use warnings;
-
-    sub new {
-        return bless [], shift;
-    }
-    
-    sub stack {
-        my ($self, $err) = @_;
-        push(@$self, $err);
-        return $self;
-    }
-    
-    sub count {
-        my ($self) = @_;
-        return scalar @$self;
-    }
-    
-    sub array {
-        my ($self) = @_;
-        return @$self;
     }
 
 1;
