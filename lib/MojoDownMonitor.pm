@@ -1,6 +1,8 @@
 package MojoDownMonitor;
 use strict;
 use warnings;
+use EV;
+use AnyEvent;
 use Mojo::Base 'Mojolicious';
 use Text::PSTemplate;
 use File::Basename 'dirname';
@@ -17,7 +19,7 @@ our $VERSION = '0.07';
     __PACKAGE__->attr('mdm_smtp');
     
     my $json_parser = Mojo::JSON->new;
-    my %loop_ids;
+    my %ev_objs;
     
     sub startup {
         my $self = shift;
@@ -97,7 +99,7 @@ our $VERSION = '0.07';
         });
         $r->route('/debug/loops.html')->via('get')->to(cb => sub {
             my $c = $_[0];
-            $c->render_json(\%loop_ids);
+            $c->render_json(\%ev_objs);
         });
         
         $self->_set_cron();
@@ -105,9 +107,9 @@ our $VERSION = '0.07';
     
     sub _delete_cron {
         my ($self, $site_id) = @_;
-        if ($loop_ids{$site_id}) {
-            Mojo::IOLoop->drop($loop_ids{$site_id});
-            delete $loop_ids{$site_id};
+        if ($ev_objs{$site_id}) {
+            undef $ev_objs{$site_id};
+            delete $ev_objs{$site_id};
         }
     }
     
@@ -116,7 +118,7 @@ our $VERSION = '0.07';
         my $sth = $self->mdm_sites->dump({id => $site_id});
         
         while (my $site = $sth->fetchrow_hashref) {
-            my $loop_id = Mojo::IOLoop->recurring($site->{'Interval'} => sub {
+            my $ev_obj = AE::timer(0, $site->{'Interval'}, sub {
                 my $new_log = $self->check($site);
                 my $sth =
                     $self->mdm_log
@@ -152,7 +154,7 @@ our $VERSION = '0.07';
                     );
                 }
             });
-            $loop_ids{$site->{'id'}} = $loop_id;
+            $ev_objs{$site->{'id'}} = $ev_obj;
         }
         $sth->finish;
     }

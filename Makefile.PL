@@ -19,6 +19,8 @@ WriteMakefile(
         'Authen::SASL'              => '2,15',
         'Net::SMTP::SSL'            => '1.01',
         'Time::Piece'               => '1.20',
+        'EV'                        => '4.03',
+        'AnyEvent'                  => '6.13',
     },
     test         => {TESTS => 't/*.t'}
 );
