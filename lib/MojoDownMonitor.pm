@@ -159,8 +159,9 @@ our $VERSION = '0.08';
         if ($code) {
             $err ||= _is($code, $site->{'Status must be'}, qq{Got wrong status '$code'});
             $err ||= _is($type, $site->{'MIME type must be'}, qq{Got wrong MIME type '$type'});
-            $err ||= _is($body, $site->{'Content must match'}, qq{Content doesn't match expectation});
             $err ||= _is($body_size, $site->{'Body size must be'}, qq{Got wrong body size $body_size bytes});
+            $err ||= _like($body, $site->{'Content must match'}, qq{Content doesn't match expectation});
+            $err ||= _like($tx->res->headers->to_string, $site->{'HTTP header must match'}, qq{HTTP header doesn't match expectation});
         } else {
             $err ||= $tx->error || 'Unknown error';
             utf8::decode($err);
@@ -180,6 +181,13 @@ our $VERSION = '0.08';
     sub _is {
         my ($got, $expected, $err) = @_;
         if ($expected && $got && $got ne $expected) {
+            return $err;
+        }
+    }
+    
+    sub _like {
+        my ($got, $expected, $err) = @_;
+        if ($expected && $got && $got !~ /\Q$expected\E/) {
             return $err;
         }
     }

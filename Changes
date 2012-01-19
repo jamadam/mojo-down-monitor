@@ -1,6 +1,7 @@
 Revision history for mojo-down-monitor
 
 0.08 2012/01/19
+  - Fixed a bug that content matching and header matching haven't been working.
 
 0.07 2012/01/18
   - Fixed a bug that very slow sites have caused malfunction on cron schedule.
