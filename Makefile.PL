@@ -10,7 +10,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/MojoDownMonitor.pm',
     AUTHOR       => 'jamadam <sugama@jamadam.com>',
     PREREQ_PM    => {
-        'Attribute::Handler'        => '0.91',
+        'Attribute::Handlers'        => '0.91',
         'Class::Data::Inheritable'  => '0.08',
         'DBD::SQLite'               => '1.35',
         'Try::Tiny'                 => '0.11',
