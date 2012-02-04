@@ -30,26 +30,26 @@ input[type=password],
 textarea{width:12.25em;*width:11.9em;}
 
 h1 {
-    margin:0;
-    margin-bottom:30px;
-    padding:20px;
-    background-color:#bbc;
+	margin:0;
+	margin-bottom:30px;
+	padding:20px;
+	background-color:#bbc;
 }
 hr {
-    height:1px;
-    margin:10px 0;
+	height:1px;
+	margin:10px 0;
 }
 input[type=text],
 input[type=password] {
-    padding:2px 5px;
-    min-width:300px;
+	padding:2px 5px;
+	min-width:300px;
 }
 th,
 td {
-    border:1px solid #ddd;
+	border:1px solid #ddd;
 }
 th {
-    background-color:#fee;
+	background-color:#fee;
 }
 tfoot td {
 	border:0;
@@ -60,7 +60,7 @@ tbody th {
 .button {
 	display: inline-block;
 	zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
-	  *display: inline;
+	*display: inline;
 	vertical-align: baseline;
 	margin: 0 2px;
 	outline: none;
@@ -81,23 +81,23 @@ tbody th {
 	border-top: solid 1px #da8;
 	background: #f78d1d;
 	background: -webkit-gradient(linear, left top, left bottom, from(#faa51a), to(#f47a20));
-	background: -moz-linear-gradient(top,  #faa51a,  #f47a20);
-	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#faa51a', endColorstr='#f47a20');
+	background: -moz-linear-gradient(top, #faa51a, #f47a20);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#faa51a', endColorstr='#f47a20');
 }
 	.button:hover {
 		text-decoration: none !important;
 		background: #f47c20;
 		background: -webkit-gradient(linear, left top, left bottom, from(#f88e11), to(#f06015));
-		background: -moz-linear-gradient(top,  #f88e11,  #f06015);
-		filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f88e11', endColorstr='#f06015');
+		background: -moz-linear-gradient(top, #f88e11, #f06015);
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f88e11', endColorstr='#f06015');
 	}
 	.button:active {
 		position: relative;
 		top: 1px;
 		color: #fcd3a5 !important;
 		background: -webkit-gradient(linear, left top, left bottom, from(#f47a20), to(#faa51a));
-		background: -moz-linear-gradient(top,  #f47a20,  #faa51a);
-		filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#faa51a');
+		background: -moz-linear-gradient(top, #f47a20, #faa51a);
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#faa51a');
 	}
 	.button.disabled {
 		color:#666;
@@ -105,8 +105,8 @@ tbody th {
 		text-shadow: -1px -1px 0 rgba(255,255,255,0.1);
 		background: #f47a20;
 		background: -webkit-gradient(linear, left top, left bottom, from(#f47a20), to(#faa51a));
-		background: -moz-linear-gradient(top,  #f47a20,  #faa51a);
-		filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#faa51a');
+		background: -moz-linear-gradient(top, #f47a20, #faa51a);
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#faa51a');
 		opacity:0.6;
 	}
 		.button.disabled:hover {
@@ -128,13 +128,13 @@ tbody th {
 		text-decoration:none;
 	}
 #mainWrapper {
-    position:relative;
+	position:relative;
 	margin:0 30px 60px;
 }
-    #main {
+	#main {
 		width:100%;
-        position:relative;
-    }
+		position:relative;
+	}
 		#main h2 {
 			background-color:#48a;
 			color:#fff;
@@ -145,10 +145,10 @@ tbody th {
 		#main .buttonContainer {
 			margin-bottom:1em;
 		}
-        #main .goDetail:hover {
-            background-color:#fae;
+		#main .goDetail:hover {
+			background-color:#fae;
 			cursor:pointer;
-        }
+		}
 		#mainLevel2 {
 			box-shadow:0 0 10px rgba(0,0,0,0.3) inset;
 			padding: 25px;
@@ -193,65 +193,65 @@ tbody th {
 		font-size:10px;
 	}
 .tabStyleMenu {
-  margin-bottom:1em;
-  border-bottom:2px solid #555;
-  font-size:13px;
+	margin-bottom:1em;
+	border-bottom:2px solid #555;
+	font-size:13px;
 }
-  .tabStyleMenu a {
-    float:left;
-    padding:5px 10px;
-    display: inline-block;
-    zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
-    *display: inline;
-    cursor: pointer;
-    text-decoration: none;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-    border-left:1px solid #fff;
-    border-right:1px solid #bbb;
-    font-family:arial,sans-serif;
-    background-color:#aaa;
-    color:#fff;
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius:  5px 5px 0 0;;
-    border-radius: 5px 5px 0 0;
-    border-bottom:1px solid #fff;
-  }
-    .tabStyleMenu a:hover {
-      text-decoration: none !important;
-      background: #f47c20;
-    }
-    .tabStyleMenu a.enabled {
-      background-color:#444;
-      border-bottom:1px solid #444;
-    }
-  .tabStyleMenu:after {clear: both; content:'.'; display:block; visibility:hidden; height:0;}
-  .tabStyleMenu {display: inline-block; height: 1%; display: block;}
+.tabStyleMenu a {
+	float:left;
+	padding:5px 10px;
+	display: inline-block;
+	zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
+	*display: inline;
+	cursor: pointer;
+	text-decoration: none;
+	text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+	border-left:1px solid #fff;
+	border-right:1px solid #bbb;
+	font-family:arial,sans-serif;
+	background-color:#aaa;
+	color:#fff;
+	-moz-border-radius: 5px 5px 0 0;
+	-webkit-border-radius: 5px 5px 0 0;;
+	border-radius: 5px 5px 0 0;
+	border-bottom:1px solid #fff;
+}
+	.tabStyleMenu a:hover {
+		text-decoration: none !important;
+		background: #f47c20;
+	}
+	.tabStyleMenu a.enabled {
+		background-color:#444;
+		border-bottom:1px solid #444;
+	}
+	.tabStyleMenu:after {clear: both; content:'.'; display:block; visibility:hidden; height:0;}
+	.tabStyleMenu {display: inline-block; height: 1%; display: block;}
 #formErrorContainer {
 	background-color:#fcc;
 	color:#f00;
 	margin-bottom:1em;
 	padding:10px 20px;
 }
-    #notifierContainer {
-        position:fixed;
-        top:10px;
-        right:10px;
-    }
-        #notifierContainer .notifier {
-            width:250px;
-            height:auto;
-            background-color:#000;
-            opacity:0.8;
-            border-radius:10px;
-            color:#fff;
-            padding:8px 12px;
-            min-height:50px;
-            margin-bottom:5px;
-            box-shadow:1px 1px 3px #888;
-        }
-        #notifierContainer .notifier:hover {
-            opacity:1;
-        }
-            #notifierContainer .notifier .error {
-                width:100%;
-            }
+	#notifierContainer {
+		position:fixed;
+		top:10px;
+		right:10px;
+	}
+		#notifierContainer .notifier {
+			width:250px;
+			height:auto;
+			background-color:#000;
+			opacity:0.8;
+			border-radius:10px;
+			color:#fff;
+			padding:8px 12px;
+			min-height:50px;
+			margin-bottom:5px;
+			box-shadow:1px 1px 3px #888;
+		}
+		#notifierContainer .notifier:hover {
+			opacity:1;
+		}
+			#notifierContainer .notifier .error {
+				width:100%;
+			}
