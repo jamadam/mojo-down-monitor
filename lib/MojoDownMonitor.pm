@@ -58,6 +58,7 @@ our $VERSION = '0.09';
             my $id = $c->app->mdm_sites->last_insert_rowid;
             $c->app->_delete_cron($id);
             $c->app->_set_cron($id);
+            warn $id;
         });
         $r->route('/site_test.html')->via('post')->to(cb => sub {
             my $c = $_[0];
@@ -124,7 +125,8 @@ our $VERSION = '0.09';
                     $change_msg_tbl[1][0] = 'An error detected';
                     $change_msg_tbl[0][1] = 'An error resolved';
                     $change_msg_tbl[0][0] = 'An error continuously detected';
-                    my $title = $change_msg_tbl[$last_log->{OK}][$new_log->{OK}];
+                    my $title =
+                        $change_msg_tbl[$last_log->{OK} || 0][$new_log->{OK}];
                     
                     my @mailto = split(',', $site->{'Mail to'});
                     $sendmail->sendmail(
