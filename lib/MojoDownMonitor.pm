@@ -124,8 +124,11 @@ our $VERSION = '0.09';
                     $change_msg_tbl[1][0] = 'An error detected';
                     $change_msg_tbl[0][1] = 'An error resolved';
                     $change_msg_tbl[0][0] = 'An error continuously detected';
+                    $change_msg_tbl[2][0] = 'An error detected with new site';
+                    $change_msg_tbl[2][1] = 'New site added with no error';
+                    
                     my $title =
-                        $change_msg_tbl[$last_log->{OK} || 0][$new_log->{OK}];
+                        $change_msg_tbl[$last_log->{OK} || 2][$new_log->{OK}];
                     
                     my @mailto = split(',', $site->{'Mail to'});
                     $sendmail->sendmail(
