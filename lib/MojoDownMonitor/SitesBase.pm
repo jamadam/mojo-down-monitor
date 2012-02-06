@@ -108,8 +108,9 @@ use feature q/:5.10/;
     
     sub delete {
         my ($self, $where_seed) = @_;
+        $where_seed ||= $self->controller->param('where');
         my $where_hash =
-            $json_parser->decode($where_seed || $self->controller->param('where'));
+            ref $where_seed ? $where_seed : $json_parser->decode($where_seed);
         my $where = SQL::OOP::Where->and_hash($where_hash);
         $self->SUPER::delete($where);
     }

@@ -11,6 +11,8 @@ use base 'MojoDownMonitor::SitesBase';
 use Data::Dumper;
 use feature q/:5.10/;
     
+    my $json_parser = Mojo::JSON->new;
+    
     sub init {
         my ($self, $app) = @_;
         my $file = $app->home->rel_file('data/sites.sqlite');
@@ -71,6 +73,15 @@ EOF
                 
             }
         }
+    }
+    
+    sub delete {
+        my ($self, $where_seed) = @_;
+        $where_seed ||= $self->controller->param('where');
+        my $where_hash =
+            ref $where_seed ? $where_seed : $json_parser->decode($where_seed);
+        $self->controller->app->mdm_log->delete({'Site id' => $where_hash->{id}});
+        $self->SUPER::delete($where_seed);
     }
 
 1;
