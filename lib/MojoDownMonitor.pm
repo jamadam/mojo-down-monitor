@@ -43,8 +43,8 @@ our $VERSION = '0.09';
         $self->mdm_sites($tusu->get_component('MojoDownMonitor::Sites'));
         $self->mdm_smtp($tusu->get_component('MojoDownMonitor::SMTP'));
         
-        # special route
         my $r = $self->routes;
+        
         $r->route('/index.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
@@ -52,6 +52,7 @@ our $VERSION = '0.09';
             $c->app->_delete_cron($id);
             $c->app->_set_cron($id);
         });
+        
         $r->route('/site_new.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
@@ -59,6 +60,7 @@ our $VERSION = '0.09';
             $c->app->_delete_cron($id);
             $c->app->_set_cron($id);
         });
+        
         $r->route('/site_test.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             my %data = $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'generate_dataset_hash_seed');
@@ -70,6 +72,7 @@ our $VERSION = '0.09';
                 $c->render_json({error => $@});
             }
         });
+        
         $r->route('/site_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::Sites', 'post');
@@ -77,6 +80,7 @@ our $VERSION = '0.09';
             $c->app->_delete_cron($id);
             $c->app->_set_cron($id);
         });
+        
         $r->route('/smtp_edit.html')->via('post')->to(cb => sub {
             my $c = $_[0];
             $tusu->bootstrap($c, 'MojoDownMonitor::SMTP', 'post');
@@ -173,6 +177,7 @@ our $VERSION = '0.09';
         
         my $time = Time::Piece::localtime()->datetime;
         $time =~ s{T}{ };
+        
         return {
             'Site id'   => $site->{'id'},
             'OK'        => $err ? '0' : '1',
