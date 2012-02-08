@@ -287,7 +287,9 @@ use warnings;
     
     sub value {
         my ($self, $name) = @_;
-        return $self->{$MEM_DATA}->{$name}->value;
+		if ($self->{$MEM_DATA}->{$name}) {
+			return $self->{$MEM_DATA}->{$name}->value;
+		}
     }
     
     sub each {
