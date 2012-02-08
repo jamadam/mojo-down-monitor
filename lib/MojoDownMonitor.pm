@@ -132,7 +132,7 @@ our $VERSION = '0.09';
                     $change_msg_tbl[2][1] = 'New site added with no error';
                     
                     my $title =
-                        $change_msg_tbl[$last_log->{OK} || 2][$new_log->{OK}];
+                        $change_msg_tbl[$last_log->{OK} // 2][$new_log->{OK}];
                     
                     my @mailto = split(',', $site->{'Mail to'});
                     $sendmail->sendmail(
