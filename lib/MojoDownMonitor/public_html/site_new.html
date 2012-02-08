@@ -53,20 +53,22 @@
 						</td>
 					</tr>
 				</tfoot>
-				<% $site->each('column')<<EOF2 %>
-					<tr>
-						<th>
-							<%= $column->key %>
-						</th>
-						<td>
-							<% switch($column->key, ['id'])<<CASE1,DEFAULT %>
-								<% include('./form_parts/readonly_varchar.html', {column => $column}) %>
-							<% CASE1 %>
-								<% include('./form_parts/'. lc $column->type. '.html', {column => $column}) %>
-							<% DEFAULT %>
-						</td>
-					</tr>
-				<% EOF2 %>
+				<tbody>
+					<% $site->each('column')<<EOF2 %>
+						<tr>
+							<th>
+								<%= $column->key %>
+							</th>
+							<td>
+								<% switch($column->key, ['id'])<<CASE1,DEFAULT %>
+									<% include('./form_parts/readonly_varchar.html', {column => $column}) %>
+								<% CASE1 %>
+									<% include('./form_parts/'. lc $column->type. '.html', {column => $column}) %>
+								<% DEFAULT %>
+							</td>
+						</tr>
+					<% EOF2 %>
+				</tbody>
 			</table>
 			</form>
 		</div>

@@ -34,21 +34,21 @@
 					<th>Response time(ms)</th>
 				</tr>
 			</thead>
-			<% Log::loop(
-				assign 	=> 'log',
-				fields	=> ['OK', 'Error', 'timestamp', 'Response time'],
-				where 	=> {'Site id' => &param('a')},
-				orderby	=> [['id', 1]]
-			)<<EOF2 %>
-				<tbody>
-					<tr>
-						<td><%= $log->value('OK') %></td>
-						<td><%= $log->value('Error') %></td>
-						<td><%= $log->value('timestamp') %></td>
-						<td><%= $log->value('Response time') %></td>
-					</tr>
-				</tbody>
-			<% EOF2 %>
+			<tbody>
+				<% Log::loop(
+					assign 	=> 'log',
+					fields	=> ['OK', 'Error', 'timestamp', 'Response time'],
+					where 	=> {'Site id' => &param('a')},
+					orderby	=> [['id', 1]]
+				)<<EOF2 %>
+						<tr>
+							<td><%= $log->value('OK') %></td>
+							<td><%= $log->value('Error') %></td>
+							<td><%= $log->value('timestamp') %></td>
+							<td><%= $log->value('Response time') %></td>
+						</tr>
+				<% EOF2 %>
+			</tbody>
 		</table>
 	</div>
 	<% BLOCK %>
