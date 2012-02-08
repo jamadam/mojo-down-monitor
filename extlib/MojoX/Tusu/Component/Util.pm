@@ -12,7 +12,6 @@ use Mojo::DOM;
     }
     
     sub param : TplExport {
-        
         my ($self, $name, $escape) = @_;
         my $c = $self->controller;
         my $val = $c->param($name);
@@ -23,7 +22,6 @@ use Mojo::DOM;
     }
     
     sub post_param : TplExport {
-        
         my ($self, $name, $escape) = @_;
         my $c = $self->controller;
         my $val = $c->req->body_params->param($name);
@@ -34,7 +32,6 @@ use Mojo::DOM;
     }
     
     sub url_abs : TplExport {
-        
         my ($self) = @_;
         my $c = $self->controller;
         my $path = $c->url_for(@_[1.. scalar (@_) - 1])->to_abs;
@@ -42,7 +39,6 @@ use Mojo::DOM;
     }
     
     sub url_for : TplExport {
-        
         my ($self) = @_;
         my $c = $self->controller;
         my $path = $c->url_for(@_[1.. scalar (@_) - 1]);
@@ -50,7 +46,6 @@ use Mojo::DOM;
     }
     
     sub html_to_text : TplExport {
-        
         my ($self, $html) = @_;
         return Mojo::DOM->new($html)->all_text;
     }

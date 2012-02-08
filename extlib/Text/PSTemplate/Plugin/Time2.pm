@@ -7,7 +7,6 @@ use Text::PSTemplate::DateTime;
 use Time::Local;
     
     sub before : TplExport {
-        
         my ($self, $date1, $date2, $include_equal) = @_;
         my $ep1 = Text::PSTemplate::DateTime->parse($date1)->epoch;
         my $ep2 = Text::PSTemplate::DateTime->parse($date2)->epoch;
@@ -17,7 +16,6 @@ use Time::Local;
     }
     
     sub after : TplExport {
-        
         my ($self, $date1, $date2, $include_equal) = @_;
         my $ep1 = Text::PSTemplate::DateTime->parse($date1)->epoch;
         my $ep2 = Text::PSTemplate::DateTime->parse($date2)->epoch;
@@ -27,7 +25,6 @@ use Time::Local;
     }
     
     sub new_datetime : TplExport {
-        
         my ($self, $date) = @_;
         return Text::PSTemplate::DateTime->parse($date);
     }
@@ -36,7 +33,6 @@ use Time::Local;
     ### Reformat time string
     ### ---
     sub strftime : TplExport {
-        
         my ($self, $ts, $format, $asset) = @_;
         if (! $ts) {
             return;
@@ -52,7 +48,6 @@ use Time::Local;
     }
     
     sub now : TplExport {
-        
         my ($self) = @_;
         return Text::PSTemplate::DateTime->new->iso8601(' ');
     }
@@ -61,7 +56,6 @@ use Time::Local;
     ### extract date part from datetime
     ### ---
     sub date : TplExport {
-        
         my ($self, $date, $delim) = @_;
         return Text::PSTemplate::DateTime->parse($date)->ymd($delim);
     }
@@ -70,7 +64,6 @@ use Time::Local;
     ### 2000-01-01 23:23:23
     ### ---
     sub iso8601 : TplExport {
-        
         my ($self, $date) = @_;
         return Text::PSTemplate::DateTime->parse($date)->iso8601(' ');
     }
@@ -79,7 +72,6 @@ use Time::Local;
     ### Convert any date string to epoch
     ### ---
     sub epoch : TplExport {
-        
         my ($self, $date) = @_;
         return Text::PSTemplate::DateTime->parse($date)->epoch;
     }

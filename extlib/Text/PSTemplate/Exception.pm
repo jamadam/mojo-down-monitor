@@ -16,7 +16,6 @@ use overload (
     my $MEM_LOCK        = 5;
     
     sub _stringify {
-        
         my ($self) = @_;
         my $out = $self->{$MEM_MESSAGE} || 'Unknown Error';
         my $file = $self->{$MEM_FILE};
@@ -35,7 +34,6 @@ use overload (
     }
 
     sub new {
-        
         my ($class, $message) = @_;
         
         if (ref $_[1] eq __PACKAGE__) {
@@ -85,7 +83,6 @@ use overload (
     }
     
     sub finalize {
-        
         my ($self) = @_;
         $self->{$MEM_LOCK} = 1;
         $self;
@@ -107,7 +104,6 @@ use overload (
     }
     
     sub _line_number {
-        
         my ($all, $pos) = @_;
         if (! defined $pos) {
             $pos = length($all);
@@ -118,7 +114,6 @@ use overload (
     }
     
     sub line_number_to_pos {
-        
         my ($str, $num) = @_;
         my $found = 0;
         my $pos;

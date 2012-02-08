@@ -13,7 +13,6 @@ use Time::Local;
         qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday);
     
     sub before : TplExport {
-        
         my ($self, $date1, $date2, $include_equal) = @_;
         my $ep1 = $self->date_to_epoch($date1);
         my $ep2 = $self->date_to_epoch($date2);
@@ -25,7 +24,6 @@ use Time::Local;
     }
     
     sub after : TplExport {
-        
         my ($self, $date1, $date2, $include_equal) = @_;
         my $ep1 = $self->date_to_epoch($date1);
         my $ep2 = $self->date_to_epoch($date2);
@@ -40,7 +38,6 @@ use Time::Local;
     ### Reformat time string
     ### ---
     sub reformat : TplExport {
-        
         my ($self, $ts, $format, $data, $asset) = @_;
         $ts     ||= $self->now();
         $format ||= '%04s/%02s/%02s %02s:%02s:%02s';
@@ -81,12 +78,10 @@ use Time::Local;
     }
     
     sub epoch : TplExport {
-        
         return time;
     }
     
     sub now : TplExport {
-        
         my ($self) = @_;
         return $self->epoch_to_iso8601();
     }
@@ -95,7 +90,6 @@ use Time::Local;
     ### extract date part from datetime
     ### ---
     sub date : TplExport {
-        
         my ($self, $date) = @_;
         
         if (!$date) {
@@ -122,7 +116,6 @@ use Time::Local;
     ### iso8601
     ### ---
     sub iso8601 : TplExport {
-        
         my ($self, $date) = @_;
         my @time_array = $self->split_date($date) or _localtime();
         
@@ -136,7 +129,6 @@ use Time::Local;
     ### 2000-01-01 23:23:23
     ### ---
     sub epoch_to_iso8601 : TplExport {
-        
         my ($self, $epoch) = @_;
         my ($sec, $min, $hour, $mday, $mon, $year) = _localtime($epoch);
         
@@ -148,7 +140,6 @@ use Time::Local;
     ### Convert any date string to epoch
     ### ---
     sub date_to_epoch : TplExport {
-        
         my ($self, $date) = @_;
         
         my @time_array = $self->split_date($date) or _localtime();
@@ -163,7 +154,6 @@ use Time::Local;
     ### Split any date string to array
     ### ---
     sub split_date : TplExport {
-        
         my ($self, $date) = @_;
         if (! $date) {
             return;
@@ -178,7 +168,6 @@ use Time::Local;
     ### Flexible timelocal wrapper
     ### ---
     sub _fixed_timelocal {
-        
         my ($sec, $minute, $hour, $date, $month, $year) = @_;
         $minute += int($sec / 60);
         $sec     = $sec % 60;
@@ -208,13 +197,11 @@ use Time::Local;
     my @_leaped = (31,28,31,30,31,30,31,31,30,31,30,31);
     
     sub _day_count {
-        
         my ($year, $month) = @_;
         return _is_leap($year) ? $_leaped[$month] : $_normal[$month];
     }
     
     sub _is_leap {
-    
         return(
             ($_[0]% 400 == 0 )
             or

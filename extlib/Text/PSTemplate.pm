@@ -5,7 +5,7 @@ use Fcntl qw(:flock);
 use Text::PSTemplate::Exception;
 use Text::PSTemplate::Block;
 use Text::PSTemplate::File;
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 use 5.005;
 use Carp;
 use Try::Tiny;
@@ -93,7 +93,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Get mother in caller context
     ### ---
     sub get_current_parser {
-        
         if (ref $_[0]) {
             $_[0]->{$MEM_MOTHER};
         } else {
@@ -115,7 +114,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Get current file name
     ### ---
     sub get_current_filename {
-        
         if ($current_file) {
             return $current_file->name;
         }
@@ -125,7 +123,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set Exception
     ### ---
     sub set_exception {
-        
         my ($self, $code_ref) = @_;
         $self->{$MEM_NONEXIST} = $code_ref;
     }
@@ -134,7 +131,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set Exception
     ### ---
     sub set_func_exception {
-        
         $_[0]->{$MEM_FUNC_NONEXIST} = $_[1];
     }
     
@@ -142,7 +138,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set Exception
     ### ---
     sub set_var_exception {
-        
         $_[0]->{$MEM_VAR_NONEXIST} = $_[1];
     }
     
@@ -150,7 +145,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set Exception
     ### ---
     sub set_recur_limit {
-        
         $_[0]->{$MEM_RECUR_LIMIT} = $_[1];
     }
     
@@ -158,7 +152,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set Encoding
     ### ---
     sub set_encoding {
-        
         $_[0]->{$MEM_ENCODING} = $_[1];
     }
     
@@ -166,7 +159,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Get a param
     ### ---
     sub get_param {
-        
         if (defined $_[1]) {
             if (defined $_[0]->{$_[1]}) {
                 return $_[0]->{$_[1]};
@@ -181,7 +173,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set chop option which reduce newline chars
     ### ---
     sub set_chop {
-        
         $chop = $_[0];
     }
     
@@ -189,7 +180,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Add tag option
     ### ---
     sub set_filter {
-        
         my ($self, $key, $cb) = @_;
         my $array = $self->{$MEM_TAG_FILTERS}->{$key} ||= [];
         push(@$array, $cb);
@@ -200,7 +190,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set delimiter
     ### ---
     sub set_delimiter {
-        
         my ($self, $left, $right) = @_;
         $self->{$MEM_DELIMITER_LEFT} = $left;
         $self->{$MEM_DELIMITER_RIGHT} = $right;
@@ -213,7 +202,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Get delimiter
     ### ---
     sub get_delimiter {
-        
         if (defined $_[0]->{$delim_tbl->[$_[1]]}) {
             return $_[0]->{$delim_tbl->[$_[1]]};
         }
@@ -226,7 +214,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set template variables
     ### ---
     sub set_var {
-        
         my ($self, %args) = (@_);
         while (my ($key, $value) = each %args) {
             $self->{$MEM_VAR}->{$key} = $value;
@@ -239,7 +226,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### my ($self, $name, $error_callback) = @_;
     ### ---
     sub var {
-        
         $_[2] ||= $_[0]->{$MEM_VAR_NONEXIST};
         
         if (defined $_[1]) {
@@ -261,7 +247,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set template function
     ### ---
     sub set_func {
-        
         my ($self, %args) = (@_);
         while ((my $key, my $value) = each %args) {
             $self->{$MEM_FUNC}->{$key} = $value;
@@ -274,8 +259,7 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### my ($self, $name, $error_callback) = @_;
     ### ---
     sub func {
-        
-        $_[2] ||= $_[0]->{$MEM_VAR_NONEXIST};
+        $_[2] ||= $_[0]->{$MEM_FUNC_NONEXIST};
         
         if (defined $_[1]) {
             if (defined $_[0]->{$MEM_FUNC}->{$_[1]}) {
@@ -294,7 +278,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Parse template
     ### ---
     sub parse_file {
-        
         my ($self, $file) = @_;
         
         local $current_file = $current_file;
@@ -312,7 +295,7 @@ $Carp::Internal{ (__PACKAGE__) }++;
             $str = $current_file->content;
         }
         local $current_file_parser = $self;
-
+        
         my $res = try {
             $self->parse($str);
         } catch {
@@ -327,7 +310,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Parse template
     ### ---
     sub parse_str {
-        
         my ($self, $str) = @_;
         if (blessed($str) && $str->isa('Text::PSTemplate::File')) {
             local $current_file_parser = $self;
@@ -338,7 +320,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     }
     
     sub get_block {
-        
         my ($index, $args) = @_;
         if (ref $block && defined $index) {
             return $block->content($index, $args);
@@ -350,7 +331,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Get block and parse
     ### ---
     sub parse_block {
-        
         my ($self, $index, $option) = @_;
         if (ref $block && defined $index) {
             my $res = try {
@@ -375,7 +355,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Parse str
     ### ---
     sub parse {
-        
         my ($self, $str) = @_;
         my $str_org = $str;
         
@@ -461,7 +440,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### ($self, $escape, $prefix, $ident)= @_;
     ### ---
     sub _interpolate_partial {
-        
         my $out;
         if ($_[1]) {
             my $len = length($_[1]);
@@ -484,7 +462,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Get template from a file
     ### ---
     sub get_file {
-        
         my ($self, $name, $translate_ref) = (@_);
         
         if (scalar @_ == 2) {
@@ -505,7 +482,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Set file name transform callback
     ### ---
     sub set_filename_trans_coderef {
-        
         my ($self, $coderef) = @_;
         $self->{$MEM_FILENAME_TRANS} = $coderef;
     }
@@ -522,7 +498,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### couunt recursion
     ### ---
     sub _count_recursion {
-        
         if (defined $_[0]->{$MEM_MOTHER}) {
             return $_[0]->{$MEM_MOTHER}->_count_recursion() + 1;
         }
@@ -530,7 +505,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     }
     
     sub plug {
-        
         my ($self, @plugins) = (@_);
         $self->{$MEM_PLUGED} ||= {};
         my $last_plugin;
@@ -558,7 +532,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     }
     
     sub get_plugin {
-        
         my ($self, $name) = @_;
         if (exists $self->{$MEM_PLUGED}->{$name}) {
             return $self->{$MEM_PLUGED}->{$name};
@@ -567,7 +540,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     }
 
     sub get_func_list {
-
         my $self = shift;
         my $out = <<EOF;
 =============================================================
@@ -581,7 +553,9 @@ EOF
             $out .= "\n";
             $out .= "\n";
 
-            my $as = $self->{$MEM_PLUGED}->{$plug}->{2};
+            my $as = $self->{$MEM_PLUGED}->{$plug}->{1};
+            $as = defined $as ? $as : $plug;
+            
             for my $func (@{$plug->_get_tpl_exports}) {
                 $out .= '<% '. join('::', grep {$_} $as, $func->[2]) . '() %>';
                 $out .= "\n";

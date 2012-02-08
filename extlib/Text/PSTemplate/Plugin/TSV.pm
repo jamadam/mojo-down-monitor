@@ -6,7 +6,6 @@ use Fcntl qw(:flock);
 use base qw(Text::PSTemplate::PluginBase);
 
     sub load_all_hashref : TplExport {
-        
         my ($self, $file, $key, $namespace, $args) = @_;
         $args ||= ();
         my $data = &seek_tsv(file => $file, %$args);
@@ -20,7 +19,6 @@ use base qw(Text::PSTemplate::PluginBase);
     }
     
     sub load_record_set : TplExport {
-        
         my ($self, $file, $args) = @_;
         my %seek_args = $args ? (%$args) : ();
         my $recordset = &seek_tsv(file => $file, %seek_args);
@@ -28,7 +26,6 @@ use base qw(Text::PSTemplate::PluginBase);
     }
     
     sub load_record : TplExport {
-        
         my ($self, $file, $column, $value , $namespace, $args) = @_;
         my %seek_args = $args ? (%$args) : ();
         my $data = &seek_tsv(file => $file, cond => {$column => $value}, limit => 1, %seek_args);
@@ -43,7 +40,6 @@ use base qw(Text::PSTemplate::PluginBase);
     }
     
     sub list : TplExport {
-        
         my $self = shift;
         my $file = shift;
         my %args = (@_);
@@ -87,7 +83,6 @@ use base qw(Text::PSTemplate::PluginBase);
     ### Total line number
     ### ---
     sub lines : TplExport {
-        
         my ($self, $file) = @_;
         open(my $fh, "<", $file) or die "open $file failed";
         flock($fh, LOCK_EX) or die 'flock failed';
@@ -102,7 +97,6 @@ use base qw(Text::PSTemplate::PluginBase);
     ### TSV
     ### ---
     sub seek_tsv {
-        
         my %args = (
             file            => '',
             sortkey         => undef,
@@ -228,13 +222,11 @@ use base qw(Text::PSTemplate::PluginBase);
 package Text::PSTemplate::Plugin::TSV::_TSV;
     
     sub new {
-        
         my ($class, $params) = @_;
         return bless {row_size => $params->{row_size}}, $class;
     }
     
     sub getline {
-        
         my ($self, $fh) = @_;
         my $line = <$fh>;
         if (defined $line) {

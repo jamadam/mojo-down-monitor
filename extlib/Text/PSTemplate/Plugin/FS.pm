@@ -17,7 +17,6 @@ use Text::PSTemplate;
     ### file test
     ### ---
     sub test : TplExport {
-        
         my ($self, $path, $opt) = @_;
         return $options->{$opt || 'e'}->($path);
     }
@@ -26,7 +25,6 @@ use Text::PSTemplate;
     ### file find
     ### ---
     sub find : TplExport {
-        
         my ($self, $dir, $regex, $default) = @_;
         
         opendir(my $DIR, $dir) or die "opendir $dir failed";

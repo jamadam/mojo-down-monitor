@@ -11,7 +11,6 @@ use Encode::Guess;
     my $MEM_ENCODE      = 3;
     
     sub new {
-        
         my ($class, $name, $encode) = @_;
         $encode ||= 'utf8';
         

@@ -8,7 +8,6 @@ use CGI;
     my $a = CGI->new;
     
     sub query : TplExport {
-        
         my ($self, $name) = @_;
         return $a->param($name);
     }

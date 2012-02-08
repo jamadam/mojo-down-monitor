@@ -7,7 +7,6 @@ use base qw(Text::PSTemplate::PluginBase);
     ### Extend
     ### ---
     sub extends : TplExport {
-        
         my ($self, $file) = @_;
         my $tpl = Text::PSTemplate->new;
         $tpl->plug('Text::PSTemplate::Plugin::Extends::_Sub', '');
@@ -24,7 +23,6 @@ use base qw(Text::PSTemplate::PluginBase);
     ### block specification
     ### ---
     sub block : TplExport {
-        
         my ($self, $name) = @_;
         my $tpl = Text::PSTemplate->get_current_parser;
         $tpl->set_var($name => $tpl->parse_block(0, {chop_left => 1, chop_right => 1}));
@@ -35,7 +33,6 @@ use base qw(Text::PSTemplate::PluginBase);
     ### placeholder specification
     ### ---
     sub placeholder : TplExport {
-        
         my ($self, $name) = @_;
         my $tpl = Text::PSTemplate::get_current_parser;
         my $val = eval {$tpl->var($name)};

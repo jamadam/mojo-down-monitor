@@ -9,7 +9,6 @@ use Text::PSTemplate::Plugin::Control;
     ### Get Environment variable
     ### ---
     sub env : TplExport {
-        
         my ($self, $key) = @_;
         return $ENV{$key};
     }
@@ -18,7 +17,6 @@ use Text::PSTemplate::Plugin::Control;
     ### Get Environment variable
     ### ---
     sub if_env : TplExport {
-        
         my ($self, $key, @args) = @_;
         return $self->Text::PSTemplate::Plugin::Control::if($ENV{$key}, @args);
     }
@@ -27,7 +25,6 @@ use Text::PSTemplate::Plugin::Control;
     ### Get Environment variable
     ### ---
     sub if_env_equals : TplExport {
-        
         my ($self, $key, @args) = @_;
         return $self->Text::PSTemplate::Plugin::Control::if_equals($ENV{$key}, @args);
     }
@@ -36,7 +33,6 @@ use Text::PSTemplate::Plugin::Control;
     ### Get Environment variable
     ### ---
     sub if_env_like : TplExport {
-        
         my ($self, $key, @args) = @_;
         return $self->Text::PSTemplate::Plugin::Control::if_like($ENV{$key}, @args);
     }

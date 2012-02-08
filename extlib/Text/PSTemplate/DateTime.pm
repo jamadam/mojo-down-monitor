@@ -19,8 +19,7 @@ use overload (
         return $self->{formatter}->format_datetime($self);
     }
     
-    sub _compare_overload
-    {
+    sub _compare_overload {
         # note: $_[1]->compare( $_[0] ) is an error when $_[1] is not a
         # DateTime (such as the INFINITY value)
         return $_[2] ? - $_[0]->compare( $_[1] ) : $_[0]->compare( $_[1] );
@@ -57,7 +56,6 @@ use overload (
     }
     
     sub _tz_to_offset {
-        
         my $name = shift;
         my $ret;
         if (defined $name) {
@@ -81,7 +79,6 @@ use overload (
     }
     
     sub new {
-        
         my ($class, %args) = @_;
         
         my $self = {
@@ -106,7 +103,6 @@ use overload (
     }
     
     sub from_epoch {
-        
         my ($class, %args) = @_;
         
         my $self = {
@@ -119,7 +115,6 @@ use overload (
     }
     
     sub parse {
-        
         my ($class, $str, $timezone) = @_;
         
         my @a;
@@ -365,7 +360,6 @@ use overload (
     };
     
     sub strftime {
-        
         my ($self, $format) = @_;
         $format =~ s{%(.)}{
             if (exists $_strftime_tbl->{$1}) {
@@ -499,7 +493,6 @@ use overload (
     }
     
     sub quarter {
-        
         my ($self) = @_;
         return
             ($self->month <= 3) ? 1 :
@@ -645,7 +638,6 @@ use overload (
     ### Flexible timelocal wrapper
     ### ---
     sub _timelocal {
-        
         my ($args, $offset) = @_;
         my ($sec, $minute, $hour, $date, $month, $year) = @$args;
         $sec ||= 0;
@@ -678,7 +670,6 @@ use overload (
     }
     
     sub _carry {
-        
         my ($super, $sub, $limit) = @_;
         if ($sub >= 0) {
             $super += int($sub / $limit);
@@ -701,7 +692,6 @@ use overload (
     my @_leaped = (31,28,31,30,31,30,31,31,30,31,30,31);
     
     sub _day_count {
-        
         my ($year, $month) = @_;
         return
             _is_leap_year($year)
@@ -1249,7 +1239,6 @@ use warnings;
     );
     
     sub get_offset {
-        
         my $name = shift;
         my $offset = $timezone_tbl{$name};
         if (defined $offset) {

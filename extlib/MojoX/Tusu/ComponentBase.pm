@@ -22,9 +22,9 @@ use base qw(Text::PSTemplate::PluginBase);
 	
 	sub component : TplExport {
 		my ($self, $name) = @_;
-        if ($name) {
-    		return $self->get_engine->get_plugin($name);
-        }
+		if ($name) {
+			return $self->get_engine->get_plugin($name);
+		}
 		return $self;
 	}
     
@@ -52,7 +52,9 @@ use base qw(Text::PSTemplate::PluginBase);
 		
 		my $base;
 		if ($ENV{REQUEST_URI}) {
-			$base = $c->req->url->base->clone->path($ENV{REQUEST_URI})->to_abs;
+            my $path = $ENV{REQUEST_URI};
+            $path =~ s{\?.+}{};
+			$base = $c->req->url->base->clone->path($path)->to_abs;
 		} else {
 			$base = $c->req->url->clone->to_abs;
 		}
@@ -64,7 +66,7 @@ use base qw(Text::PSTemplate::PluginBase);
 		$c->rendered($res->is_status_class(300) ? undef : 302);
 		return $c;
 	}
-    
+	
 	### ---
 	### user_error
 	### ---

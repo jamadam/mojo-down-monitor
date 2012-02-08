@@ -8,7 +8,6 @@ use Text::PSTemplate;
     ### Parse inline template if the variable is in array
     ### ---
     sub if_in_array : TplExport {
-        
         my ($self, $target, $array_ref, $then, $else) = @_;
         
         my $tpl = Text::PSTemplate->get_current_parser;
@@ -33,7 +32,6 @@ use Text::PSTemplate;
     ### Parse inline template if the variable equals to value
     ### ---
     sub if : TplExport {
-        
         my ($self, $condition, $then, $else) = @_;
         
         my $tpl = Text::PSTemplate->get_current_parser;
@@ -58,7 +56,6 @@ use Text::PSTemplate;
     ### Parse inline template if the variable equals to value
     ### ---
     sub if_equals : TplExport {
-        
         my ($self, $target, $value, $then, $else) = @_;
         
         my $tpl = Text::PSTemplate->new;
@@ -83,7 +80,6 @@ use Text::PSTemplate;
     ### Parse inline template if the variable equals to value
     ### ---
     sub if_like : TplExport {
-        
         my ($self, $target, $pattern, $then, $else) = @_;
         
         my $tpl = Text::PSTemplate->get_current_parser;
@@ -108,7 +104,6 @@ use Text::PSTemplate;
     ### Switch inline Templates and parse on given cases
     ### ---
     sub switch : TplExport {
-        
         my ($self, $target, $case_ref, $default) = @_;
         
         my $tpl = Text::PSTemplate->get_current_parser;
@@ -137,7 +132,6 @@ use Text::PSTemplate;
     ### Switch file Templates and parse on given cases
     ### ---
     sub tpl_switch : TplExport {
-        
         my ($self, $target, $case_ref, $default) = @_;
         
         my $tpl = Text::PSTemplate->get_current_parser;
@@ -156,7 +150,6 @@ use Text::PSTemplate;
     ### each
     ### ---
     sub each : TplExport {
-        
         my ($self, $data, $asign1, $asign2) = @_;
         
         my $tpl = Text::PSTemplate->new;
@@ -203,7 +196,6 @@ use Text::PSTemplate;
     ### <!-- ') %> -->
     ### ---
     sub bypass : TplExport(chop => 1) {
-        
         return '';
     }
     
@@ -211,7 +203,6 @@ use Text::PSTemplate;
     ### include a file into template
     ### ---
     sub include : TplExport {
-        
         my ($self, $file, $vars) = @_;
         my $tpl = Text::PSTemplate->new->set_var(%$vars);
         return $tpl->parse_file($file);
@@ -221,7 +212,6 @@ use Text::PSTemplate;
     ### set variable
     ### ---
     sub extract : TplExport {
-        
         my ($self, $obj, $name) = @_;
         
         if (ref $obj eq 'ARRAY') {
@@ -253,7 +243,6 @@ use Text::PSTemplate;
     ### assign variables
     ### ---
     sub assign : TplExport(chop => 1) {
-        
         my $self = shift;
         Text::PSTemplate->get_current_file_parser->set_var(@_);
         return;
@@ -263,7 +252,6 @@ use Text::PSTemplate;
     ### set delimiter
     ### ---
     sub set_delimiter : TplExport(chop => 1) {
-        
         my ($self, $left, $right) = @_;
         Text::PSTemplate->get_current_file_parser->set_delimiter($left, $right);
         return;
@@ -273,7 +261,6 @@ use Text::PSTemplate;
     ### output default instead of false value
     ### ---
     sub default : TplExport {
-        
         my ($self, $value, $default) = @_;
         if ($value) {
             return $value;
@@ -285,7 +272,6 @@ use Text::PSTemplate;
     ### Counter 
     ### ---
     sub with : TplExport {
-        
         my ($self, $dataset) = @_;
         my $tpl = Text::PSTemplate->new;
         my $out = '';
@@ -300,7 +286,6 @@ use Text::PSTemplate;
     ### echo
     ### ---
     sub echo : TplExport {
-        
         my ($self, $data) = @_;
         return $data;
     }

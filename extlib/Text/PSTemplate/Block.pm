@@ -8,12 +8,14 @@ use Carp;
     
     sub new {
         my ($class, $names, $right, $delim_l, $delim_r) = @_;
-        my $length;
+        my $length = 0;
         my @out = ();
         for my $a (split(',', $names)) {
             if ($$right =~ s{(.*?)($delim_l\s*$a\s*$delim_r)}{}s) {
                 push(@out, [$1, $2]);
                 $length += length($1) + length($2);
+            } else {
+                die "unclosed block $a found";
             }
         }
         bless {
@@ -23,7 +25,6 @@ use Carp;
     }
     
     sub get_left_chomp {
-        
         my ($self, $index) = @_;
         my $data = $self->content($index);
         $data =~ m{^(\r\n|\r|\n)};
@@ -34,7 +35,6 @@ use Carp;
     ### Get inline data
     ### ---
     sub content {
-        
         my ($self, $index, $args) = @_;
         if (defined $index) {
             my $data = $self->{$MEM_BLOCKS}->[$index]->[0];

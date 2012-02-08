@@ -8,7 +8,6 @@ use Text::PSTemplate;
     ### escape
     ### ---
     sub escape : TplExport {
-        
         my ($self, $html) = @_;
         $html =~ s/&/&amp;/go;
         $html =~ s/</&lt;/go;
@@ -22,7 +21,6 @@ use Text::PSTemplate;
     ### replace linebreaks to <br /> tag
     ### ---
     sub linebreak2br : TplExport {
-        
         my ($self, $str) = @_;
         $str =~ s{\r\n|\r|\n}{<br />}g;
         return $str;
