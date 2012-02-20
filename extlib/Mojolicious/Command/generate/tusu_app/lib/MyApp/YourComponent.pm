@@ -9,7 +9,8 @@ use base 'MojoX::Tusu::ComponentBase';
   }
   
   sub post {
-    my ($self, $c) = @_;
+    my ($self) = @_;
+    my $c = $self->controller;
     
     # validate
     

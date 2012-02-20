@@ -6,6 +6,10 @@ use Text::PSTemplate;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util;
 use Carp;
+use File::Basename;
+use File::Spec;
+use Mojolicious::Types;
+use Mojo::Util 'url_unescape';
 
     our $APP;
     our $CONTROLLER;
@@ -15,6 +19,7 @@ use Carp;
     __PACKAGE__->attr('directory_index');
     __PACKAGE__->attr('error_document');
     __PACKAGE__->attr('document_root');
+    __PACKAGE__->attr('indexes');
     
     # internal use
     __PACKAGE__->attr('_default_route_set');
@@ -40,6 +45,7 @@ use Carp;
             directory_index         => ['index.html','index.htm'],
             error_document          => {},
             components              => {},
+            indexes                 => 0,
         };
         
         if (my $key = _check_hash_key($args, keys %$default_args)) {
@@ -66,10 +72,11 @@ use Carp;
         $app->hook('around_dispatch' => sub {
             my ($next, $c) = @_;
             $self->_dispatch($c->app, $c);
+            $next->();
         });
         
-        $app->static->root($args->{document_root});
-        $app->renderer->root($args->{document_root});
+        $app->static->paths([$args->{document_root}, $self->_asset]);
+        $app->renderer->paths([$args->{document_root}]);
         
         my $engine = Text::PSTemplate->new;
         $engine->set_filter('=', \&Mojo::Util::html_escape);
@@ -94,6 +101,7 @@ use Carp;
         $self->error_document($args->{error_document});
         $self->extensions_to_render($args->{extensions_to_render});
         $self->document_root($args->{document_root});
+        $self->indexes($args->{indexes});
         
         $app->renderer->add_handler(tusu => sub { $self->_render(@_) });
         
@@ -109,7 +117,6 @@ use Carp;
     ### bootstrap for frameworking
     ### ---
     sub bootstrap {
-        
         my ($self, $c, $component, $action, @args) = @_;
         local $CONTROLLER = $c;
         return $self->engine->get_plugin($component)->$action(@args);
@@ -119,7 +126,6 @@ use Carp;
     ### Custom dispatcher
     ### ---
     sub _dispatch {
-        
         my ($self, $app, $c) = @_;
         
         my $tx = $c->tx;
@@ -137,12 +143,17 @@ use Carp;
         my $check_result = $self->_check_file_type($path);
         
         if (! $check_result->{type}) {
-            $not_found = 1;
+            if ($path =~ qr{/$} && $self->indexes) {
+                $self->_render_indexes($c);
+                return;
+            } else {
+                $not_found = 1;
+            }
         } elsif ($check_result->{type} eq 'directory') {
             $c->redirect_to($path. '/');
             $tx->res->code(301);
             return;
-        } elsif (! _permission_ok($check_result->{path}, $app->static->root)) {
+        } elsif (! _permission_ok($check_result->{path}, $app->static->paths->[0])) {
             $self->_render_error_document($c, 403);
             return;
         }
@@ -176,7 +187,7 @@ use Carp;
         
         my $relpath =
             ($check_result->{path})
-                ? File::Spec->abs2rel($check_result->{path}, $app->static->root)
+                ? File::Spec->abs2rel($check_result->{path}, $app->static->paths->[0])
                 : $path;
         ### defaults to static content
         if ($app->static->serve($c, $relpath)) {
@@ -188,12 +199,79 @@ use Carp;
         }
         $plugins->emit_hook_reverse(after_static_dispatch => $c);
     }
+
+    ### ---
+    ### Asset directory
+    ### ---
+    sub _asset {
+        my ($class, $path) = @_;
+        if ($path) {
+            return File::Spec->catfile(dirname(__FILE__), 'Tusu', 'Asset', $path);
+        }
+        return File::Spec->catdir(dirname(__FILE__), 'Tusu', 'Asset');
+    }
+    
+    sub _file_to_mime_class {
+        my $name = shift;
+        my $ext = ($name =~ qr{\.(\w+)$}) ? $1 : '';
+        return (split('/', Mojolicious::Types->type($ext) || 'text/plain'))[0];
+    }
+    
+    sub _file_timestamp {
+        my $path = shift;
+        my @dt = localtime((stat($path))[9]);
+        return sprintf('%d-%02d-%02d %02d:%02d', 1900 + $dt[5], $dt[4] + 1, $dt[3], $dt[2], $dt[1]);
+    }
+    
+    sub _file_size {
+        my $path = shift;
+        return ((stat($path))[7] > 1024)
+            ? sprintf("%.1f",(stat($path))[7] / 1024) . 'KB'
+            : (stat($path))[7]. 'B';
+    }
+    
+    ### ---
+    ### Render file list
+    ### ---
+    sub _render_indexes {
+        my ($self, $c) = @_;
+        my $req_path = url_unescape($c->tx->req->url->path);
+        utf8::decode($req_path);
+        my $dir = $self->document_root() . $req_path;
+        
+        opendir(my $DIR, $dir);
+        my @file = readdir($DIR);
+        closedir $DIR;
+        
+        my @dataset = ();
+        for my $file (@file) {
+            utf8::decode($file);
+            $file = url_unescape($file);
+            if ($file =~ qr{^\.$} || $req_path =~ qr{^/$} && $file =~ qr{^\.\.$}) {
+                next;
+            }
+            my $path = $dir. $file;
+            push(@dataset, {
+                name        => -f $path ? $file : $file. '/',
+                timestamp   => _file_timestamp($path),
+                size        => _file_size($path),
+                type        => -f $path ? _file_to_mime_class($file) : 'dir',
+            });
+        }
+        @dataset = sort {
+            ($a->{type} ne 'dir') <=> ($b->{type} ne 'dir')
+            ||
+            $a->{name} cmp $b->{name}
+        } @dataset;
+        my $tpl = Text::PSTemplate->new;
+        $tpl->set_var(dir => $req_path, dataset => \@dataset);
+        $c->render_text($tpl->parse_file($self->_asset('file_list.html')));
+    }
     
     ### ---
     ### Render Error document
     ### ---
     sub _render_error_document {
-        
         my ($self, $c, $code, $debug_message) = @_;
         
         $debug_message ||= 'Unknown Error';
@@ -219,7 +297,6 @@ use Carp;
     ### fill directory_index candidate
     ### ---
     sub _fill_filename {
-        
         my ($path, $directory_index) = @_;
         for my $default (@{$directory_index}) {
             my $path = File::Spec->catfile($path, $default);
@@ -234,7 +311,6 @@ use Carp;
     ### find file and type
     ### ---
     sub _check_file_type {
-        
         my ($self, $name) = @_;
         $name ||= '';
         my $leading_slash  = (substr($name, 0, 1) eq '/');
@@ -260,7 +336,6 @@ use Carp;
     ### foo             -> public_html/foo
     ### ---
     sub _filename_trans {
-        
         my ($template_base, $directory_index, $name) = @_;
         $name ||= '';
         my $leading_slash = substr($name, 0, 1) eq '/';
@@ -285,7 +360,6 @@ use Carp;
     ### Check if others readable
     ### ---
     sub _permission_ok {
-        
         my ($name, $base) = @_;
         $base ||= '';
         if ($^O eq 'MSWin32') {
@@ -311,7 +385,6 @@ use Carp;
     ### tusu renderer
     ### ---
     sub _render {
-        
         my ($self, $renderer, $c, $output, $options) = @_;
         
         try {
@@ -432,8 +505,18 @@ the request path doesn't ended with file name. And this setting also affects to
 inside template context such as include('path') function. Following example is
 the default setting.
 
-    my $tusu = Mojolicious::Plugin::Tusu->new($app);
-    $tusu->directory_index(['index.html', 'index.htm']);
+    my $tusu = $self->plugin(tusu => {
+        directory_index => ['index.html', 'index.htm'],
+    });
+
+=head2 indexes => bool
+
+This option emulates apache's indexes option. When the value is 1,
+the server generates file list page for directory access.
+
+    my $tusu = $self->plugin(tusu => {
+        indexes => 1,
+    });
 
 =head2 extensions_to_render => array ref
 
@@ -441,18 +524,21 @@ This option sets the extensions to be parsed by tusu renderer. If request
 doesn't match any of extensions, dispatcher try to render it as static file.
 Following setting is the default.
 
-    my $tusu = Mojolicious::Plugin::Tusu->new($self);
-    $tusu->extensions_to_render(['html','htm','xml'])
+    my $tusu = $self->plugin(tusu => {
+        extensions_to_render => ['html','htm','xml'],
+    });
 
 =head2 error_document => hash ref
 
 This option setup custom error pages like apache's ErrorDocument.
 
-    $instance->error_document({
-        404 => '/errors/404.html',
-        403 => '/errors/403.html',
-        500 => '/errors/405.html',
-    })
+    my $tusu = $self->plugin(tusu => {
+        error_document => {
+            404 => '/errors/404.html',
+            403 => '/errors/403.html',
+            500 => '/errors/405.html',
+        },
+    });
 
 =head1 METHODS
 
