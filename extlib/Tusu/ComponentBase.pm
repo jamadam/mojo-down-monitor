@@ -1,8 +1,8 @@
-package MojoX::Tusu::ComponentBase;
+package Tusu::ComponentBase;
 use strict;
 use warnings;
 use Mojo::Base;
-use MojoX::Tusu::UserError;
+use Tusu::UserError;
 use base qw(Text::PSTemplate::PluginBase);
 
     sub attr {
@@ -12,7 +12,9 @@ use base qw(Text::PSTemplate::PluginBase);
     sub new {
         my $class = shift;
         my $self = $class->SUPER::new(@_);
-        $self->init($Mojolicious::Plugin::Tusu::APP);
+		if ($Tusu::APP) {
+			$self->init($Tusu::APP);
+		}
         return $self;
     }
     
@@ -33,12 +35,12 @@ use base qw(Text::PSTemplate::PluginBase);
     }
     
     sub controller {
-        return $Mojolicious::Plugin::Tusu::CONTROLLER;
+        return $Tusu::CONTROLLER;
     }
     
     sub render {
         my ($self) = shift;
-        my $c = $Mojolicious::Plugin::Tusu::CONTROLLER;
+        my $c = $Tusu::CONTROLLER;
         $c->render(
             handler => 'tusu',
             template => $c->req->url->path->to_string,
@@ -74,7 +76,7 @@ use base qw(Text::PSTemplate::PluginBase);
         my ($self) = @_;
         my $c = $self->controller;
         if (! $c->stash('user_err')) {
-            $c->stash('user_err', MojoX::Tusu::UserError->new)
+            $c->stash('user_err', Tusu::UserError->new)
         }
         return $c->stash('user_err');
     }
@@ -85,14 +87,14 @@ __END__
 
 =head1 NAME
 
-MojoX::Tusu::ComponentBase - Base Class for WAF component
+Tusu::ComponentBase - Base Class for WAF component
 
 =head1 SYNOPSIS
     
     package YourComponent;
     use strict;
     use warnings;
-    use base qw(MojoX::Tusu::ComponentBase);
+    use base qw(Tusu::ComponentBase);
     
     sub your_action1 {
         my ($self, $controller) = @_;
@@ -118,8 +120,8 @@ MojoX::Tusu::ComponentBase - Base Class for WAF component
 
 =head1 DESCRIPTION
 
-C<MojoX::Tusu::ComponentBase> is a Component Base class for
-MojoX::Tusu sub framework on mojolicious. This class inherits
+C<Tusu::ComponentBase> is a Component Base class for
+Tusu sub framework on mojolicious. This class inherits
 all methods from Text::PSTemplate::PluginBase.
 
 =head1 METHODS

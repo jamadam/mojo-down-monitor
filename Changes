@@ -2,6 +2,7 @@ Revision history for mojo-down-monitor
 
 0.09 2012/02/20
   - Moved configuration from hypnotoad to myapp.conf
+  - Bundled Tusu instead of MojoX::Tusu.
 
 0.08 2012/01/19
   - Fixed a bug that content matching and header matching haven't been working.

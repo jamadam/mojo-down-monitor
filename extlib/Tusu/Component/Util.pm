@@ -1,7 +1,7 @@
-package MojoX::Tusu::Component::Util;
+package Tusu::Component::Util;
 use strict;
 use warnings;
-use base qw(MojoX::Tusu::ComponentBase);
+use base qw(Tusu::ComponentBase);
 use Mojo::Util;
 use Mojo::DOM;
     
@@ -35,14 +35,14 @@ use Mojo::DOM;
         my ($self) = @_;
         my $c = $self->controller;
         my $path = $c->url_for(@_[1.. scalar (@_) - 1])->to_abs;
-        return bless $path, 'MojoX::Tusu::Component::Util::URL';
+        return bless $path, 'Tusu::Component::Util::URL';
     }
     
     sub url_for : TplExport {
         my ($self) = @_;
         my $c = $self->controller;
         my $path = $c->url_for(@_[1.. scalar (@_) - 1]);
-        return bless $path, 'MojoX::Tusu::Component::Util::URL';
+        return bless $path, 'Tusu::Component::Util::URL';
     }
     
     sub html_to_text : TplExport {
@@ -50,7 +50,7 @@ use Mojo::DOM;
         return Mojo::DOM->new($html)->all_text;
     }
 
-package MojoX::Tusu::Component::Util::URL;
+package Tusu::Component::Util::URL;
 use strict;
 use warnings;
 use Mojo::Base -base;
@@ -80,7 +80,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Tusu::Component::Util - Utility functions for template
+Tusu::Component::Util - Utility functions for template
 
 =head1 SYNOPSIS
     

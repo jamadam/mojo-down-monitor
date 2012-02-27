@@ -1,4 +1,4 @@
-package MojoX::Tusu::Component::DB;
+package Tusu::Component::DB;
 use strict;
 use warnings;
 use Text::PSTemplate;
@@ -8,7 +8,7 @@ use SQL::OOP::Insert;
 use SQL::OOP::Delete;
 use SQL::OOP::Update;
 use DBI;
-use base 'MojoX::Tusu::ComponentBase';
+use base 'Tusu::ComponentBase';
 use Data::Dumper;
 
     __PACKAGE__->attr('table_structure');
@@ -338,7 +338,7 @@ use warnings;
 
 __END__
 
-=head1 NAME MojoX::Tusu::Component::DB
+=head1 NAME Tusu::Component::DB
 
 =head1 SYNOPSIS
 

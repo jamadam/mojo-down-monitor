@@ -8,7 +8,7 @@ use SQL::OOP::Insert;
 use SQL::OOP::Delete;
 use Mojo::JSON;
 use DBI;
-use base 'MojoX::Tusu::Component::SQLite';
+use base 'Tusu::Component::SQLite';
 use Data::Dumper;
 use feature q/:5.10/;
     

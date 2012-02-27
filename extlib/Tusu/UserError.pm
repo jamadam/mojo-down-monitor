@@ -1,4 +1,4 @@
-package MojoX::Tusu::UserError;
+package Tusu::UserError;
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Tusu::ComponentBase::UserError - User error container
+Tusu::ComponentBase::UserError - User error container
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ MojoX::Tusu::ComponentBase::UserError - User error container
 
 =head1 METHODS
 
-=head2 MojoX::Tusu::ComponentBase::UserError->new
+=head2 Tusu::UserError->new
 
 =head2 $instance->stack($error);
 

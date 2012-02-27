@@ -134,38 +134,14 @@ use overload (
     ### ---
     ### return null string
     ### ---
-    our $PARTIAL_NONEXIST_NULL = sub {
-        '';
-    };
+    our $PARTIAL_NONEXIST_NULL = sub {''};
     
+    ### ---
+    ### Die with undef warning
+    ### ---
     our $PARTIAL_NONEXIST_DIE = sub {
         my ($parser, $var, $type) = (@_);
         CORE::die "$type $var undefined\n";
-    };
-    
-    ### ---
-    ### return null string
-    ### ---
-    our $TAG_ERROR_NULL = sub {
-        '';
-    };
-    
-    ### ---
-    ### returns template tag itself
-    ### ---
-    our $TAG_ERROR_NO_ACTION = sub {
-        my ($parser, $line, $self) = (@_);
-        my $delim_l = Text::PSTemplate::get_current_parser()->get_delimiter(0);
-        my $delim_r = Text::PSTemplate::get_current_parser()->get_delimiter(1);
-        $delim_l. $line. $delim_r;
-    };
-    
-    ### ---
-    ### returns nothing and just die;
-    ### ---
-    our $TAG_ERROR_DIE = sub {
-        my ($parser, $line, $self) = (@_);
-        CORE::die $self;
     };
 
 1;

@@ -5,7 +5,7 @@ use Fcntl qw(:flock);
 use Text::PSTemplate::Exception;
 use Text::PSTemplate::Block;
 use Text::PSTemplate::File;
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 use 5.005;
 use Carp;
 use Try::Tiny;
@@ -27,11 +27,10 @@ $Carp::Internal{ (__PACKAGE__) }++;
     my $MEM_FUNC                    = 6;
     my $MEM_VAR                     = 7;
     my $MEM_FILENAME_TRANS          = 8;
-    my $MEM_NONEXIST                = 9;
-    my $MEM_FUNC_NONEXIST           = 10;
-    my $MEM_VAR_NONEXIST            = 11;
-    my $MEM_PLUGED                  = 12;
-    my $MEM_TAG_FILTERS             = 13;
+    my $MEM_FUNC_NONEXIST           = 9;
+    my $MEM_VAR_NONEXIST            = 10;
+    my $MEM_PLUGED                  = 11;
+    my $MEM_TAG_FILTERS             = 12;
 
     my %CORE_LIST = (
         Control => '',
@@ -69,10 +68,7 @@ $Carp::Internal{ (__PACKAGE__) }++;
             $self->{$MEM_DELIMITER_RIGHT}   = '%>';
             $self->{$MEM_FUNC_NONEXIST}     =
                             $Text::PSTemplate::Exception::PARTIAL_NONEXIST_DIE;
-            $self->{$MEM_VAR_NONEXIST}      =
-                            $Text::PSTemplate::Exception::PARTIAL_NONEXIST_DIE;
-            $self->{$MEM_NONEXIST}          =
-                            $Text::PSTemplate::Exception::TAG_ERROR_DIE;
+            $self->{$MEM_VAR_NONEXIST}      = sub {};
         }
         
         if ($self->_count_recursion() > $self->get_param($MEM_RECUR_LIMIT)) {
@@ -93,11 +89,7 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### Get mother in caller context
     ### ---
     sub get_current_parser {
-        if (ref $_[0]) {
-            $_[0]->{$MEM_MOTHER};
-        } else {
-            $current_parser;
-        }
+        return (ref $_[0]) ? $_[0]->{$MEM_MOTHER} : $current_parser;
     }
     
     ### ---
@@ -117,14 +109,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
         if ($current_file) {
             return $current_file->name;
         }
-    }
-    
-    ### ---
-    ### Set Exception
-    ### ---
-    sub set_exception {
-        my ($self, $code_ref) = @_;
-        $self->{$MEM_NONEXIST} = $code_ref;
     }
     
     ### ---
@@ -356,7 +340,6 @@ $Carp::Internal{ (__PACKAGE__) }++;
     ### ---
     sub parse {
         my ($self, $str) = @_;
-        my $str_org = $str;
         
         if (! defined $str) {
             die Text::PSTemplate::Exception->new('No template string found');
@@ -398,16 +381,9 @@ $Carp::Internal{ (__PACKAGE__) }++;
                     Text::PSTemplate::_EvalStage::_do($self, $interp);
                 } catch {
                     my $exception = $_;
-                    my $org = $opt_l. $space_l. $prefix. $tag. $space_r;
                     my $position = $exception->position || 0;
-                    my $ret = try {
-                        $self->get_param($MEM_NONEXIST)->($self, $org, $exception);
-                    } catch {
-                        my $exception = Text::PSTemplate::Exception->new($_);
-                        $exception->set_position($position + $eval_pos);
-                        die $exception;
-                    };
-                    return $ret;
+                    $exception->set_position($position + $eval_pos);
+                    die $exception;
                 };
                 
                 if ($chop) {
@@ -579,10 +555,7 @@ $Carp::Internal{ (__PACKAGE__) }++;
             if ($@) {
                 die Text::PSTemplate::Exception->new($@);
             }
-            if (! defined $res) {
-                die Text::PSTemplate::Exception->new('Tag resulted undefined');
-            }
-            return $res;
+            return (defined $res) ? $res : '';
         }
         sub AUTOLOAD {
             our $AUTOLOAD;
@@ -907,19 +880,6 @@ You can set a array reference for guessing encoding. The value will be thrown at
 Encode::guess_encoding.
 
     $instance->set_encoding(['euc-jp', 'shiftjis', '7bit-jis'])
-
-=head2 $instance->set_exception($code_ref)
-
-This is a callback setter. If any errors occurred at parsing phase, the $code_ref
-will be called. Your callback subroutine can get following arguments.
-
-    $template->set_exception(sub {
-        my ($self, $line, $err) = (@_);
-    });
-
-With these arguments, you can log the error, do nothing and return '', or
-reconstruct the tag and return it as if the tag was escaped. See also
-Text::PSTemplate::Exception Class for example.
 
 =head2 $instance->set_var_exception($code_ref)
 

@@ -11,7 +11,7 @@ use File::Copy;
 use LWP::Simple;
 
 has description => <<'EOF';
-Generate MojoX::Tusu application directory structure.
+Generate Tusu application directory structure.
 EOF
 has usage => <<"EOF";
 usage: $0 generate tusu app [NAME]
@@ -46,9 +46,8 @@ EOF
     $self->render_to_rel_file($class, 'public_html/.htaccess');
     $self->create_rel_dir("$app/log");
     
-    print "  [bundle distribution] MojoX::Tusu\n";
+    print "  [bundle distribution] Tusu\n";
     my @bundle = qw(
-        lib/Attribute/Handlers.pm
         lib/Mojolicious/Command/generate/tusu_app.pm
         lib/Mojolicious/Command/generate/tusu_app/lib/MyApp.pm
         lib/Mojolicious/Command/generate/tusu_app/lib/MyApp/YourComponent.pm
@@ -64,21 +63,6 @@ EOF
         lib/Mojolicious/Command/generate/tusu_app/script/my_app
         lib/Mojolicious/Command/generate/tusu_app/t/basic.t
         lib/Mojolicious/Plugin/Tusu.pm
-        lib/Mojolicious/Plugin/Tusu/Asset/file_list.html
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/back.gif
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/file_list.css
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/file_list.js
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/folder.gif
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/image2.gif
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/jquery.1.7.1.js
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/text.gif
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/yui-fonts.css
-        lib/Mojolicious/Plugin/Tusu/Asset/tusu_asset/yui-reset.css
-        lib/MojoX/Tusu.pm
-        lib/MojoX/Tusu/Component/Mojolicious.pm
-        lib/MojoX/Tusu/Component/Util.pm
-        lib/MojoX/Tusu/ComponentBase.pm
-        lib/MojoX/Tusu/UserError.pm
         lib/Text/PSTemplate.pm
         lib/Text/PSTemplate/Block.pm
         lib/Text/PSTemplate/DateTime.pm
@@ -96,7 +80,17 @@ EOF
         lib/Text/PSTemplate/Plugin/TSV.pm
         lib/Text/PSTemplate/Plugin/Util.pm
         lib/Text/PSTemplate/PluginBase.pm
-        lib/Try/Tiny.pm
+        lib/Tusu.pm
+        lib/Tusu/Asset/file_list.html
+        lib/Tusu/Asset/tusu_asset/file_list.css
+        lib/Tusu/Asset/tusu_asset/file_list.js
+        lib/Tusu/Asset/tusu_asset/jquery.1.7.1.js
+        lib/Tusu/Asset/tusu_asset/yui-fonts.css
+        lib/Tusu/Asset/tusu_asset/yui-reset.css
+        lib/Tusu/Component/Mojolicious.pm
+        lib/Tusu/Component/Util.pm
+        lib/Tusu/ComponentBase.pm
+        lib/Tusu/UserError.pm
     );
     for my $file (@bundle) {
         $file =~ s{^lib/}{};
@@ -188,7 +182,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::generate::tusu_app - MojoX::Tusu App Generator Command
+Mojolicious::Command::generate::tusu_app - Tusu App Generator Command
 
 =head1 SYNOPSIS
 

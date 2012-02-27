@@ -1,8 +1,8 @@
-package MojoX::Tusu::Component::SQLite;
+package Tusu::Component::SQLite;
 use strict;
 use warnings;
 use utf8;
-use base 'MojoX::Tusu::Component::DB';
+use base 'Tusu::Component::DB';
 
     ### ---
     ### get table information
@@ -85,7 +85,7 @@ EOF
 
 __END__
 
-=head1 NAME MojoDownMonitor::SQLite
+=head1 NAME Tusu::Component::SQLite
 
 =head1 SYNOPSIS
 
