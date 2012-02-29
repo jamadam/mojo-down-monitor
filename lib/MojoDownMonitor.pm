@@ -155,6 +155,8 @@ our $VERSION = '0.09';
         my ($self, $site) = @_;
         my $ua = Mojo::UserAgent->new->name($site->{'User Agent'} || "mojo-down-monitor/$VERSION (+https://github.com/jamadam/mojo-down-monitor)");
         $ua->inactivity_timeout($site->{'Connect timeout'} || 10);
+        $ua->connect_timeout($site->{'Connect timeout'} || 10);
+        $ua->request_timeout($site->{'Connect timeout'} || 10);
         
         my $time_s = time;
         my $tx = $ua->get($site->{URI});
