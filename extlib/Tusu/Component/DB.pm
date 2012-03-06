@@ -319,19 +319,19 @@ use warnings;
     }
     
     sub key {
-        return $_[0]->{$MEM_KEY} // '';
+        return defined $_[0]->{$MEM_KEY} ? $_[0]->{$MEM_KEY} : '';
     }
     
     sub value {
-        return $_[0]->{$MEM_VALUE} // '';
+        return defined $_[0]->{$MEM_VALUE} ? $_[0]->{$MEM_VALUE} : '';
     }
     
     sub type {
-        return $_[0]->{$MEM_TYPE} // '';
+        return defined $_[0]->{$MEM_TYPE} ? $_[0]->{$MEM_TYPE} : '';
     }
     
     sub cid {
-        return $_[0]->{$MEM_CID} // '';
+        return defiend $_[0]->{$MEM_CID} ? $_[0]->{$MEM_CID} : '';
     }
 
 1;
