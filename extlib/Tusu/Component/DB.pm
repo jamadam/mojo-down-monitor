@@ -69,7 +69,7 @@ EOF
 		my $table_structure = $self->get_table_structure;
         while (my $hash = $sth->fetchrow_hashref) {
             my $tpl = Text::PSTemplate->new();
-			my $rec = MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
+			my $rec = Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
 			$tpl->set_var($args{assign} => $rec);
 			$tpl->set_var(component => $self);
             $out .= $tpl->parse_str($template);
@@ -91,7 +91,7 @@ EOF
         my $template = Text::PSTemplate::get_block(0);
 		my $table_structure = $self->get_table_structure;
 		my $tpl = Text::PSTemplate->new();
-		my $rec = MojoX::Tusu::Component::DB::Record->new(undef, $table_structure, $args{fields});
+		my $rec = Tusu::Component::DB::Record->new(undef, $table_structure, $args{fields});
 		$tpl->set_var($args{assign} => $rec);
 		$tpl->set_var(component => $self);
 		return $tpl->parse_str($template);
@@ -130,7 +130,7 @@ EOF
 		my $table_structure = $self->get_table_structure;
         while (my $hash = $sth->fetchrow_hashref) {
             my $tpl = Text::PSTemplate->new();
-			my $rec = MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, [$args{field}]);
+			my $rec = Tusu::Component::DB::Record->new($hash, $table_structure, [$args{field}]);
 			$tpl->set_var($args{assign} => $rec);
             $out .= $tpl->parse_str($template);
         }
@@ -153,7 +153,7 @@ EOF
         my $sth = $self->dump($args{where}, $args{fields}, $args{limit}, $args{orderby});
 		my $table_structure = $self->get_table_structure;
         if (my $hash = $sth->fetchrow_hashref) {
-			return MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
+			return Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
         }
 		$sth->finish;
 		return;
@@ -175,11 +175,11 @@ EOF
 		my @array;
 		my $table_structure = $self->get_table_structure;
         while (my $hash = $sth->fetchrow_hashref) {
-			my $rec = MojoX::Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
+			my $rec = Tusu::Component::DB::Record->new($hash, $table_structure, $args{fields});
 			push(@array, $rec);
         }
 		$sth->finish;
-		return MojoX::Tusu::Component::DB::Records->new(\@array);
+		return Tusu::Component::DB::Records->new(\@array);
 	}
     
     ### ---
@@ -240,7 +240,7 @@ EOF
         die 'get_table_structure must be implemented.';
     }
 
-package MojoX::Tusu::Component::DB::Records;
+package Tusu::Component::DB::Records;
 use strict;
 use warnings;
 	
@@ -259,7 +259,7 @@ use warnings;
 		return scalar @{$self->[0]};
 	}
 
-package MojoX::Tusu::Component::DB::Record;
+package Tusu::Component::DB::Record;
 use strict;
 use warnings;
 
@@ -270,7 +270,7 @@ use warnings;
         my ($class, $hash, $table_structure, $fields) = @_;
         my $data = {};
         for my $key ($hash ? keys %$hash : @$fields) {
-            $data->{$key} = MojoX::Tusu::Component::DB::Column->new(
+            $data->{$key} = Tusu::Component::DB::Column->new(
                 $key,
                 $hash ? $hash->{$key} : undef,
                 $table_structure->{$key}->{type},
@@ -299,7 +299,7 @@ use warnings;
         Text::PSTemplate::Plugin::Control->each(\@data, @_);
     }
 
-package MojoX::Tusu::Component::DB::Column;
+package Tusu::Component::DB::Column;
 use strict;
 use warnings;
 	
