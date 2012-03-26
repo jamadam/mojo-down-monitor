@@ -331,7 +331,7 @@ use warnings;
     }
     
     sub cid {
-        return defiend $_[0]->{$MEM_CID} ? $_[0]->{$MEM_CID} : '';
+        return defined $_[0]->{$MEM_CID} ? $_[0]->{$MEM_CID} : '';
     }
 
 1;
