@@ -79,7 +79,7 @@ use feature q/:5.10/;
         $self->validate_form;
         
         if ($self->user_err->count) {
-            $self->render;
+            return;
         } else {
             given ($tx->req->body_params->param('mode')) {
                 when ('update') {$self->update}
