@@ -14,3 +14,5 @@ pm_to_blib
 *.sqlite-journal
 *.log
 *.pid
+*.komodoproject
+!.htaccess

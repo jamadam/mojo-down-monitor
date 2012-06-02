@@ -14,7 +14,7 @@ use feature q/:5.10/;
     
     sub init {
         my ($self, $app) = @_;
-        my $file = $app->home->rel_file('data/sites.sqlite');
+        my $file = './mojo-down-monitor.sqlite';
         my $dbh = DBI->connect_cached("DBI:SQLite:dbname=$file",
             undef, undef, {
                 AutoCommit      => 1,
@@ -53,7 +53,8 @@ EOF
     
     sub validate_form {
         my ($self) = @_;
-        my $params = $self->controller->req->body_params;
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $params = $tx->req->body_params;
         my $cid_data = $self->cid_table;
         given ($params->param('mode')) {
             when ($_ ~~ ['update','create']) {

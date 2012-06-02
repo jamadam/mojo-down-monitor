@@ -1,0 +1,239 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename 'dirname';
+use File::Spec;
+
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'extlib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+
+use EV;
+use AnyEvent;
+use File::Basename 'dirname';
+use Data::Dumper;
+use Time::Piece;
+use SQL::OOP::Dataset;
+use Time::HiRes qw ( time );
+use Mojo::Base 'Mojolicious';
+use Mojo::UserAgent;
+use MojoSimpleHTTPServer;
+use MojoDownMonitor;
+use MojoDownMonitor::Sites;
+use MojoDownMonitor::Log;
+use MojoDownMonitor::SMTP;
+use MojoDownMonitor::Util::Sendmail;
+use Mojo::JSON;
+our $VERSION = '0.09';
+
+    my $mdm_sites   = MojoDownMonitor::Sites->new;
+    my $mdm_log     = MojoDownMonitor::Log->new;
+    my $mdm_smtp    = MojoDownMonitor::SMTP->new;
+    my $json_parser = Mojo::JSON->new;
+    my %ev_objs;
+    
+    my $mail_template =
+        File::Spec->catfile(dirname($INC{'MojoDownMonitor.pm'}), 'MojoDownMonitor', 'mail_body.html');
+    
+    my $app = MojoSimpleHTTPServer->new;
+    $app->document_root(File::Spec->catdir(dirname($INC{'MojoDownMonitor.pm'}), 'MojoDownMonitor', 'public_html'));
+    $app->log_file("$FindBin::Bin/log/MojoSimpleHTTPServer.log");
+    $app->default_file('index.html');
+    $app->under_development(1);
+    
+    $app->stash->set('sites'   => $mdm_sites);
+    $app->stash->set('log'     => $mdm_log);
+    $app->stash->set('smtp'    => $mdm_smtp);
+    
+    $app->ssi_handlers->{ep}->add_function(is_pjax => sub {
+        return $MojoSimpleHTTPServer::CONTEXT->tx->req->headers->header('X-PJAX');
+    });
+    
+    $app->plugin(Router => sub {
+        
+        my $r = shift;
+        
+        $r->route(qr{^/index\.html})->via('post')->to(sub {
+            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            $mdm_sites->post();
+            my $id = $json_parser->decode($c->param('where'))->{id};
+            _delete_cron($id);
+            _set_cron($id);
+        });
+        
+        $r->route(qr{^/site_new\.html})->via('post')->to(sub {
+            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            $mdm_sites->post();
+            my $id = $c->app->mdm_sites->last_insert_rowid;
+            _delete_cron($id);
+            _set_cron($id);
+        });
+        
+        $r->route(qr{^/site_test\.html})->via('post')->to(sub {
+            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my %data = $mdm_sites->generate_dataset_hash_seed();
+            eval {
+                my $check_res = check(\%data);
+                my $res = $c->tx->res;
+                $res->code(200);
+                $res->body($json_parser->encode({result => $check_res}));
+                $res->headers->content_type('application/json');
+            };
+            if ($@) {
+                my $res = $c->tx->res;
+                $res->code(200);
+                $res->body($json_parser->encode({error => $@}));
+                $res->headers->content_type('application/json');
+            }
+        });
+        
+        $r->route(qr{/site_edit\.html})->via('post')->to(sub {
+            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            $mdm_sites->post();
+            my $id = $json_parser->decode($c->tx->req->param('where'))->{id};
+            _delete_cron($id);
+            _set_cron($id);
+        });
+        
+        $r->route(qr{/smtp_edit\.html})->via('post')->to(sub {
+            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            $mdm_smtp->post();
+        });
+    });
+    
+    _set_cron();
+    
+    $app->start;
+    
+    sub _delete_cron {
+        my $site_id = shift;
+        if ($ev_objs{$site_id}) {
+            undef $ev_objs{$site_id};
+            delete $ev_objs{$site_id};
+        }
+    }
+    
+    sub _set_cron {
+        my $site_id = shift;
+        my $sth = $mdm_sites->dump({id => $site_id});
+        
+        while (my $site = $sth->fetchrow_hashref) {
+            my $ev_obj = AE::timer(0, $site->{'Interval'}, sub {
+                my $new_log = check($site);
+                my $sth =
+                    $mdm_log
+                         ->dump({'Site id' => $site->{'id'}}, ['OK'], 1, [['id', 1]]);
+                my $last_log = $sth->fetchrow_hashref;
+                $sth->finish;
+                
+                $mdm_log->create(SQL::OOP::Dataset->new($new_log));
+                $mdm_log->vacuum($site->{'Max log'}, $site->{'id'});
+                
+                if ($last_log && ! $new_log->{OK} || ! $last_log->{OK}) {
+                    
+                    my $smtp_info = $mdm_smtp->server_info;
+                    my $sendmail = MojoDownMonitor::Util::Sendmail->new(
+                        $smtp_info->value('host'),
+                        $smtp_info->value('port'),
+                        $smtp_info->value('ssl'),
+                        $smtp_info->value('user'),
+                        $smtp_info->value('password'),
+                    );
+                    
+                    my @change_msg_tbl = ();
+                    $change_msg_tbl[1][0] = 'An error detected';
+                    $change_msg_tbl[0][1] = 'An error resolved';
+                    $change_msg_tbl[0][0] = 'An error continuously detected';
+                    $change_msg_tbl[2][0] = 'An error detected with new site';
+                    $change_msg_tbl[2][1] = 'New site added with no error';
+                    
+                    my $title =
+                        $change_msg_tbl[$last_log->{OK} // 2][$new_log->{OK}];
+                    
+                    my @mailto = split(',', $site->{'Mail to'});
+                    $sendmail->sendmail(
+                        \@mailto,
+                        "[ALERT] $title",
+                        _mail_body($site, $new_log, $title),
+                    );
+                }
+            });
+            $ev_objs{$site->{'id'}} = $ev_obj;
+        }
+        $sth->finish;
+    }
+    
+    sub check {
+        my $site = shift;
+        my $ua = Mojo::UserAgent->new->name($site->{'User Agent'} || "mojo-down-monitor/$VERSION (+https://github.com/jamadam/mojo-down-monitor)");
+        $ua->inactivity_timeout($site->{'Connect timeout'} || 10);
+        $ua->connect_timeout($site->{'Connect timeout'} || 10);
+        $ua->request_timeout($site->{'Connect timeout'} || 10);
+        
+        my $time_s = time;
+        my $tx = $ua->get($site->{URI});
+        my $time_e = time;
+        
+        my $res_time = (int($time_e * 1000000) - int($time_s * 1000000)) / 1000;
+        
+        my $res = $tx->res;
+        my $code = $res->code;
+        my $type = $res->headers->content_type || '';
+        my $body = $res->body || '';
+        my $body_size = $res->body_size;
+        my $err;
+        if ($code) {
+            $err ||= _is($code, $site->{'Status must be'}, qq{Got wrong status '$code'});
+            $err ||= _is($type, $site->{'MIME type must be'}, qq{Got wrong MIME type '$type'});
+            $err ||= _is($body_size, $site->{'Body size must be'}, qq{Got wrong body size $body_size bytes});
+            $err ||= _like($body, $site->{'Content must match'}, qq{Content doesn't match expectation});
+            $err ||= _like($tx->res->headers->to_string, $site->{'HTTP header must match'}, qq{HTTP header doesn't match expectation});
+        } else {
+            $err ||= $tx->error || 'Unknown error';
+            utf8::decode($err);
+        }
+        
+        my $time = Time::Piece::localtime()->datetime;
+        $time =~ s{T}{ };
+        
+        return {
+            'Site id'   => $site->{'id'},
+            'OK'        => $err ? '0' : '1',
+            'Error'     => $err || undef,
+            'timestamp' => $time,
+            'Response time' => $res_time,
+        };
+    }
+    
+    sub _is {
+        my ($got, $expected, $err) = @_;
+        if ($expected && $got && $got ne $expected) {
+            return $err;
+        }
+    }
+    
+    sub _like {
+        my ($got, $expected, $err) = @_;
+        if ($expected && $got && $got !~ /\Q$expected\E/) {
+            return $err;
+        }
+    }
+    
+    sub _mail_body {
+        my ($site, $log, $title) = @_;
+        my $mt = Mojo::Template->new;
+        my $params = {title => $title};
+        
+        for my $key (keys %$site) {
+            my $key2 = $key;
+            $key2 =~ s{ }{_};
+            $params->{'site_'. $key2} = $site->{$key} || '';
+        }
+        for my $key (keys %$log) {
+            my $key2 = $key;
+            $key2 =~ s{ }{_};
+            $params->{'log_'. $key2} = $log->{$key} || '';
+        }
+        return $mt->render_file($mail_template, $params);
+    }

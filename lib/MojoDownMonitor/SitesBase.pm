@@ -8,22 +8,19 @@ use SQL::OOP::Insert;
 use SQL::OOP::Delete;
 use Mojo::JSON;
 use DBI;
-use base 'Tusu::Component::SQLite';
+use MojoDownMonitor::UserError;
+use base 'DBModel::SQLite';
 use Data::Dumper;
 use feature q/:5.10/;
     
     my $json_parser = Mojo::JSON->new;
     
-    sub is_pjax : TplExport {
-        my ($self) = @_;
-        return defined $self->controller->req->headers->header('X-PJAX');
-    }
-    
     sub cid_table {
-        my ($self, $c) = @_;
+        my ($self) = @_;
         my $t_def = $self->get_table_structure;
         my $out = {};
-        my $p = ($c || $self->controller)->req->body_params;
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $p = $tx->req->body_params;
         for my $name (keys %$t_def) {
             my $cid = 'cid-'. $t_def->{$name}->{cid};
             $out->{$name} = $p->param($cid)
@@ -35,13 +32,14 @@ use feature q/:5.10/;
         my $self = shift;
         my @data;
         my $tabe_structure = $self->get_table_structure;
-        my @columns = split /,/, $self->controller->param('columns');
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my @columns = split /,/, $tx->req->param('columns');
         if (! scalar @columns) {
             return;
         }
         COLUMN : for my $cname (@columns) {
             my $id = 'cid-'. $tabe_structure->{$cname}->{cid};
-            my $value = $self->controller->param($id);
+            my $value = $tx->req->param($id);
             given (lc $tabe_structure->{$cname}->{type}) {
                 when ('bool') {
                     if ($value) {
@@ -76,19 +74,20 @@ use feature q/:5.10/;
     
     sub post {
         my ($self) = @_;
-        my $c = $self->controller;
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
         
         $self->validate_form;
         
         if ($self->user_err->count) {
             $self->render;
         } else {
-            given ($c->req->body_params->param('mode')) {
+            given ($tx->req->body_params->param('mode')) {
                 when ('update') {$self->update}
                 when ('create') {$self->create}
                 when ('delete') {$self->delete}
             }
-            $self->redirect_to($c->req->body_params->param('nextpage'));
+            my $app = $MojoSimpleHTTPServer::CONTEXT->app;
+            $app->serve_redirect($tx->req->body_params->param('nextpage'));
         }
         return;
     }
@@ -100,19 +99,33 @@ use feature q/:5.10/;
     
     sub update {
         my ($self, $data, $where_seed) = @_;
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
         my $where_hash =
-            $json_parser->decode($where_seed || $self->controller->param('where'));
+            $json_parser->decode($where_seed || $tx->req->param('where'));
         my $where = SQL::OOP::Where->and_hash($where_hash);
         $self->SUPER::update($data || $self->generate_dataset, $where);
     }
     
     sub delete {
         my ($self, $where_seed) = @_;
-        $where_seed ||= $self->controller->param('where');
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        $where_seed ||= $tx->req->param('where');
         my $where_hash =
             ref $where_seed ? $where_seed : $json_parser->decode($where_seed);
         my $where = SQL::OOP::Where->and_hash($where_hash);
         $self->SUPER::delete($where);
+    }
+	
+	### ---
+	### user_error
+	### ---
+    sub user_err {
+        my ($self) = @_;
+        my $stash = $MojoSimpleHTTPServer::CONTEXT->stash;
+        if (! $stash->{user_err}) {
+            $stash->set('user_err', MojoDownMonitor::UserError->new);
+        }
+        return $stash->{user_err};
     }
 
 1;

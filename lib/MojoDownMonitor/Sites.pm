@@ -15,7 +15,7 @@ use feature q/:5.10/;
     
     sub init {
         my ($self, $app) = @_;
-        my $file = $app->home->rel_file('data/sites.sqlite');
+        my $file = './mojo-down-monitor.sqlite';
         my $dbh = DBI->connect_cached("DBI:SQLite:dbname=$file",
             undef, undef, {
                 AutoCommit      => 1,
@@ -55,7 +55,8 @@ EOF
     
     sub validate_form {
         my ($self) = @_;
-        my $params = $self->controller->req->body_params;
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $params = $tx->req->body_params;
         my $cid_data = $self->cid_table;
         given ($params->param('mode')) {
             when ($_ ~~ ['update','create']) {
@@ -77,7 +78,8 @@ EOF
     
     sub delete {
         my ($self, $where_seed) = @_;
-        $where_seed ||= $self->controller->param('where');
+        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        $where_seed ||= $tx->req->param('where');
         my $where_hash =
             ref $where_seed ? $where_seed : $json_parser->decode($where_seed);
         $self->controller->app->mdm_log->delete({'Site id' => $where_hash->{id}});

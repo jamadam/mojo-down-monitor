@@ -1,0 +1,1 @@
+<input type="text" name="cid-<%= $column->cid %>" value="<%= $column->value ? $column->value : 'AUTO NUMBER' %>" id="cid-<%= $column->cid %>" disabled="disabled" />

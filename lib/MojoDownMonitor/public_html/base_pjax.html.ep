@@ -1,0 +1,11 @@
+<head>
+	<%= placeholder 'doctitle' => begin %>
+    	<title>mojo-down-monitor</title>
+	<% end %>
+</head>
+<div id="mainWrapper">
+    <div id="main">
+		<%= placeholder 'main' => begin %>
+		<% end %>
+	</div>
+</div>

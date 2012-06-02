@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%
+    my $param = shift;
+%>
 <html>
 <head>
     <title>mojo-down-monitor</title>
@@ -13,28 +16,28 @@
 </head>
 <body>
 <h2>
-	<% $title %>!
+	<%= $param->{title} %>!
 </h2>
 <table>
 	<tr>
 		<th>Site name</th>
-		<td><%= $site_Site_name %></td>
+		<td><%== $param->{site_Site_name} %></td>
 	</tr>
 	<tr>
 		<th>URI</td>
-		<td><%= $site_URI %></td>
+		<td><%== $param->{site_URI} %></td>
 	</tr>
 	<tr>
 		<th>Error</th>
-		<td><%= $log_Error %></td>
+		<td><%== $param->{log_Error} %></td>
 	</tr>
 	<tr>
 		<th>time</td>
-		<td><%= $log_timestamp %></td>
+		<td><%== $param->{log_timestamp} %></td>
 	</tr>
 	<tr>
 		<th>Response Time</th>
-		<td><%= $log_Response_time %> ms</td>
+		<td><%== $param->{log_Response_time} %> ms</td>
 	</tr>
 </table>
 </body>

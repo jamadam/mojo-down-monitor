@@ -14,7 +14,7 @@ use Data::Dumper;
     
     sub init {
         my ($self, $app) = @_;
-        my $file = $app->home->rel_file('data/sites.sqlite');
+        my $file = './mojo-down-monitor.sqlite';
         my $dbh = DBI->connect_cached("DBI:SQLite:dbname=$file",
             undef, undef, {
                 AutoCommit      => 1,

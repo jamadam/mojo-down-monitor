@@ -10,8 +10,6 @@ WriteMakefile(
     VERSION_FROM => 'lib/MojoDownMonitor.pm',
     AUTHOR       => 'jamadam <sugama@jamadam.com>',
     PREREQ_PM    => {
-        'Attribute::Handlers'        => '0.91',
-        'Class::Data::Inheritable'  => '0.08',
         'DBD::SQLite'               => '1.35',
         'Try::Tiny'                 => '0.11',
         'SQL::OOP'                  => '0.20',
@@ -22,5 +20,6 @@ WriteMakefile(
         'EV'                        => '4.03',
         'AnyEvent'                  => '6.13',
     },
+    EXE_FILES => ['mojo-down-monitor'],
     test         => {TESTS => 't/*.t'}
 );

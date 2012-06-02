@@ -1,0 +1,67 @@
+<% my $db = ($smtp->fetch(
+    assign 	=> 'smtp',
+    where 	=> {id => 1},
+    fields 	=> [
+        'host',
+        'port',
+        'ssl',
+        'user',
+        'password',
+    ]
+))[0]; %>
+<%== extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
+	<% override 'doctitle' => begin %>
+    	<title>Edit SMTP info | mojo-down-monitor</title>
+	<% end %>
+	<% override 'main' => begin %>
+        <div id="mainLevel2">
+            
+            <% if($sites->user_err->count) { %>
+                <ul id="formErrorContainer">
+                    <% for my $err (@{$sites->user_err}) { %>
+                        <%= $err %>
+                    <% } %>
+                </ul>
+            <% } %>
+        
+            <h2>
+                Edit SMTP
+            </h2>
+            
+            <form enctype="multipart/form-data" method="post" action="./smtp_edit.html">
+            <div>
+                <input type="hidden" name="nextpage" value="/smtp_edit.html" />
+                <input type="hidden" name="mode" value="update" />
+                <input type="hidden" name="where" value='{"id":"1"}' />
+                <input type="hidden" name="columns" value="host,port,ssl,user,password" />
+            </div>
+            <table>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type="submit" value="edit" class="button" />
+                        </td>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <% for my $column ($db->columns) { %>
+                        <tr>
+                            <th>
+                                <%= $column->key %>
+                            </th>
+                            <td>
+                                <% if ($column->key eq 'password') { %>
+                                    <%== include('./form_parts/password.html.ep', {column => $column}) %>
+                                <% } else { %>
+                                    <%== include('./form_parts/'. lc $column->type. '.html.ep', {column => $column}) %>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            </form>
+        </div>
+	<% end %>
+<% end %>

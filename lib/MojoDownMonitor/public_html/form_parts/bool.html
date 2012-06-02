@@ -1,5 +1,0 @@
-<% if(&default(&param('cid-'. $column->cid), $column->value))<<THEN,ELSE %>
-<input type="checkbox" name="cid-<%= $column->cid %>" id="cid-<%= $column->cid %>" checked="checked" />
-<% THEN %>
-<input type="checkbox" name="cid-<%= $column->cid %>" id="cid-<%= $column->cid %>" />
-<% ELSE %>

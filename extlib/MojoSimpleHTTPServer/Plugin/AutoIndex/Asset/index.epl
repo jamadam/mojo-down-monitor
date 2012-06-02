@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+	<%
+		my $r 			= shift;
+		my $c 			= shift;
+		my $dir 		= $c->stash->{dir};
+		my $static_dir 	= $c->stash->{static_dir};
+		my $dataset 	= $c->stash->{dataset};
+	%>
+    <title>Index of <%= $dir %></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<link type="text/css" rel="stylesheet" href="/<%= $static_dir %>/yui-reset.css" />
+	<link type="text/css" rel="stylesheet" href="/<%= $static_dir %>/yui-fonts.css" />
+	<link type="text/css" rel="stylesheet" href="/<%= $static_dir %>/site_main.css" />
+	<link type="text/css" rel="stylesheet" href="/<%= $static_dir %>/site_file_list.css" />
+	<link rel="shortcut icon" href="/static/favicon.ico" />
+    <script type="text/javascript" src="/<%= $static_dir %>/jquery.1.7.1.js"></script>
+    <script type="text/javascript" src="/<%= $static_dir %>/site_file_list.js"></script>
+</head>
+<body>
+    <h1>
+        Index of <code><%= $dir %></code>
+    </h1>
+    <div id="wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Last modified</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+			% for my $data (@$dataset) {
+				<tr>
+					<td><a class="<%= $data->{type} %>" href="<%= $data->{name} %>"><%= $data->{name} %></a></td>
+					<td><%= $data->{timestamp} %></td>
+					<td><%= $data->{size} %></td>
+				</tr>
+			% }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

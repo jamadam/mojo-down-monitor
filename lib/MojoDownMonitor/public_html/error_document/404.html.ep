@@ -1,0 +1,13 @@
+<%== extends(is_pjax() ? '/base_pjax.html' : '/base.html')<<EXTENDS %>
+	<% block('doctitle')<<BLOCK %>
+	<title>404 File Not Found | mojo-down-monitor</title>
+	<% BLOCK %>
+	<% block('main')<<BLOCK %>
+	<h2>
+		404 File Not Found
+	</h2>
+	<div>
+		The page you were looking for appears to have been moved, deleted or does not exist.
+	</div>
+	<% BLOCK %>
+<% EXTENDS %>

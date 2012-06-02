@@ -1,0 +1,61 @@
+<% my $site = ($sites->fetch(
+	where 	=> {id => param('a')},
+	fields 	=> [
+		'id',
+		'Site name',
+		'URI',
+		'Interval',
+		'Mail to',
+		'Status must be',
+		'MIME type must be',
+		'Content must match',
+		'HTTP header must match',
+		'Body size must be',
+		'Max log',
+		'Connect timeout',
+		'User Agent',
+	]
+))[0]; %>
+<%== extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
+	<% override 'doctitle' => begin %>
+    	<title>Log for <%= $site->value('Site name') %> | mojo-down-monitor</title>
+	<% end %>
+	<% override 'main' => begin %>
+        <h2>
+            <%= $site->value('Site name') %>
+        </h2>
+        <div class="tabStyleMenu">
+            <a href="/site_log.html?a=<%= param('a') %>">log</a>
+            <a href="/site_edit.html?a=<%= param('a') %>">Site Edit</a>
+        </div>
+        <div id="mainLevel2">
+            <table>
+                <thead>
+                    <tr>
+                        <th>OK</th>
+                        <th>Error</th>
+                        <th>timestamp</th>
+                        <th>Response time(ms)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% my @site_log = $log->fetch(
+                        assign 	=> 'log',
+                        fields	=> ['OK', 'Error', 'timestamp', 'Response time'],
+                        where 	=> {'Site id' => param('a')},
+                        orderby	=> [['id', 1]]
+                    ); %>
+                    <% for my $entry (@site_log) { %>
+                        <tr>
+                            <td><%= $entry->value('OK') %></td>
+                            <td><%= $entry->value('Error') %></td>
+                            <td><%= $entry->value('timestamp') %></td>
+                            <td><%= $entry->value('Response time') %></td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+	<% end %>
+<% end %>
+

@@ -1,0 +1,5 @@
+<% if (param('cid-'. $column->cid) || $column->value) { %>
+    <input type="checkbox" name="cid-<%= $column->cid %>" id="cid-<%= $column->cid %>" checked="checked" />
+<% } else { %>
+    <input type="checkbox" name="cid-<%= $column->cid %>" id="cid-<%= $column->cid %>" />
+<% } %>
