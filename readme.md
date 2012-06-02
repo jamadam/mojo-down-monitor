@@ -25,10 +25,10 @@ To install this module, run the following commands:
 
 ## GETTING STARTED
 
-    $ hypnotoad ./script/mojo_down_monitor
+    $ hypnotoad ./mojo-down-monitor
     Server available at http://127.0.0.1:8010.
 
-    $ hypnotoad ./script/mojo_down_monitor --stop
+    $ hypnotoad ./mojo-down-monitor --stop
 
 Copyright (c) 2011 [jamadam]
 [jamadam]: http://blog2.jamadam.com/
