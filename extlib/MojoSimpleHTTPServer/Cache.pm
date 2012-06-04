@@ -13,12 +13,19 @@ use Mojo::Base -base;
             if ($cache->[2]) {
                 for my $code (@{$cache->[2]}) {
                     if ($code->($cache->[1])) {
+                        delete $_[0]->{$ATTR_CACHE}->{$_[1]};
+                        $_[0]->vacuum;
                         return;
                     }
                 }
             }
             $cache->[0];
         }
+    }
+    
+    sub vacuum {
+        @{$_[0]->{$ATTR_STACK}} =
+                    grep {$_[0]->{$ATTR_CACHE}->{$_}} @{$_[0]->{$ATTR_STACK}};
     }
     
     sub set {
@@ -30,6 +37,10 @@ use Mojo::Base -base;
         
         while (@$stack >= $max_keys) {
             delete $cache->{shift @$stack};
+        }
+        
+        if (delete $cache->{$key}) {
+            $self->vacuum;
         }
         
         push @$stack, $key;
@@ -77,6 +88,10 @@ Get cache value for given name.
 =head2 $instance->set($name => $data)
 
 Set cache values with given name and data.
+
+    $cache->set(key, $data);
+    $cache->set(key, $data, sub {...});
+    $cache->set(key, $data, [sub {...}, sub {...}]);
 
 =head1 SEE ALSO
 

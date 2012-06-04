@@ -16,7 +16,7 @@
 		'User Agent',
 	]
 ))[0]; %>
-<%== extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
+<%= extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
 	<% override 'doctitle' => begin %>
     	<title>Log for <%= $site->value('Site name') %> | mojo-down-monitor</title>
 	<% end %>

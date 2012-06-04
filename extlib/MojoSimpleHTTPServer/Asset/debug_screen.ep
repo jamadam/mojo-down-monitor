@@ -4,8 +4,8 @@
 <head>
 	<%
 		my $c 			= shift;
-		my $exception	= stash('mshs.exception');
-		my $static_dir 	= stash('mshs.static_dir');
+		my $exception	= stash('message');
+		my $static_dir 	= stash('static_dir');
 	%>
     <title>Debug Screen</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -20,14 +20,14 @@
     <script type="text/javascript" src="/<%= $static_dir %>/jquery.1.7.1.js"></script>
     <script type="text/javascript" src="/<%= $static_dir %>/js/prettify.js"></script>
 </head>
-<body onload="prettyPrint()">
+<body id="debugScreen" onload="prettyPrint()">
     <h1>
         Debug Screen
     </h1>
     <div id="wrapper">
 		% my $cv = begin
 		  % my ($key, $value, $i) = @_;
-			<tr <%= $i ? 'class="important"' : '' %>>
+			<tr <%== $i ? 'class="important"' : '' %>>
 				<td class="key"><%= $key %>.</td>
 				<td class="value"><pre class="prettyprint"><%= $value %></pre></td>
 			</tr>
@@ -114,8 +114,7 @@
 				%= $kv->(URL => $url->to_string)
 				%= $kv->('Base URL' => $url->base->to_string)
 				%= $kv->(Parameters => dumper $req->params->to_hash)
-				% my %snapshot = %{stash()};
-				% %snapshot = map { $_ => $snapshot{$_} } grep { !/^mshs\./ and defined $snapshot{$_} } keys %snapshot;
+				% my %snapshot = %{snapshot()};
 				%= $kv->(Stash => dumper \%snapshot)
 				%# $kv->(Session => dumper $c->session)
 				%= $kv->(Version => $req->version)

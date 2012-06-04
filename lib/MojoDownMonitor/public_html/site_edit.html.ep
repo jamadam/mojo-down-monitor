@@ -16,7 +16,7 @@
 		'User Agent',
 	]
 ))[0]; %>
-<%== extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
+<%= extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
 	<% override 'doctitle' => begin %>
     	<title>Edit <%= $site->value('Site name') %> | mojo-down-monitor</title>
 	<% end %>
@@ -64,9 +64,9 @@
                             </th>
                             <td>
                                 <% if ($column->key eq 'id') { %>
-                                    <%== include('./form_parts/readonly_varchar.html.ep', {column => $column}) %>
+                                    <%= include('./form_parts/readonly_varchar.html.ep', {column => $column}) %>
                                 <% } else { %>
-                                    <%== include('./form_parts/'. lc $column->type. '.html.ep', {column => $column}) %>
+                                    <%= include('./form_parts/'. lc $column->type. '.html.ep', {column => $column}) %>
                                 <% } %>
                             </td>
                         </tr>

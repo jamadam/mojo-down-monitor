@@ -16,13 +16,17 @@ use MojoSimpleHTTPServer::Context;
 use MojoSimpleHTTPServer::SSIHandler::EP;
 use MojoSimpleHTTPServer::SSIHandler::EPL;
 use MojoSimpleHTTPServer::Stash;
+use MojoSimpleHTTPServer::ErrorDocument;
 
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     
     our $CONTEXT;
 
     __PACKAGE__->attr('document_root');
     __PACKAGE__->attr('default_file');
+    __PACKAGE__->attr(error_document => sub {
+        MojoSimpleHTTPServer::ErrorDocument->new;
+    });
     __PACKAGE__->attr('log_file');
     __PACKAGE__->attr(hooks => sub {MojoSimpleHTTPServer::Hooks->new});
     __PACKAGE__->attr(roots => sub {[]});
@@ -31,12 +35,6 @@ use MojoSimpleHTTPServer::Stash;
     __PACKAGE__->attr(types => sub { Mojolicious::Types->new });
     __PACKAGE__->attr('under_development' => 0);
     __PACKAGE__->attr('x_powered_by' => 'Simple HTTP Server with Mojo(Perl)');
-    
-    my %error_messages = (
-        404 => 'File not found',
-        500 => 'Internal server error',
-        403 => 'Forbidden',
-    );
     
     ### --
     ### Constructor
@@ -99,7 +97,7 @@ use MojoSimpleHTTPServer::Stash;
         
         if (! $res->code) {
             if ($tx->req->url =~ /$self->{_handler_re}/) {
-                $self->serve_error_document(403);
+                $self->error_document->render(403);
                 return;
             }
         }
@@ -151,15 +149,11 @@ use MojoSimpleHTTPServer::Stash;
         
         if ($@) {
             $self->log->fatal("Processing request failed: $@");
-            if ($self->under_development) {
-                $self->serve_debug_screen($@);
-            } else {
-                $self->serve_error_document(500);
-            }
+            $self->error_document->render(500, $@);
         }
         
         if (! $tx->res->code) {
-            $self->serve_error_document(404);
+            $self->error_document->render(404);
             $self->log->fatal($tx->req->url->path. qq{ Not found});
         }
         
@@ -237,39 +231,6 @@ use MojoSimpleHTTPServer::Stash;
         my $tx = $CONTEXT->tx;
         $tx->res->code(301);
         $tx->res->headers->location(_to_abs($self, $uri)->to_string);
-        return $self;
-    }
-    
-    ### --
-    ### serve error document
-    ### --
-    sub serve_debug_screen {
-        my ($self, $exception) = @_;
-        
-        my $tx = $CONTEXT->tx;
-        $CONTEXT->stash->set(
-            'mshs.static_dir' => 'static',
-            'mshs.exception' => $exception
-        );
-        $tx->res->body(
-            encode('UTF-8',
-                MojoSimpleHTTPServer::SSIHandler::EP->new->render_traceable(
-                                                _asset('debug_screen.ep'))));
-        $tx->res->code(200);
-        $tx->res->headers->content_type($self->types->type('html'));
-        return $self;
-    }
-    
-    ### --
-    ### serve error document
-    ### --
-    sub serve_error_document {
-        my ($self, $code, $message) = @_;
-        
-        my $tx = $CONTEXT->tx;
-        $tx->res->body($message || ($code. ' '. $error_messages{$code}));
-        $tx->res->code($code);
-        $tx->res->headers->content_type($self->types->type('html'));
         return $self;
     }
     
@@ -356,7 +317,7 @@ use MojoSimpleHTTPServer::Stash;
     ### ---
     ### Asset directory
     ### ---
-    sub _asset {
+    sub asset {
         my @seed = (substr(__FILE__, 0, -3), 'Asset');
         if ($_[0]) {
             return File::Spec->catdir(@seed, $_[0]);
@@ -379,7 +340,7 @@ use MojoSimpleHTTPServer::Stash;
             die 'document_root is not a directory';
         }
         
-        unshift(@{$self->roots}, $self->document_root, _asset());
+        unshift(@{$self->roots}, $self->document_root, asset());
 
         $self->{_handler_re} =
                     '\.(?:'. join('|', keys %{$self->ssi_handlers}). ')$';
@@ -445,6 +406,10 @@ This is built on mojo modules in L<Mojolicious> distribution.
 
 Specify a default file name and activate auto fill.
 
+=head2 error_document
+
+Error document renderer instace. Defaults to MojoSimpleHTTPServer::ErrorDocument
+
 =head2 log_file
 
 Specify a log file path.
@@ -489,6 +454,10 @@ Adds ssi_handlers entry.
 
     $instance->add_handler(ep => MojoSimpleHTTPServer::SSIHandler::EP->new);
 
+=head2 __PACKAGE__::asset($filename);
+
+Returns bundled asset path for given file name.
+
 =head2 $instance->context()
 
 Returns current context
@@ -528,17 +497,9 @@ Serves response that redirects to trailing slashed URI.
 
 Serves response that redirects to given URI.
 
-=head2 $instance->serve_error_document($code, $message)
-
-Serves error document with given status code and message.
-
 =head2 $instance->serve_static($path)
 
 Serves static file of given path.
-
-=head2 $instance->serve_debug_screen($exception)
-
-Serves debug screen with given L<Mojo::Exception> instance.
 
 =head2 $instance->serve_dynamic($path)
 

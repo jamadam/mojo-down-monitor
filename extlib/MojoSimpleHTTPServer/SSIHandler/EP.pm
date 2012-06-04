@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Mojo::Base 'MojoSimpleHTTPServer::SSIHandler::EPL';
 use File::Basename 'dirname';
+use Mojo::ByteStream;
 
     ### --
     ### Function definitions for inside template
@@ -103,8 +104,8 @@ use File::Basename 'dirname';
             my $c = $MojoSimpleHTTPServer::CONTEXT;
             local $c->{stash} = $c->{stash}->clone;
             $c->{stash}->set(@args);
-            
-            return $c->app->render_ssi($self->_to_abs($path));
+            return
+                Mojo::ByteStream->new($c->app->render_ssi($self->_to_abs($path)));
         };
         
         $self->funcs->{override} = sub {
@@ -132,7 +133,8 @@ use File::Basename 'dirname';
             
             $block->();
             
-            return $c->app->render_ssi($self->_to_abs($path));
+            return
+                Mojo::ByteStream->new($c->app->render_ssi($self->_to_abs($path)));
         };
         
         return $self;

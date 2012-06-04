@@ -135,20 +135,11 @@ __END__
 
 =head1 NAME
 
-MojoSimpleHTTPServer::Plugin::Router - Router [EXPERIMENTAL]
+MojoSimpleHTTPServer::Plugin::AutoIndex - Auto index
 
 =head1 SYNOPSIS
 
-    $app->load_plugin(Router => {
-        qr/index\.html/ => sub {
-            my $context = MyApp->context;
-            ### DO SOMETHING
-        },
-        qr/special\.html/ => sub {
-            my $context = MyApp->context;
-            ### DO SOMETHING
-        },
-    });
+    $app->load_plugin('AutoIndex');
 
 =head1 DESCRIPTION
 

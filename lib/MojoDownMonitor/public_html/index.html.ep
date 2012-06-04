@@ -1,4 +1,4 @@
-<%== extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
+<%= extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
 	<% override 'doctitle' => begin %>
         <title>Site list | mojo-down-monitor</title>
 	<% end %>
