@@ -1,5 +1,4 @@
 <% my $db = ($smtp->fetch(
-    assign 	=> 'smtp',
     where 	=> {id => 1},
     fields 	=> [
         'host',
