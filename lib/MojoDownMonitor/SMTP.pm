@@ -38,10 +38,10 @@ EOF
     
     sub server_info {
         my $self = shift;
-        return $self->load(
+        return ($self->fetch(
             where   => {id => 1},
             fields  => ['host','port','ssl','user', 'password']
-        );
+        ))[0];
     }
     
     sub validate_form {

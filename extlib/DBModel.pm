@@ -63,7 +63,7 @@ EOF
 	### ---
 	### total size
 	### ---
-	sub count {# : TplExport 
+	sub count {
 		my $self = shift;
 		my %args = (
 			where  	=> undef,
@@ -109,54 +109,6 @@ EOF
     }
     
 	### ---
-	### load
-	### ---
-    sub load {
-        my $self = shift;
-		my %args = (
-			fields 	=> undef,
-			where  	=> undef,
-			limit  	=> undef,
-			orderby	=> undef,
-			offset  => undef,
-			@_);
-		
-        my $sth = $self->dump($args{where}, $args{fields},
-							  $args{limit}, $args{orderby}, $args{offset});
-		my $table_structure = $self->get_table_structure;
-        if (my $hash = $sth->fetchrow_hashref) {
-			return DBModel::Record->new($hash, $table_structure, $args{fields});
-        }
-		$sth->finish;
-		return;
-    }
-	
-	### ---
-	### load_records
-	### ---
-	sub load_records {
-		my $self = shift;
-		my %args = (
-			fields 	=> undef,
-			where  	=> undef,
-			limit  	=> undef,
-			orderby	=> undef,
-			@_);
-		
-        my $sth = $self->dump(
-					$args{where}, $args{fields}, $args{limit}, $args{orderby});
-		my @array;
-		my $table_structure = $self->get_table_structure;
-        while (my $hash = $sth->fetchrow_hashref) {
-			my $rec =
-				DBModel::Record->new($hash, $table_structure, $args{fields});
-			push(@array, $rec);
-        }
-		$sth->finish;
-		return DBModel::Records->new(\@array);
-	}
-    
-	### ---
 	### skeleton
 	### ---
     sub skeleton {
@@ -180,8 +132,6 @@ EOF
 			limit 	=> 10,
 			@_);
 		
-        my $template = Text::PSTemplate::get_block(0);
-		
 		my $sql = SQL::OOP::Select->new();
 		$sql->set(
 			$sql->ARG_FIELDS 	=>
@@ -199,17 +149,17 @@ EOF
 		
 		$sth->execute($sql->bind) or return;
 		
-        my $out = '';
+        my @ret;
+		
 		my $table_structure = $self->get_table_structure;
         while (my $hash = $sth->fetchrow_hashref) {
-            my $tpl = Text::PSTemplate->new();
 			my $rec =
 				DBModel::Record->new($hash, $table_structure, [$args{field}]);
-			$tpl->set_var($args{assign} => $rec);
-            $out .= $tpl->parse_str($template);
+			push(@ret, $rec);
         }
 		$sth->finish;
-        return $out;
+		
+        return @ret;
 	}
     
     ### ---
@@ -272,25 +222,6 @@ EOF
     sub get_table_structure {
         die 'get_table_structure must be implemented.';
     }
-
-package DBModel::Records;
-use strict;
-use warnings;
-	
-	sub new {
-        my ($class, $array) = @_;
-		return bless [$array], $class;
-	}
-    
-    sub each {
-        my ($self) = shift;
-		Text::PSTemplate::Plugin::Control->each($self->[0], @_);
-    }
-	
-	sub length {
-		my $self = shift;
-		return scalar @{$self->[0]};
-	}
 
 package DBModel::Record;
 use strict;
