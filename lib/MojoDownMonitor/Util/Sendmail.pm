@@ -7,7 +7,6 @@ use Net::SMTP::SSL;
 use MIME::Lite;
 use Authen::SASL;
 use Encode;
-use feature q/:5.10/;
 
     my $MEM_HOST = 1;
     my $MEM_PORT = 2;

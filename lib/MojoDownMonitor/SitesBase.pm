@@ -11,8 +11,7 @@ use DBI;
 use MojoDownMonitor::UserError;
 use base 'DBModel::SQLite';
 use Data::Dumper;
-use feature q/:5.10/;
-    
+
     my $json_parser = Mojo::JSON->new;
     
     sub cid_table {
@@ -40,18 +39,16 @@ use feature q/:5.10/;
         COLUMN : for my $cname (@columns) {
             my $id = 'cid-'. $tabe_structure->{$cname}->{cid};
             my $value = $tx->req->param($id);
-            given (lc $tabe_structure->{$cname}->{type}) {
-                when ('bool') {
-                    if ($value) {
-                        $value = $self->true_for_sql_statement;
-                    } else {
-                        $value = $self->false_for_sql_statement;
-                    }
+            my $type = lc $tabe_structure->{$cname}->{type};
+            if ($type eq 'bool') {
+                if ($value) {
+                    $value = $self->true_for_sql_statement;
+                } else {
+                    $value = $self->false_for_sql_statement;
                 }
-                when (['integer', 'real']) {
-                    if (defined $value && $value eq '') {
-                        next COLUMN;
-                    }
+            } elsif ($type eq 'integer' || $type eq 'real') {
+                if (defined $value && $value eq '') {
+                    next COLUMN;
                 }
             }
             push(@data, $cname, $value);
@@ -81,10 +78,13 @@ use feature q/:5.10/;
         if ($self->user_err->count) {
             return;
         } else {
-            given ($tx->req->body_params->param('mode')) {
-                when ('update') {$self->update}
-                when ('create') {$self->create}
-                when ('delete') {$self->delete}
+            my $mode = $tx->req->body_params->param('mode');
+            if ($mode eq 'update') {
+                $self->update;
+            } elsif ($mode eq 'create') {
+                $self->create;
+            } elsif ($mode eq 'delete') {
+                $self->delete;
             }
             my $app = $MojoSimpleHTTPServer::CONTEXT->app;
             $app->serve_redirect($tx->req->body_params->param('nextpage'));

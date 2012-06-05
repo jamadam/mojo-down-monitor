@@ -4,7 +4,6 @@ use warnings;
 use DBI;
 use base 'MojoDownMonitor::SitesBase';
 use Data::Dumper;
-use feature q/:5.10/;
     
     my $json_parser = Mojo::JSON->new;
     
@@ -53,20 +52,16 @@ EOF
         my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
         my $params = $tx->req->body_params;
         my $cid_data = $self->cid_table;
-        given ($params->param('mode')) {
-            when ($_ ~~ ['update','create']) {
-                if (! $cid_data->{'Site name'}) {
-                    $self->user_err->stack('Site name is required');
-                }
-                if (! $cid_data->{'Interval'} || $cid_data->{'Interval'} =~ /\D+/) {
-                    $self->user_err->stack('Interval must be a digit');
-                }
-                if (! $cid_data->{'URI'}) {
-                    $self->user_err->stack('URI is required');
-                }
+        my $mode = $params->param('mode');
+        if ($mode eq 'update' || $mode eq 'create') {
+            if (! $cid_data->{'Site name'}) {
+                $self->user_err->stack('Site name is required');
             }
-            when ('delete') {
-                
+            if (! $cid_data->{'Interval'} || $cid_data->{'Interval'} =~ /\D+/) {
+                $self->user_err->stack('Interval must be a digit');
+            }
+            if (! $cid_data->{'URI'}) {
+                $self->user_err->stack('URI is required');
             }
         }
     }

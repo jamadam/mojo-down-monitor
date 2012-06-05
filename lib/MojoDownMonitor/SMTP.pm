@@ -4,7 +4,6 @@ use warnings;
 use DBI;
 use base 'MojoDownMonitor::SitesBase';
 use Data::Dumper;
-use feature q/:5.10/;
     
     sub init {
         my ($self, $app) = @_;
@@ -50,14 +49,10 @@ EOF
         my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
         my $params = $tx->req->body_params;
         my $cid_data = $self->cid_table;
-        given ($params->param('mode')) {
-            when ($_ ~~ ['update','create']) {
-                if (! $cid_data->{'host'}) {
-                    $self->user_err->stack('Host name is required');
-                }
-            }
-            when ('delete') {
-                
+        my $mode = $params->param('mode');
+        if ($mode eq 'update' || $mode eq 'create') {
+            if (! $cid_data->{'host'}) {
+                $self->user_err->stack('Host name is required');
             }
         }
     }
