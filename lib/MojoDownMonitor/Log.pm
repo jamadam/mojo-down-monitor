@@ -1,7 +1,6 @@
 package MojoDownMonitor::Log;
 use strict;
 use warnings;
-use Text::PSTemplate;
 use SQL::OOP::Select;
 use SQL::OOP::Dataset;
 use SQL::OOP::Insert;

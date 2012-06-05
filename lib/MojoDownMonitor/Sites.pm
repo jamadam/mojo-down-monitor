@@ -1,11 +1,6 @@
 package MojoDownMonitor::Sites;
 use strict;
 use warnings;
-use Text::PSTemplate;
-use SQL::OOP::Select;
-use SQL::OOP::Dataset;
-use SQL::OOP::Insert;
-use SQL::OOP::Delete;
 use DBI;
 use base 'MojoDownMonitor::SitesBase';
 use Data::Dumper;
