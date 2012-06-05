@@ -17,7 +17,7 @@ use Data::Dumper;
         my ($self) = @_;
         my $t_def = $self->get_table_structure;
         my $out = {};
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         my $p = $tx->req->body_params;
         for my $name (keys %$t_def) {
             my $cid = 'cid-'. $t_def->{$name}->{cid};
@@ -30,7 +30,7 @@ use Data::Dumper;
         my $self = shift;
         my @data;
         my $tabe_structure = $self->get_table_structure;
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         my @columns = split /,/, $tx->req->param('columns');
         if (! scalar @columns) {
             return;
@@ -70,7 +70,7 @@ use Data::Dumper;
     
     sub post {
         my ($self) = @_;
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         
         $self->validate_form;
         
@@ -85,7 +85,7 @@ use Data::Dumper;
             } elsif ($mode eq 'delete') {
                 $self->delete;
             }
-            my $app = $MojoSimpleHTTPServer::CONTEXT->app;
+            my $app = $MSHS::CONTEXT->app;
             $app->serve_redirect($tx->req->body_params->param('nextpage'));
         }
         return;
@@ -98,7 +98,7 @@ use Data::Dumper;
     
     sub update {
         my ($self, $data, $where_seed) = @_;
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         my $where_hash =
             $json_parser->decode($where_seed || $tx->req->param('where'));
         my $where = SQL::OOP::Where->and_hash($where_hash);
@@ -107,7 +107,7 @@ use Data::Dumper;
     
     sub delete {
         my ($self, $where_seed) = @_;
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         $where_seed ||= $tx->req->param('where');
         my $where_hash =
             ref $where_seed ? $where_seed : $json_parser->decode($where_seed);
@@ -120,7 +120,7 @@ use Data::Dumper;
 	### ---
     sub user_err {
         my ($self) = @_;
-        my $stash = $MojoSimpleHTTPServer::CONTEXT->stash;
+        my $stash = $MSHS::CONTEXT->stash;
         if (! $stash->{user_err}) {
             $stash->set('user_err', MojoDownMonitor::UserError->new);
         }

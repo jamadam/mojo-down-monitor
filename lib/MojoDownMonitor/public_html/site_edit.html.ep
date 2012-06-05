@@ -33,9 +33,9 @@
             
             <% if($sites->user_err->count) { %>
                 <ul id="formErrorContainer">
-                    <% for my $err (@{$sites->user_err}) { %>
-                        <%= $err %>
-                    <% } %>
+                    <%= iter @{$sites->user_err} => begin %>
+                        <li><%= shift %></li>
+                    <% end %>
                 </ul>
             <% } %>
             
@@ -57,7 +57,8 @@
                     </tr>
                 </tfoot>
                 <tbody>
-                    <% for my $column ($site->columns) { %>
+                    <%= iter $site->columns => begin %>
+						<% my $column = shift; %>
                         <tr>
                             <th>
                                 <%= $column->key %>
@@ -70,7 +71,7 @@
                                 <% } %>
                             </td>
                         </tr>
-                    <% } %>
+                    <% end %>
                 </tbody>
             </table>
             </form>

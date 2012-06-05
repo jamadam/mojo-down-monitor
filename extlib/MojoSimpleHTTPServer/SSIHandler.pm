@@ -23,8 +23,7 @@ use Mojo::Util qw/encode md5_sum/;
         
         $index ||= 0;
         
-        my $route =
-                $MojoSimpleHTTPServer::CONTEXT->stash->{'mshs.template_path'};
+        my $route = $MSHS::CONTEXT->stash->{'mshs.template_path'};
         
         while ($index-- > 0) {
             $route = $route->[1] || return;
@@ -50,7 +49,7 @@ use Mojo::Util qw/encode md5_sum/;
     sub render_traceable {
         my ($self, $path, $cb) = @_;
         
-        my $stash = $MojoSimpleHTTPServer::CONTEXT->stash;
+        my $stash = $MSHS::CONTEXT->stash;
         
         local $stash->{'mshs.template_path'} =
                                         [$path, $stash->{'mshs.template_path'}];

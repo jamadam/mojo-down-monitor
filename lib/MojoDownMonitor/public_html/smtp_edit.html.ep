@@ -1,13 +1,3 @@
-<% my $db = ($smtp->fetch(
-    where 	=> {id => 1},
-    fields 	=> [
-        'host',
-        'port',
-        'ssl',
-        'user',
-        'password',
-    ]
-))[0]; %>
 <%= extends is_pjax() ? '/base_pjax.html.ep' : '/base.html.ep' => begin %>
 	<% override 'doctitle' => begin %>
     	<title>Edit SMTP info | mojo-down-monitor</title>
@@ -15,11 +5,11 @@
 	<% override 'main' => begin %>
         <div id="mainLevel2">
             
-            <% if($sites->user_err->count) { %>
+            <% if ($sites->user_err->count) { %>
                 <ul id="formErrorContainer">
-                    <% for my $err (@{$sites->user_err}) { %>
-                        <%= $err %>
-                    <% } %>
+                    <%= iter @{$sites->user_err} => begin %>
+                        <li><%= shift %></li>
+                    <% end %>
                 </ul>
             <% } %>
         
@@ -44,7 +34,18 @@
                     </tr>
                 </tfoot>
                 <tbody>
-                    <% for my $column ($db->columns) { %>
+					<% my $db = ($smtp->fetch(
+						where 	=> {id => 1},
+						fields 	=> [
+							'host',
+							'port',
+							'ssl',
+							'user',
+							'password',
+						]
+					))[0]; %>
+                    <%= iter $db->columns => begin %>
+						<% my $column = shift; %>
                         <tr>
                             <th>
                                 <%= $column->key %>
@@ -57,7 +58,7 @@
                                 <% } %>
                             </td>
                         </tr>
-                    <% } %>
+                    <% end %>
                 </tbody>
             </table>
             </form>

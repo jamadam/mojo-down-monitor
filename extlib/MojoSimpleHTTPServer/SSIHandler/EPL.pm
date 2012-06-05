@@ -28,7 +28,7 @@ use Mojo::Util qw/encode md5_sum/;
     sub render {
         my ($self, $path) = @_;
         
-        my $context = $MojoSimpleHTTPServer::CONTEXT;
+        my $context = $MSHS::CONTEXT;
         
         my $mt = $self->cache($path);
         

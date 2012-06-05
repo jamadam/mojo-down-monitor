@@ -39,20 +39,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% my @site_log = $log->fetch(
+                    <%= iter $log->fetch(
                         assign 	=> 'log',
                         fields	=> ['OK', 'Error', 'timestamp', 'Response time'],
                         where 	=> {'Site id' => param('a')},
                         orderby	=> [['id', 1]]
-                    ); %>
-                    <% for my $entry (@site_log) { %>
+                    ) => begin %>
+						<% my $entry = shift; %>
                         <tr>
                             <td><%= $entry->value('OK') %></td>
                             <td><%= $entry->value('Error') %></td>
                             <td><%= $entry->value('timestamp') %></td>
                             <td><%= $entry->value('Response time') %></td>
                         </tr>
-                    <% } %>
+                    <% end %>
                 </tbody>
             </table>
         </div>

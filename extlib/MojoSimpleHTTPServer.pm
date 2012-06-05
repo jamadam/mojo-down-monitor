@@ -1,3 +1,16 @@
+package MSHS;
+use strict;
+use warnings;
+
+    our $CONTEXT;
+    
+    ### --
+    ### Accessor for localized context
+    ### --
+    sub context {
+        return $_[1] ? $CONTEXT = $_[1] : $CONTEXT;
+    }
+
 package MojoSimpleHTTPServer;
 use strict;
 use warnings;
@@ -18,9 +31,7 @@ use MojoSimpleHTTPServer::SSIHandler::EPL;
 use MojoSimpleHTTPServer::Stash;
 use MojoSimpleHTTPServer::ErrorDocument;
 
-    our $VERSION = '0.04';
-    
-    our $CONTEXT;
+    our $VERSION = '0.05';
 
     __PACKAGE__->attr('document_root');
     __PACKAGE__->attr('default_file');
@@ -45,15 +56,15 @@ use MojoSimpleHTTPServer::ErrorDocument;
         ### hook points
         $self->hook(around_dispatch => sub {
             shift;
-            $CONTEXT->app->dispatch;
+            $MSHS::CONTEXT->app->dispatch;
         });
         $self->hook(around_static => sub {
             shift;
-            $CONTEXT->app->serve_static(@_);
+            $MSHS::CONTEXT->app->serve_static(@_);
         });
         $self->hook(around_dynamic => sub {
             shift;
-            $CONTEXT->app->serve_dynamic(@_);
+            $MSHS::CONTEXT->app->serve_dynamic(@_);
         });
         
         $self->add_handler(ep => MojoSimpleHTTPServer::SSIHandler::EP->new);
@@ -75,10 +86,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
     ### Accessor for localized context
     ### --
     sub context {
-        if ($_[1]) {
-            $CONTEXT = $_[1];
-        }
-        $CONTEXT;
+        MSHS::context(@_);
     }
     
     ### --
@@ -87,7 +95,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
     sub dispatch {
         my ($self) = @_;
         
-        my $tx = $CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         my $res = $tx->res;
         my $path = $tx->req->url->path->clone->canonicalize;
         
@@ -97,7 +105,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
         
         if (! $res->code) {
             if ($tx->req->url =~ /$self->{_handler_re}/) {
-                $self->error_document->render(403);
+                $self->error_document->serve(403);
                 return;
             }
         }
@@ -112,7 +120,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
                                     $root, File::Spec->splitpath($filled_path));
                 if (-f $path) {
                     $self->hooks->emit_chain('around_static', $path);
-                } else {
+                } elsif (my $path = $self->search_template($path)) {
                     $self->hooks->emit_chain('around_dynamic', $path);
                 }
                 if ($res->code) {
@@ -136,7 +144,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
     sub handler {
         my ($self, $tx) = @_;
         
-        local $CONTEXT =
+        local $MSHS::CONTEXT =
                     MojoSimpleHTTPServer::Context->new(app => $self, tx => $tx);
         
         $self->_init;
@@ -149,11 +157,11 @@ use MojoSimpleHTTPServer::ErrorDocument;
         
         if ($@) {
             $self->log->fatal("Processing request failed: $@");
-            $self->error_document->render(500, $@);
+            $self->error_document->serve(500, $@);
         }
         
         if (! $tx->res->code) {
-            $self->error_document->render(404);
+            $self->error_document->serve(404);
             $self->log->fatal($tx->req->url->path. qq{ Not found});
         }
         
@@ -217,7 +225,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
         my ($self, $path) = @_;
         
         my $uri =
-            $CONTEXT->tx->req->url->clone->path(
+            $MSHS::CONTEXT->tx->req->url->clone->path(
                                     $path->clone->trailing_slash(1))->to_abs;
         return $self->serve_redirect($uri);
     }
@@ -228,7 +236,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
     sub serve_redirect {
         my ($self, $uri) = @_;
         
-        my $tx = $CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         $tx->res->code(301);
         $tx->res->headers->location(_to_abs($self, $uri)->to_string);
         return $self;
@@ -243,7 +251,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
         my $asset = Mojo::Asset::File->new(path => $path);
         my $modified = (stat $path)[9];
         
-        my $tx = $CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         
         # If modified since
         my $req_headers = $tx->req->headers;
@@ -269,24 +277,35 @@ use MojoSimpleHTTPServer::ErrorDocument;
     }
     
     ### --
-    ### serve dynamic content
+    ### search template
     ### --
-    sub serve_dynamic {
+    sub search_template {
         my ($self, $path) = @_;
-        my $tx = $CONTEXT->tx;
+        
+        my $tx = $MSHS::CONTEXT->tx;
         
         for my $ext (keys %{$self->ssi_handlers}) {
             my $path = "$path.$ext";
             if (-f $path) {
-                my $ret = $self->render_ssi($path, $ext);
-                if (defined $ret) {
-                    $tx->res->body(encode('UTF-8', $ret));
-                    $tx->res->code(200);
-                    if (my $type = $self->path_to_type($path)) {
-                        $tx->res->headers->content_type($type);
-                    }
-                    last;
-                }
+                return $path;
+            }
+        }
+    }
+    
+    ### --
+    ### serve dynamic content
+    ### --
+    sub serve_dynamic {
+        my ($self, $path) = @_;
+        
+        my $ret = $self->render_ssi($path);
+        
+        if (defined $ret) {
+            my $tx = $MSHS::CONTEXT->tx;
+            $tx->res->body(encode('UTF-8', $ret));
+            $tx->res->code(200);
+            if (my $type = $self->path_to_type($path)) {
+                $tx->res->headers->content_type($type);
             }
         }
         
@@ -359,7 +378,7 @@ use MojoSimpleHTTPServer::ErrorDocument;
         $url = Mojo::URL->new($url);
         
         if (! $url->scheme) {
-            my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+            my $tx = $MSHS::CONTEXT->tx;
             my $base = $tx->req->url->clone;
             $base->path($url->path);
             $url = $base;

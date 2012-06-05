@@ -21,8 +21,8 @@
                     </tr>
                 </thead>
                 <tbody>
-					<% my @a = $sites->fetch(fields => ['id', 'Site name', 'URI', 'Interval']); %>
-					<% for my $rec (@a) { %>
+					<%= iter $sites->fetch(fields => ['id', 'Site name', 'URI', 'Interval']) => begin %>
+						<% my $rec = shift; %>
 						<tr class="goDetail">
 							<td><a href="/site_edit.html?a=<%= $rec->value('id') %>"><%= $rec->value('id') %></a></td>
 							<td><%= $rec->value('Site name') %></td>
@@ -39,7 +39,7 @@
 								</form>
 							</td>
 						</tr>
-					<% } %>
+					<% end %>
                 </tbody>
             </table>
         </div>

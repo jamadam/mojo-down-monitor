@@ -49,7 +49,7 @@ EOF
     
     sub validate_form {
         my ($self) = @_;
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         my $params = $tx->req->body_params;
         my $cid_data = $self->cid_table;
         my $mode = $params->param('mode');
@@ -68,7 +68,7 @@ EOF
     
     sub delete {
         my ($self, $where_seed) = @_;
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         $where_seed ||= $tx->req->param('where');
         my $where_hash =
             ref $where_seed ? $where_seed : $json_parser->decode($where_seed);

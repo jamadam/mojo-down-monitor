@@ -47,7 +47,7 @@ our $VERSION = '0.09';
     $app->stash->set('smtp'    => $mdm_smtp);
     
     $app->ssi_handlers->{ep}->add_function(is_pjax => sub {
-        return $MojoSimpleHTTPServer::CONTEXT->tx->req->headers->header('X-PJAX');
+        return $MSHS::CONTEXT->tx->req->headers->header('X-PJAX');
     });
     
     $app->plugin(Router => sub {
@@ -55,7 +55,7 @@ our $VERSION = '0.09';
         my $r = shift;
         
         $r->route(qr{^/index\.html})->via('post')->to(sub {
-            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my $c = $MSHS::CONTEXT;
             $mdm_sites->post();
             my $id = $json_parser->decode($c->param('where'))->{id};
             _delete_cron($id);
@@ -63,7 +63,7 @@ our $VERSION = '0.09';
         });
         
         $r->route(qr{^/site_new\.html})->via('post')->to(sub {
-            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my $c = $MSHS::CONTEXT;
             $mdm_sites->post();
             my $id = $c->app->mdm_sites->last_insert_rowid;
             _delete_cron($id);
@@ -71,7 +71,7 @@ our $VERSION = '0.09';
         });
         
         $r->route(qr{^/site_test\.html})->via('post')->to(sub {
-            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my $c = $MSHS::CONTEXT;
             my %data = $mdm_sites->generate_dataset_hash_seed();
             eval {
                 my $check_res = check(\%data);
@@ -89,7 +89,7 @@ our $VERSION = '0.09';
         });
         
         $r->route(qr{/site_edit\.html})->via('post')->to(sub {
-            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my $c = $MSHS::CONTEXT;
             $mdm_sites->post();
             my $id = $json_parser->decode($c->tx->req->param('where'))->{id};
             _delete_cron($id);
@@ -97,7 +97,7 @@ our $VERSION = '0.09';
         });
         
         $r->route(qr{/smtp_edit\.html})->via('post')->to(sub {
-            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my $c = $MSHS::CONTEXT;
             $mdm_smtp->post();
         });
     });

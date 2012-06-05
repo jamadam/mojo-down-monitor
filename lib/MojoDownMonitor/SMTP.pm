@@ -46,7 +46,7 @@ EOF
     
     sub validate_form {
         my ($self) = @_;
-        my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+        my $tx = $MSHS::CONTEXT->tx;
         my $params = $tx->req->body_params;
         my $cid_data = $self->cid_table;
         my $mode = $params->param('mode');

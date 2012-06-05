@@ -41,7 +41,7 @@ use Mojo::ByteStream;
                 }
             }
         
-            my $context = $MojoSimpleHTTPServer::CONTEXT;
+            my $context = $MSHS::CONTEXT;
             
             $prepend .= 'use strict;';
             for my $var (keys %{$context->stash}) {
@@ -65,17 +65,17 @@ use Mojo::ByteStream;
         
         $self->funcs->{app} = sub {
             shift;
-            return $MojoSimpleHTTPServer::CONTEXT->app;
+            return $MSHS::CONTEXT->app;
         };
         
         $self->funcs->{param} = sub {
             shift;
-            return $MojoSimpleHTTPServer::CONTEXT->tx->req->param($_[0]);
+            return $MSHS::CONTEXT->tx->req->param($_[0]);
         };
         
         $self->funcs->{stash} = sub {
             shift;
-            my $stash = $MojoSimpleHTTPServer::CONTEXT->stash;
+            my $stash = $MSHS::CONTEXT->stash;
             if ($_[0] && $_[1]) {
                 return $stash->set(@_);
             } elsif (! $_[0]) {
@@ -101,17 +101,31 @@ use Mojo::ByteStream;
         $self->funcs->{include} = sub {
             my ($self, $path, @args) = @_;
             
-            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my $c = $MSHS::CONTEXT;
             local $c->{stash} = $c->{stash}->clone;
             $c->{stash}->set(@args);
             return
                 Mojo::ByteStream->new($c->app->render_ssi($self->_to_abs($path)));
         };
         
+        $self->funcs->{iter} = sub {
+            my $self    = shift;
+            my $block   = pop;
+            my @array = (scalar @_ > 1 || ref $_[0] ne 'ARRAY') ? @_ : @{$_[0]};
+            
+            my $ret = '';
+            
+            for my $elem (@array) {
+                $ret .= $block->($elem);
+            }
+            
+            return Mojo::ByteStream->new($ret);
+        };
+        
         $self->funcs->{override} = sub {
             my ($self, $name, $value) = @_;
             my $path = $self->current_template;
-            $MojoSimpleHTTPServer::CONTEXT->stash->set($name => sub {
+            $MSHS::CONTEXT->stash->set($name => sub {
                 return $self->render_traceable($path, $value);
             });
             return;
@@ -119,15 +133,14 @@ use Mojo::ByteStream;
         
         $self->funcs->{placeholder} = sub {
             my ($self, $name, $defalut) = @_;
-            my $block =
-                    $MojoSimpleHTTPServer::CONTEXT->stash->{$name} || $defalut;
+            my $block = $MSHS::CONTEXT->stash->{$name} || $defalut;
             return $block->() || '';
         };
         
         $self->funcs->{extends} = sub {
             my ($self, $path, $block) = @_;
             
-            my $c = $MojoSimpleHTTPServer::CONTEXT;
+            my $c = $MSHS::CONTEXT;
             
             local $c->{stash} = $c->{stash}->clone;
             
@@ -175,7 +188,7 @@ EP handler.
 
 Returns current template path.
 
-=head2 <% extends($path, block) %>
+=head2 <% extends($path, $block) %>
 
 Base template.
 
@@ -212,6 +225,15 @@ Extended template.
     <% end %>
 
 Extends template.
+
+=head2 <% iter @array => $block %>
+
+Array iterator with block.
+
+    <%= iter @array => begin %>
+        <% my $elem = shift; %>
+        <%= $elem %>
+    <% end %>
 
 =head2 <% include('./path/to/template.html.ep', key => value) %>
 

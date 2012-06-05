@@ -14,7 +14,7 @@ use Mojo::Util qw'encode';
     my $type = Mojolicious::Types->new->type('html');
     
     __PACKAGE__->attr('template', sub {
-        MojoSimpleHTTPServer::asset('error_document.ep');
+        MojoSimpleHTTPServer::asset('error_document.html.ep');
     });
     
     __PACKAGE__->attr('status_template' => sub {{}});
@@ -22,10 +22,12 @@ use Mojo::Util qw'encode';
     ### --
     ### Serve error document
     ### --
-    sub render {
+    sub serve {
         my ($self, $code, $message) = @_;
         
-        my $context     = $MojoSimpleHTTPServer::CONTEXT;
+        $message ||= $messages{$code};
+        
+        my $context     = $MSHS::CONTEXT;
         my $tx          = $context->tx;
         my $stash       = $context->stash;
         my $template    = ($self->status_template)->{$code} || $self->template;
@@ -40,17 +42,13 @@ use Mojo::Util qw'encode';
                 message     =>
                     ref $message ? $message : Mojo::Exception->new($message),
             );
-            $template = MojoSimpleHTTPServer::asset('debug_screen.ep');
+            $template = MojoSimpleHTTPServer::asset('debug_screen.html.ep');
         } else {
             $stash->set(
                 static_dir  => 'static',
                 code        => $code,
             );
-            if (ref $message) {
-                $stash->set(message => $messages{$code});
-            } else {
-                $stash->set(message => $message || $messages{$code});
-            }
+            $stash->set(message => ref $message ? $messages{$code} : $message);
         }
         
         $tx->res->code($code);

@@ -20,7 +20,7 @@ use Mojo::Base 'MojoSimpleHTTPServer::Plugin';
         $app->hook(around_dispatch => sub {
             my ($next, @args) = @_;
             
-            my $tx = $MojoSimpleHTTPServer::CONTEXT->tx;
+            my $tx = $MSHS::CONTEXT->tx;
             
             my @routes = @{$self->routes};
             
