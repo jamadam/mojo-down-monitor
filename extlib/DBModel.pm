@@ -83,7 +83,7 @@ EOF
 	}
 	
 	### ---
-	### loop
+	### fetch
 	### ---
     sub fetch {
         my $self = shift;
@@ -105,7 +105,8 @@ EOF
 			push(@ret, $rec);
         }
 		$sth->finish;
-        return @ret;
+        return @ret if wantarray;
+		return shift @ret;
     }
     
 	### ---
@@ -118,7 +119,9 @@ EOF
 			@_);
 		
 		my $table_structure = $self->get_table_structure;
-		return DBModel::Record->new(undef, $table_structure, $args{fields});
+		my $ret = DBModel::Record->new(undef, $table_structure, $args{fields});
+        return ($ret) if wantarray;
+		return $ret;
     }
 	
 	### ---
