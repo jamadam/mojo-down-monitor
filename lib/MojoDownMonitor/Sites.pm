@@ -69,10 +69,11 @@ EOF
     sub delete {
         my ($self, $where_seed) = @_;
         my $tx = $MSHS::CONTEXT->tx;
+        my $app = $MSHS::CONTEXT->app;
         $where_seed ||= $tx->req->param('where');
         my $where_hash =
             ref $where_seed ? $where_seed : $json_parser->decode($where_seed);
-        $self->controller->app->mdm_log->delete({'Site id' => $where_hash->{id}});
+        $app->stash->{log}->delete({'Site id' => $where_hash->{id}});
         $self->SUPER::delete($where_seed);
     }
 

@@ -57,7 +57,7 @@ our $VERSION = '0.09';
         $r->route(qr{^/index\.html})->via('post')->to(sub {
             my $c = $MSHS::CONTEXT;
             $mdm_sites->post();
-            my $id = $json_parser->decode($c->param('where'))->{id};
+            my $id = $json_parser->decode($c->tx->req->param('where'))->{id};
             _delete_cron($id);
             _set_cron($id);
         });
@@ -65,7 +65,7 @@ our $VERSION = '0.09';
         $r->route(qr{^/site_new\.html})->via('post')->to(sub {
             my $c = $MSHS::CONTEXT;
             $mdm_sites->post();
-            my $id = $c->app->mdm_sites->last_insert_rowid;
+            my $id = $mdm_sites->last_insert_rowid;
             _delete_cron($id);
             _set_cron($id);
         });

@@ -91,6 +91,18 @@ use Data::Dumper;
         return;
     }
     
+	sub generate_where {
+        my ($self, $where_seed) = @_;
+		
+		if (ref $where_seed eq 'HASH') {
+	        return SQL::OOP::Where->and_hash($where_seed);
+		} elsif (ref $where_seed) {
+	        return $where_seed;
+		} else {
+	        return SQL::OOP::Where->and_hash($json_parser->decode($where_seed));
+		}
+	}
+    
     sub create {
         my ($self, $data) = @_;
         $self->SUPER::create($data || $self->generate_dataset);
@@ -99,20 +111,15 @@ use Data::Dumper;
     sub update {
         my ($self, $data, $where_seed) = @_;
         my $tx = $MSHS::CONTEXT->tx;
-        my $where_hash =
-            $json_parser->decode($where_seed || $tx->req->param('where'));
-        my $where = SQL::OOP::Where->and_hash($where_hash);
-        $self->SUPER::update($data || $self->generate_dataset, $where);
+		my $where = $self->generate_where($where_seed || $tx->req->param('where'));
+		$self->SUPER::delete($where);
     }
     
     sub delete {
         my ($self, $where_seed) = @_;
         my $tx = $MSHS::CONTEXT->tx;
-        $where_seed ||= $tx->req->param('where');
-        my $where_hash =
-            ref $where_seed ? $where_seed : $json_parser->decode($where_seed);
-        my $where = SQL::OOP::Where->and_hash($where_hash);
-        $self->SUPER::delete($where);
+		my $where = $self->generate_where($where_seed || $tx->req->param('where'));
+		$self->SUPER::delete($where);
     }
 	
 	### ---
