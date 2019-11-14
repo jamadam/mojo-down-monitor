@@ -8,11 +8,11 @@ This is a web monitoring tool to detect your sites down.
 MojoDownMonitor gets multiple URIs in regular basis and checks if the response
 fulfills given conditions. 
 
-![Site list](/jamadam/mojo-down-monitor/raw/master/screenshot/01.png "Site list")
+![Site list](screenshot/01.png)
 
-![Site edit](/jamadam/mojo-down-monitor/raw/master/screenshot/02.png "Site edit")
+![Site edit](screenshot/02.png)
 
-![Site log](/jamadam/mojo-down-monitor/raw/master/screenshot/03.png "Site log")
+![Site log](screenshot/03.png)
 
 ## INSTALLATION
 
@@ -30,12 +30,9 @@ To install this module, run the following commands:
 
     $ hypnotoad ./mojo-down-monitor --stop
 
-Copyright (c) 2011 [jamadam]
-[jamadam]: http://blog2.jamadam.com/
+Copyright (c) 2011 [jamadam](http://blog2.jamadam.com)
 
 Dual licensed under the MIT and GPL licenses:
 
-- [http://www.opensource.org/licenses/mit-license.php]
-- [http://www.gnu.org/licenses/gpl.html]
-[http://www.opensource.org/licenses/mit-license.php]: http://www.opensource.org/licenses/mit-license.php
-[http://www.gnu.org/licenses/gpl.html]:http://www.gnu.org/licenses/gpl.html
+- [MIT Licence](http://www.opensource.org/licenses/mit-license.php)
+- [GPL v1](http://www.gnu.org/licenses/gpl.html)
